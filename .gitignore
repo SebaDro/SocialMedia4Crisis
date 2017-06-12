@@ -14,3 +14,5 @@
 .classpath
 .project
 .settings/
+/SocialMedia4Crisis/sm4c-monitoring/target/
+/SocialMedia4Crisis/sm4c-collector/target/

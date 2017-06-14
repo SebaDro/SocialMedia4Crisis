@@ -14,11 +14,4 @@
     <mvc:annotation-driven />
     <ctx:annotation-config />
     
-<!--     static resources 
-    <mvc:resources mapping="/ui/**" location="/ui/"/>-->
-  
-    
-<!--    <import resource="security.xml" />
-        <import resource="security-permitAll.xml" />-->
-    
 </beans>

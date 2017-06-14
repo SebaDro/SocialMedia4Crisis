@@ -10,9 +10,12 @@
 /webapp/src/main/resources/config.json
 /core/src/test/resources/test-config.json
 
+*.properties
+*/nb-configuration.xml
+
 # Eclipse
 .classpath
 .project
 .settings/
-/SocialMedia4Crisis/sm4c-monitoring/target/
-/SocialMedia4Crisis/sm4c-collector/target/
+/sm4c-monitoring/target/
+/sm4c-collector/target/

@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>collector</artifactId>
+            <artifactId>sm4c-rest</artifactId>
         </dependency>
         <dependency>
             <groupId>com.thetransactioncompany</groupId>

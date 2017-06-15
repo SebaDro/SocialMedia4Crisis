@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.collector.rest;
+package de.hsbo.fbg.sm4c.rest;
 
 import facebook4j.Facebook;
 import facebook4j.FacebookException;

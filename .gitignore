@@ -1,5 +1,5 @@
 /webapp/target/
-/target/
+*/target/*
 /core/target/
 /rest/target/
 /webapp/logs/
@@ -11,11 +11,9 @@
 /core/src/test/resources/test-config.json
 
 *.properties
-*/nb-configuration.xml
+nb-configuration.xml
 
 # Eclipse
 .classpath
 .project
 .settings/
-/sm4c-monitoring/target/
-/sm4c-collector/target/

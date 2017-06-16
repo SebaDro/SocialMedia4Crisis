@@ -22,7 +22,7 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sm4c-collector</artifactId>
+                <artifactId>sm4c-mining</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -32,7 +32,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sm4c-mining</artifactId>
+                <artifactId>sm4c-monitoring</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

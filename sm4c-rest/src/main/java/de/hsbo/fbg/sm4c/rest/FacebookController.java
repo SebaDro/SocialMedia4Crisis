@@ -7,6 +7,7 @@ package de.hsbo.fbg.sm4c.rest;
 
 import de.hsbo.fbg.sm4c.mining.FacebookCollector;
 import facebook4j.Group;
+import facebook4j.Page;
 import java.util.List;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,6 +32,12 @@ public class FacebookController implements InitializingBean {
         return groups;
     }
 
+    @RequestMapping(value = "/pages/{keywords}", method = RequestMethod.GET)
+    public String getPages(@PathVariable("keywords") String keywords) {
+        String pages = facebookCollector.getPagesAsJSON(keywords);
+        return pages;
+    }
+
     @RequestMapping(value = "/groups/{keywords}/posts/startTime/{startTime}/endTime/{endTime}",
             method = RequestMethod.GET)
     public String getPostsFromGroups(@PathVariable("keywords") String keywords,
@@ -38,6 +45,18 @@ public class FacebookController implements InitializingBean {
             @PathVariable("endTime") String endTime) {
         List<Group> groups = facebookCollector.getGroups(keywords);
         String posts = facebookCollector.getPostsFromGroupsAsJSON(groups,
+                new DateTime(startTime).toDate(),
+                new DateTime(endTime).toDate());
+        return posts;
+    }
+
+    @RequestMapping(value = "/pages/{keywords}/posts/startTime/{startTime}/endTime/{endTime}",
+            method = RequestMethod.GET)
+    public String getPostsFromPages(@PathVariable("keywords") String keywords,
+            @PathVariable("startTime") String startTime,
+            @PathVariable("endTime") String endTime) {
+        List<Page> pages = facebookCollector.getPages(keywords);
+        String posts = facebookCollector.getPostsFromPagesAsJSON(pages,
                 new DateTime(startTime).toDate(),
                 new DateTime(endTime).toDate());
         return posts;

@@ -15,6 +15,7 @@ import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.Group;
 import facebook4j.GroupPrivacyType;
+import facebook4j.Page;
 import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
@@ -33,7 +34,9 @@ import java.util.stream.Collectors;
  */
 public class FacebookCollector {
 
-    private final int LIMIT = 10;
+    private final int GROUP_LIMIT = 1000;
+    private final int PAGE_LIMIT = 10;
+    private final int POST_LIMIT = 10;
     private final Facebook facebook;
     private final Gson gson;
 
@@ -45,15 +48,15 @@ public class FacebookCollector {
     /**
      * Search for facebook groups whose names contain the specified keyords.
      *
-     * @param keywords keyword to search for
-     * @return List of facebook groupse
+     * @param keywords keywords to search for
+     * @return List of facebook groups
      */
     public List<Group> getGroups(String keywords) {
         List result = new ArrayList();
         try {
             ResponseList<Group> groups = facebook.searchGroups(keywords, new Reading()
-                    .limit(LIMIT)
-                    .fields("id", "description", "email", "name", "privacy", "updated_time"));
+                    .limit(GROUP_LIMIT)
+                    .fields("id", "description", "email", "name", "privacy", "updated_time", "city"));
             groups.removeIf(g -> g.getPrivacy() == GroupPrivacyType.CLOSED);
             result = groups.stream().collect(Collectors.toList());
         } catch (FacebookException ex) {
@@ -62,9 +65,48 @@ public class FacebookCollector {
         return result;
     }
 
+    /**
+     * Search for facebook groups whose names contain the specified keyords and
+     * encodes the result to JSON.
+     *
+     * @param keywords keywords to search for
+     * @return List of facebook groups as JSON
+     */
     public String getGroupsAsJSON(String keywords) {
         List<Group> groups = getGroups(keywords);
         String groupsJSON = gson.toJson(groups);
+        return groupsJSON;
+    }
+
+    /**
+     * Search for facebook pages whose names contain the specified keyords.
+     *
+     * @param keywords keywords to search for
+     * @return List of facebook pages
+     */
+    public List<Page> getPages(String keywords) {
+        List result = new ArrayList();
+        try {
+            ResponseList<Page> pages = facebook.searchPages(keywords, new Reading()
+                    .limit(PAGE_LIMIT)
+                    .fields("id", "description", "emails", "about", "category", "location", "name"));
+            result = pages.stream().collect(Collectors.toList());
+        } catch (FacebookException ex) {
+            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    /**
+     * Search for facebook pages whose names contain the specified keyords and
+     * encodes the result to JSON.
+     *
+     * @param keywords keywords to search for
+     * @return List of facebook groups as JSON
+     */
+    public String getPagesAsJSON(String keywords) {
+        List<Page> pages = getPages(keywords);
+        String groupsJSON = gson.toJson(pages);
         return groupsJSON;
     }
 
@@ -81,7 +123,7 @@ public class FacebookCollector {
         List result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
-                    .limit(LIMIT)
+                    .limit(POST_LIMIT)
                     .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());
@@ -139,6 +181,84 @@ public class FacebookCollector {
         });
         String result = "";
         root.set("groups", groupArray);
+        try {
+            result = mapper.writeValueAsString(root);
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    /**
+     * Fecthes posts from the specified page for a specified time period.
+     *
+     * @param page Facebook page
+     * @param startDate start date of the time period
+     * @param endDate end date of the time period
+     * @return List of posts from the facebook page
+     */
+    public List<Post> getPostsFromPage(Page page, Date startDate, Date endDate) {
+        List result = new ArrayList();
+        try {
+            ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
+                    .limit(POST_LIMIT)
+                    .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .since(startDate).until(endDate));
+            result = feeds.stream().collect(Collectors.toList());
+        } catch (FacebookException ex) {
+            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+
+    /**
+     * Fecthes posts from the specified list of pages for a specified time
+     * period.
+     *
+     * @param pages Facebook pages
+     * @param startDate start date of the time period
+     * @param endDate end date of the time period
+     * @return List of posts from facebook pages
+     */
+    public List<Post> getPostsFromPages(List<Page> pages, Date startDate, Date endDate) {
+        List<List<Post>> resultList = new ArrayList();
+        pages.forEach(p -> {
+            List<Post> posts = getPostsFromPage(p, startDate, endDate);
+            resultList.add(posts);
+        });
+        return resultList.stream()
+                .flatMap(p -> p.stream()).collect(Collectors.toList());
+    }
+
+    /**
+     * Fetches posts from the specified list of pages for a specified time
+     * period and encode it to JSON.
+     *
+     * @param groups Facebook pages
+     * @param startDate start date of the time period
+     * @param endDate end date of the time period
+     * @return posts from facebook pages as JSON
+     */
+    public String getPostsFromPagesAsJSON(List<Page> pages, Date startDate, Date endDate) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode root = mapper.createObjectNode();
+        ArrayNode pageArray = mapper.createArrayNode();
+        pages.forEach(p -> {
+            try {
+                List<Post> posts = getPostsFromPage(p, startDate, endDate);
+                ObjectNode pageObject = mapper.createObjectNode();
+                String groupJsonString = gson.toJson(posts);
+                pageObject.put("pageId", p.getId());
+                pageObject.put("pageName", p.getName());
+                ArrayNode postArray = (ArrayNode) mapper.readTree(groupJsonString);
+                pageObject.set("posts", postArray);
+                pageArray.add(pageObject);
+            } catch (IOException ex) {
+                Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+        String result = "";
+        root.set("pages", pageArray);
         try {
             result = mapper.writeValueAsString(root);
         } catch (JsonProcessingException ex) {

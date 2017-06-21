@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
+import de.hsbo.fbg.sm4c.mining.encode.FacebookCSVEncoder;
+import de.hsbo.fbg.sm4c.mining.encode.FacebookJSONEncoder;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -34,15 +36,19 @@ import java.util.stream.Collectors;
  */
 public class FacebookCollector {
 
-    private final int GROUP_LIMIT = 1000;
+    private final int GROUP_LIMIT = 10;
     private final int PAGE_LIMIT = 10;
     private final int POST_LIMIT = 10;
     private final Facebook facebook;
     private final Gson gson;
+    private final FacebookCSVEncoder fbCsvEncoder;
+    private final FacebookJSONEncoder fbJsonEncoder;
 
     public FacebookCollector() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
+        fbCsvEncoder = new FacebookCSVEncoder();
+        fbJsonEncoder = new FacebookJSONEncoder();
     }
 
     /**
@@ -76,6 +82,19 @@ public class FacebookCollector {
         List<Group> groups = getGroups(keywords);
         String groupsJSON = gson.toJson(groups);
         return groupsJSON;
+    }
+
+    /**
+     * Search for facebook groups whose names contain the specified keyords and
+     * encodes the result to CSV.
+     *
+     * @param keywords keywords to search for
+     * @return List of facebook groups as JSON
+     */
+    public String getGroupsAsCSV(String keywords) {
+        List<Group> groups = getGroups(keywords);
+        String groupsCsv = fbCsvEncoder.createGroupCSV(groups);
+        return groupsCsv;
     }
 
     /**
@@ -119,7 +138,7 @@ public class FacebookCollector {
      * @param endDate end date of the time period
      * @return
      */
-    public List<Post> getPostsFromGroup(Group group, Date startDate, Date endDate) {
+    public List<Post> getPostsFromSingleGroup(Group group, Date startDate, Date endDate) {
         List result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
@@ -143,13 +162,12 @@ public class FacebookCollector {
      * @return List of posts from facebook groups
      */
     public List<Post> getPostsFromGroups(List<Group> groups, Date startDate, Date endDate) {
-        List<List<Post>> resultList = new ArrayList();
+        List<Post> resultList = new ArrayList();
         groups.forEach(g -> {
-            List<Post> posts = getPostsFromGroup(g, startDate, endDate);
-            resultList.add(posts);
+            List<Post> posts = getPostsFromSingleGroup(g, startDate, endDate);
+            resultList.addAll(posts);
         });
-        return resultList.stream()
-                .flatMap(p -> p.stream()).collect(Collectors.toList());
+        return resultList;
     }
 
     /**
@@ -163,26 +181,14 @@ public class FacebookCollector {
      */
     public String getPostsFromGroupsAsJSON(List<Group> groups, Date startDate, Date endDate) {
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
-        ArrayNode groupArray = mapper.createArrayNode();
+        ArrayNode postArray = mapper.createArrayNode();
         groups.forEach(g -> {
-            try {
-                List<Post> posts = getPostsFromGroup(g, startDate, endDate);
-                ObjectNode groupObject = mapper.createObjectNode();
-                String groupJsonString = gson.toJson(posts);
-                groupObject.put("groupId", g.getId());
-                groupObject.put("groupName", g.getName());
-                ArrayNode postArray = (ArrayNode) mapper.readTree(groupJsonString);
-                groupObject.set("posts", postArray);
-                groupArray.add(groupObject);
-            } catch (IOException ex) {
-                Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            List<Post> posts = getPostsFromSingleGroup(g, startDate, endDate);
+            postArray.addAll(fbJsonEncoder.createPostArrayNode(posts, g));
         });
         String result = "";
-        root.set("groups", groupArray);
         try {
-            result = mapper.writeValueAsString(root);
+            result = mapper.writeValueAsString(postArray);
         } catch (JsonProcessingException ex) {
             Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -197,7 +203,7 @@ public class FacebookCollector {
      * @param endDate end date of the time period
      * @return List of posts from the facebook page
      */
-    public List<Post> getPostsFromPage(Page page, Date startDate, Date endDate) {
+    public List<Post> getPostsFromSinglePage(Page page, Date startDate, Date endDate) {
         List result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
@@ -223,7 +229,7 @@ public class FacebookCollector {
     public List<Post> getPostsFromPages(List<Page> pages, Date startDate, Date endDate) {
         List<List<Post>> resultList = new ArrayList();
         pages.forEach(p -> {
-            List<Post> posts = getPostsFromPage(p, startDate, endDate);
+            List<Post> posts = getPostsFromSinglePage(p, startDate, endDate);
             resultList.add(posts);
         });
         return resultList.stream()
@@ -241,26 +247,14 @@ public class FacebookCollector {
      */
     public String getPostsFromPagesAsJSON(List<Page> pages, Date startDate, Date endDate) {
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
-        ArrayNode pageArray = mapper.createArrayNode();
+        ArrayNode postArray = mapper.createArrayNode();
         pages.forEach(p -> {
-            try {
-                List<Post> posts = getPostsFromPage(p, startDate, endDate);
-                ObjectNode pageObject = mapper.createObjectNode();
-                String groupJsonString = gson.toJson(posts);
-                pageObject.put("pageId", p.getId());
-                pageObject.put("pageName", p.getName());
-                ArrayNode postArray = (ArrayNode) mapper.readTree(groupJsonString);
-                pageObject.set("posts", postArray);
-                pageArray.add(pageObject);
-            } catch (IOException ex) {
-                Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            List<Post> posts = getPostsFromSinglePage(p, startDate, endDate);
+            postArray.addAll(fbJsonEncoder.createPostArrayNode(posts, p));
         });
         String result = "";
-        root.set("pages", pageArray);
         try {
-            result = mapper.writeValueAsString(root);
+            result = mapper.writeValueAsString(postArray);
         } catch (JsonProcessingException ex) {
             Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
         }

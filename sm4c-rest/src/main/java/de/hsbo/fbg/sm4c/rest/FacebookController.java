@@ -26,9 +26,15 @@ public class FacebookController implements InitializingBean {
 
     private FacebookCollector facebookCollector;
 
-    @RequestMapping(value = "/groups/{keywords}", method = RequestMethod.GET)
-    public String getGroups(@PathVariable("keywords") String keywords) {
+    @RequestMapping(value = "/groups/{keywords}/json", method = RequestMethod.GET)
+    public String getGroupsAsJSON(@PathVariable("keywords") String keywords) {
         String groups = facebookCollector.getGroupsAsJSON(keywords);
+        return groups;
+    }
+
+    @RequestMapping(produces = {"text/csv"},value = "/groups/{keywords}/csv", method = RequestMethod.GET)
+    public String getGroupsAsCSV(@PathVariable("keywords") String keywords) {
+        String groups = facebookCollector.getGroupsAsCSV(keywords);
         return groups;
     }
 

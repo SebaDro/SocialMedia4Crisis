@@ -9,8 +9,8 @@ package de.hsbo.fbg.sm4c.mining.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -18,6 +18,8 @@ import java.util.logging.Logger;
  */
 public class Configuration {
 
+    private static final Logger LOGGER = LogManager.getLogger(Configuration.class);
+    
     private final String CONFIG_FILE="config.properties";
     private Properties properties;
     
@@ -29,7 +31,7 @@ public class Configuration {
             InputStream stream = this.getClass().getResourceAsStream("/"+CONFIG_FILE);
             properties.load(stream);
         } catch (IOException ex) {
-            Logger.getLogger(Configuration.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Configuration file could not be found",ex.getMessage());
         }
     }
     

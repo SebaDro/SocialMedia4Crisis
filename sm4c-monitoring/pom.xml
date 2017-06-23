@@ -74,6 +74,14 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -203,7 +211,7 @@
                             <scanTargets>
                                 <scanTarget>target/classes</scanTarget>
                                 <scanTarget>../sm4c-rest/target/classes</scanTarget>
-                                 <scanTarget>../sm4c-mining/target/classes</scanTarget>
+                                <scanTarget>../sm4c-mining/target/classes</scanTarget>
                             </scanTargets>
                             <httpConnector>
                                 <port>8080</port>

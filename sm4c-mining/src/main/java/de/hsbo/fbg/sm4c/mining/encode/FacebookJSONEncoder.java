@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.mining.encode;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,12 +16,12 @@ import facebook4j.Page;
 import facebook4j.Post;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  *
@@ -28,8 +29,10 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class FacebookJSONEncoder {
 
+    private static final Logger LOGGER = LogManager.getLogger(FacebookJSONEncoder.class);
+
     private Gson gson;
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     public FacebookJSONEncoder() {
         gson = new Gson();
@@ -41,8 +44,24 @@ public class FacebookJSONEncoder {
         ObjectNode postNode = createPostNode(post, group);
         try {
             result = mapper.writeValueAsString(postNode);
-        } catch (IOException ex) {
-            Logger.getLogger(FacebookJSONEncoder.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Could not encode post", ex);
+        }
+        return result;
+    }
+
+    public String encodePostArray(List<Post> posts, Object source) {
+        ObjectNode root = mapper.createObjectNode();
+        ArrayNode postArray = mapper.createArrayNode();
+        posts.forEach(p -> {
+            ObjectNode node = createPostNode(p, source);
+            postArray.add(node);
+        });
+        String result = "";
+        try {
+            result = mapper.writeValueAsString(postArray);
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Could not encode post", ex);
         }
         return result;
     }
@@ -78,7 +97,7 @@ public class FacebookJSONEncoder {
             root.put("label", "");
             root.set("fb_post", fbPostNode);
         } catch (IOException ex) {
-            Logger.getLogger(FacebookJSONEncoder.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Could not parse JSON post", ex);
         }
         return root;
     }

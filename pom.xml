@@ -10,7 +10,7 @@
         <module>sm4c-monitoring</module>
         <module>sm4c-rest</module>
         <module>sm4c-mining</module>
-        <module>sm4c-classifier</module>
+        <module>sm4c-classify</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,6 +35,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sm4c-monitoring</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sm4c-classify</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

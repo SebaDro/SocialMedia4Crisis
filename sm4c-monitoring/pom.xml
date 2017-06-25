@@ -21,6 +21,14 @@
             <artifactId>sm4c-rest</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sm4c-mining</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sm4c-classify</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.thetransactioncompany</groupId>
             <artifactId>cors-filter</artifactId>
         </dependency>
@@ -206,12 +214,13 @@
                             <webAppSourceDirectory>${jetty.docroot}</webAppSourceDirectory>
                             <webAppConfig>
                                 <contextPath>/${project.build.finalName}</contextPath>
-                                <extraClasspath>target/classes;../sm4c-rest/target/classes;../sm4c-mining/target/classes</extraClasspath>
+                                <extraClasspath>target/classes;../sm4c-rest/target/classes;../sm4c-mining/target/classes;../sm4c-classify/target/classes</extraClasspath>
                             </webAppConfig>
                             <scanTargets>
                                 <scanTarget>target/classes</scanTarget>
                                 <scanTarget>../sm4c-rest/target/classes</scanTarget>
                                 <scanTarget>../sm4c-mining/target/classes</scanTarget>
+                                <scanTarget>../sm4c-classify/target/classes</scanTarget>
                             </scanTargets>
                             <httpConnector>
                                 <port>8080</port>

@@ -17,6 +17,7 @@
 
     <mvc:annotation-driven/>
     
-    <bean class="de.hsbo.fbg.sm4c.rest.FacebookController" />
+    <bean class="de.hsbo.fbg.sm4c.rest.control.FacebookController" />
+    <bean class="de.hsbo.fbg.sm4c.rest.control.SimulationController" />
   
 </beans>

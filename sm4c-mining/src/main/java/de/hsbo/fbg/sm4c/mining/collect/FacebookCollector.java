@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.mining;
+package de.hsbo.fbg.sm4c.mining.collect;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import de.hsbo.fbg.sm4c.mining.encode.FacebookCSVEncoder;
 import de.hsbo.fbg.sm4c.mining.encode.FacebookJSONEncoder;
@@ -21,13 +20,13 @@ import facebook4j.Page;
 import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Collector class for fetching different content from the Facebook Graph API
@@ -35,15 +34,18 @@ import java.util.stream.Collectors;
  * @author Sebastian Drost
  */
 public class FacebookCollector {
-
+    
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
+    
     private final int GROUP_LIMIT = 10;
     private final int PAGE_LIMIT = 10;
-    private final int POST_LIMIT = 10;
+    private final int POST_LIMIT = 100;
     private final Facebook facebook;
     private final Gson gson;
+    
     private final FacebookCSVEncoder fbCsvEncoder;
-    private final FacebookJSONEncoder fbJsonEncoder;
-
+    private FacebookJSONEncoder fbJsonEncoder;
+    
     public FacebookCollector() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
@@ -65,8 +67,9 @@ public class FacebookCollector {
                     .fields("id", "description", "email", "name", "privacy", "updated_time", "city"));
             groups.removeIf(g -> g.getPrivacy() == GroupPrivacyType.CLOSED);
             result = groups.stream().collect(Collectors.toList());
+            LOGGER.info("Retrieved groups for keywords [" + keywords + "]: " + groups.size());
         } catch (FacebookException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Could not search for groups", ex);
         }
         return result;
     }
@@ -110,8 +113,9 @@ public class FacebookCollector {
                     .limit(PAGE_LIMIT)
                     .fields("id", "description", "emails", "about", "category", "location", "name"));
             result = pages.stream().collect(Collectors.toList());
+            LOGGER.info("Retrieved pages for keywords [" + keywords + "]: " + pages.size());
         } catch (FacebookException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Could not search for pages", ex);
         }
         return result;
     }
@@ -146,8 +150,9 @@ public class FacebookCollector {
                     .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());
+            LOGGER.info("Retrieved posts from group [" + group.getId() + "]: " + feeds.size());
         } catch (FacebookException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Could not retrieve posts from group", ex);
         }
         return result;
     }
@@ -211,8 +216,9 @@ public class FacebookCollector {
                     .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());
+            LOGGER.info("Retrieved posts from page [" + page.getId() + "]: " + feeds.size());
         } catch (FacebookException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Could not retrieve posts", ex);
         }
         return result;
     }
@@ -260,5 +266,5 @@ public class FacebookCollector {
         }
         return result;
     }
-
+    
 }

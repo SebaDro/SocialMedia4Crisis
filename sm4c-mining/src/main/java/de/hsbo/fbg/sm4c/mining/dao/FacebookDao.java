@@ -9,11 +9,19 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Filters.eq;
 import de.hsbo.fbg.sm4c.mining.config.Configuration;
+import de.hsbo.fbg.sm4c.mining.encode.FacebookJSONEncoder;
+import facebook4j.Group;
+import facebook4j.Page;
+import facebook4j.Post;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -21,32 +29,36 @@ import org.bson.Document;
  */
 public class FacebookDao {
 
+    private static final Logger LOGGER = LogManager.getLogger(FacebookDao.class);
+
     private MongoClient mongoClient;
     private MongoDatabase database;
     private MongoCollection<Document> collection;
+    private FacebookJSONEncoder fbEncoder;
 
-    public FacebookDao() {
+    public FacebookDao(String collectionName) {
         mongoClient = new MongoClient(
                 Configuration.getConfig().getPropertyValue("db_host"),
                 Integer.parseInt(Configuration.getConfig().getPropertyValue("db_port")));
         database = mongoClient.getDatabase(
                 Configuration.getConfig().getPropertyValue("db_name"));
-        collection = database.getCollection(
-                Configuration.getConfig().getPropertyValue("db_fb_collection"));
+        collection = database.getCollection(collectionName);
+        fbEncoder = new FacebookJSONEncoder();
     }
 
-    public void storeFacebookPosts(List<String> postsJoson) {
-        List<Document> documents = postsJoson.stream()
-                .map(p -> Document.parse(p)).collect(Collectors.toList());
-        collection.insertMany(documents);
+    public void storeFaceBookPosts(List<Post> posts, Object source) {
+        List<Document> postDocs = posts.stream().map(p -> Document.parse(fbEncoder
+                .encodePost(p, source)))
+                .collect(Collectors.toList());
+        collection.insertMany(postDocs);
     }
 
-    public void storeSingleFacebookPost(String postJson) {
-        Document postDoc = Document.parse(postJson);
+    public void storeSingleFacebookPost(Post post, Object source) {
+        Document postDoc = Document.parse(fbEncoder.encodePost(post, source));
         collection.insertOne(postDoc);
     }
 
-    public ArrayList<String> getValues() {
+    public List<String> getValues() {
         MongoCursor<Document> cursor = collection.find().iterator();
         ArrayList<String> resultList = new ArrayList<>();
         while (cursor.hasNext()) {
@@ -54,6 +66,19 @@ public class FacebookDao {
             resultList.add(doc.toJson());
         }
         return resultList;
+    }
+
+    public boolean existsPage(Page p) {
+        return collection.find(eq("source.id", p.getId())).first() != null;
+
+    }
+
+    public boolean existsGroup(Group g) {
+        return collection.find(eq("source.id", g.getId())).first() != null;
+    }
+
+    public void dropCollection() {
+        collection.drop();
     }
 
 }

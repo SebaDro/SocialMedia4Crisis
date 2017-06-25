@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.rest;
+package de.hsbo.fbg.sm4c.rest.control;
 
-import de.hsbo.fbg.sm4c.mining.FacebookCollector;
+import de.hsbo.fbg.sm4c.mining.collect.FacebookCollector;
 import facebook4j.Group;
 import facebook4j.Page;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = {"application/json"}, value = "/facebook")
 public class FacebookController implements InitializingBean {
 
+    private static final Logger LOGGER = LogManager.getLogger(FacebookController.class);
+
     private FacebookCollector facebookCollector;
 
     @RequestMapping(value = "/groups/{keywords}/json", method = RequestMethod.GET)
@@ -32,7 +36,7 @@ public class FacebookController implements InitializingBean {
         return groups;
     }
 
-    @RequestMapping(produces = {"text/csv"},value = "/groups/{keywords}/csv", method = RequestMethod.GET)
+    @RequestMapping(produces = {"text/csv"}, value = "/groups/{keywords}/csv", method = RequestMethod.GET)
     public String getGroupsAsCSV(@PathVariable("keywords") String keywords) {
         String groups = facebookCollector.getGroupsAsCSV(keywords);
         return groups;

@@ -16,12 +16,12 @@ import facebook4j.Page;
 import facebook4j.Post;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
-import org.springframework.beans.factory.InitializingBean;
 
 /**
  *
@@ -73,7 +73,9 @@ public class FacebookJSONEncoder {
         try {
             JsonNode fbPostNode = mapper.readTree(postJson);
             String createdTime = fbPostNode.get("createdTime").asText();
-            DateTime dt = DateTime.parse(createdTime, DateTimeFormat.forPattern("MMM dd, yyyy hh:mm:ss a"));
+            DateTime dt = DateTime.parse(createdTime, 
+                    DateTimeFormat.forPattern("MMM dd, yyyy hh:mm:ss a")
+                    .withLocale(Locale.ENGLISH));
             ((ObjectNode) fbPostNode).put("createdTime", dt.toDateTime(DateTimeZone.UTC).toString());
             root.put("id", fbPostNode.get("id").asText());
             ObjectNode sourceNode = mapper.createObjectNode();
@@ -96,7 +98,7 @@ public class FacebookJSONEncoder {
             root.set("source", sourceNode);
             root.put("label", "");
             root.set("fb_post", fbPostNode);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             LOGGER.error("Could not parse JSON post", ex);
         }
         return root;

@@ -34,18 +34,19 @@ import org.apache.logging.log4j.LogManager;
  * @author Sebastian Drost
  */
 public class FacebookCollector {
-    
+
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
-    
-    private final int GROUP_LIMIT = 10;
-    private final int PAGE_LIMIT = 10;
-    private final int POST_LIMIT = 100;
+
+    private final int GROUP_LIMIT = 1000;
+    private final int PAGE_LIMIT = 1000;
+    private final int GROUP_POST_LIMIT = 1000;
+    private final int PAGE_POST_LIMIT = 100;
     private final Facebook facebook;
     private final Gson gson;
-    
+
     private final FacebookCSVEncoder fbCsvEncoder;
-    private FacebookJSONEncoder fbJsonEncoder;
-    
+    private final FacebookJSONEncoder fbJsonEncoder;
+
     public FacebookCollector() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
@@ -134,8 +135,7 @@ public class FacebookCollector {
     }
 
     /**
-     * Fecthes posts from the specified group between for a specified time
-     * period.
+     * Fetches posts from the specified group for a specified time period.
      *
      * @param group Facebook group
      * @param startDate start date of the time period
@@ -146,11 +146,19 @@ public class FacebookCollector {
         List result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
-                    .limit(POST_LIMIT)
+                    .limit(GROUP_POST_LIMIT)
                     .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
-            result = feeds.stream().collect(Collectors.toList());
-            LOGGER.info("Retrieved posts from group [" + group.getId() + "]: " + feeds.size());
+            if (feeds != null && !feeds.isEmpty()) {
+                result = feeds.stream().collect(Collectors.toList());
+                ResponseList<Post> f = facebook.fetchNext(feeds.getPaging());
+                while (f != null && !f.isEmpty()) {
+                    LOGGER.info("Retrieved partial posts from group [" + group.getId() + "]");
+                    result.addAll(f.stream().collect(Collectors.toList()));
+                    f = facebook.fetchNext(f.getPaging());
+                }
+            }
+            LOGGER.info("Retrieved posts from group [" + group.getId() + "]: " + result.size());
         } catch (FacebookException ex) {
             LOGGER.error("Could not retrieve posts from group", ex);
         }
@@ -158,7 +166,31 @@ public class FacebookCollector {
     }
 
     /**
-     * Fecthes posts from the specified list of groups for a specified time
+     * Fetches posts from the specified group for a specified time period. The
+     * number of posts that will be fetched is limited.
+     *
+     * @param group Facebook group
+     * @param startDate start date of the time period
+     * @param endDate end date of the time period
+     * @return
+     */
+    public List<Post> getLimitedPostsFromSingleGroup(Group group, Date startDate, Date endDate) {
+        List result = new ArrayList();
+        try {
+            ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
+                    .limit(GROUP_POST_LIMIT)
+                    .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .since(startDate).until(endDate));
+            result = feeds.stream().collect(Collectors.toList());
+            LOGGER.info("Retrieved posts from group [" + group.getId() + "]: " + feeds.size());
+        } catch (FacebookException ex) {
+            LOGGER.error("Could not retrieve posts from group[" + group.getId() + "]", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Fetches posts from the specified list of groups for a specified time
      * period.
      *
      * @param groups Facebook groups
@@ -201,7 +233,7 @@ public class FacebookCollector {
     }
 
     /**
-     * Fecthes posts from the specified page for a specified time period.
+     * Fetches posts from the specified page for a specified time period.
      *
      * @param page Facebook page
      * @param startDate start date of the time period
@@ -209,14 +241,46 @@ public class FacebookCollector {
      * @return List of posts from the facebook page
      */
     public List<Post> getPostsFromSinglePage(Page page, Date startDate, Date endDate) {
-        List result = new ArrayList();
+        List<Post> result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
-                    .limit(POST_LIMIT)
+                    .limit(PAGE_POST_LIMIT)
+                    .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .since(startDate).until(endDate));
+            if (feeds != null && !feeds.isEmpty()) {
+                result = feeds.stream().collect(Collectors.toList());
+                ResponseList<Post> f = facebook.fetchNext(feeds.getPaging());
+                while (f != null && !f.isEmpty()) {
+                    LOGGER.info("Retrieved partial posts from page [" + page.getId() + "]: " + result.size());
+                    result.addAll(f.stream().collect(Collectors.toList()));
+                    f = facebook.fetchNext(f.getPaging());
+                }
+            }
+            LOGGER.info("Retrieved posts from page [" + page.getId() + "]: " + result.size());
+        } catch (FacebookException ex) {
+            LOGGER.error("Could not retrieve posts from page [" + page.getId() + "]", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Fecthes posts from the specified page for a specified time period. The
+     * number of posts that will be fetched is limited.
+     *
+     * @param page Facebook page
+     * @param startDate start date of the time period
+     * @param endDate end date of the time period
+     * @return List of posts from the facebook page
+     */
+    public List<Post> getLimitedPostsFromSinglePage(Page page, Date startDate, Date endDate) {
+        List<Post> result = new ArrayList();
+        try {
+            ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
+                    .limit(PAGE_POST_LIMIT)
                     .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());
-            LOGGER.info("Retrieved posts from page [" + page.getId() + "]: " + feeds.size());
+            LOGGER.info("Retrieved posts from page [" + page.getId() + "]: " + result.size());
         } catch (FacebookException ex) {
             LOGGER.error("Could not retrieve posts", ex);
         }
@@ -246,7 +310,7 @@ public class FacebookCollector {
      * Fetches posts from the specified list of pages for a specified time
      * period and encode it to JSON.
      *
-     * @param groups Facebook pages
+     * @param pages Facebook pages
      * @param startDate start date of the time period
      * @param endDate end date of the time period
      * @return posts from facebook pages as JSON
@@ -266,5 +330,5 @@ public class FacebookCollector {
         }
         return result;
     }
-    
+
 }

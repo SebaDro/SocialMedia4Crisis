@@ -10,7 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.Gson;
 import de.hsbo.fbg.sm4c.mining.encode.FacebookCSVEncoder;
-import de.hsbo.fbg.sm4c.mining.encode.FacebookJSONEncoder;
+import de.hsbo.fbg.sm4c.mining.encode.FacebookEncoder;
+import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -37,21 +38,21 @@ public class FacebookCollector {
 
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
 
-    private final int GROUP_LIMIT = 1000;
+    private final int GROUP_LIMIT = 10;
     private final int PAGE_LIMIT = 1000;
-    private final int GROUP_POST_LIMIT = 1000;
+    private final int GROUP_POST_LIMIT = 10;
     private final int PAGE_POST_LIMIT = 100;
     private final Facebook facebook;
     private final Gson gson;
 
     private final FacebookCSVEncoder fbCsvEncoder;
-    private final FacebookJSONEncoder fbJsonEncoder;
+    private final FacebookEncoder fbEncoder;
 
     public FacebookCollector() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
-        fbJsonEncoder = new FacebookJSONEncoder();
+        fbEncoder = new FacebookEncoder();
     }
 
     /**
@@ -142,8 +143,8 @@ public class FacebookCollector {
      * @param endDate end date of the time period
      * @return
      */
-    public List<Post> getPostsFromSingleGroup(Group group, Date startDate, Date endDate) {
-        List result = new ArrayList();
+    public List<Post> getMessagesFromSingleGroup(Group group, Date startDate, Date endDate) {
+        List<Post> result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
                     .limit(GROUP_POST_LIMIT)
@@ -201,7 +202,7 @@ public class FacebookCollector {
     public List<Post> getPostsFromGroups(List<Group> groups, Date startDate, Date endDate) {
         List<Post> resultList = new ArrayList();
         groups.forEach(g -> {
-            List<Post> posts = getPostsFromSingleGroup(g, startDate, endDate);
+            List<Post> posts = getMessagesFromSingleGroup(g, startDate, endDate);
             resultList.addAll(posts);
         });
         return resultList;
@@ -220,8 +221,11 @@ public class FacebookCollector {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode postArray = mapper.createArrayNode();
         groups.forEach(g -> {
-            List<Post> posts = getPostsFromSingleGroup(g, startDate, endDate);
-            postArray.addAll(fbJsonEncoder.createPostArrayNode(posts, g));
+            List<Post> posts = getMessagesFromSingleGroup(g, startDate, endDate);
+            List<FacebookMessage> messages = posts.stream()
+                    .map(p -> fbEncoder.createMessage(p, g))
+                    .collect(Collectors.toList());
+            postArray.addAll(fbEncoder.createPostArrayNode(messages));
         });
         String result = "";
         try {
@@ -320,7 +324,10 @@ public class FacebookCollector {
         ArrayNode postArray = mapper.createArrayNode();
         pages.forEach(p -> {
             List<Post> posts = getPostsFromSinglePage(p, startDate, endDate);
-            postArray.addAll(fbJsonEncoder.createPostArrayNode(posts, p));
+            List<FacebookMessage> messages = posts.stream()
+                    .map(fP -> fbEncoder.createMessage(fP, p))
+                    .collect(Collectors.toList());
+            postArray.addAll(fbEncoder.createPostArrayNode(messages));
         });
         String result = "";
         try {

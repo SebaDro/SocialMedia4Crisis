@@ -6,20 +6,24 @@
 package de.hsbo.fbg.sm4c.mining.dao;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import de.hsbo.fbg.sm4c.mining.config.Configuration;
-import de.hsbo.fbg.sm4c.mining.encode.FacebookJSONEncoder;
+import com.mongodb.client.model.Filters;
+import de.hsbo.fbg.sm4c.mining.encode.FacebookEncoder;
 import facebook4j.Group;
 import facebook4j.Page;
-import facebook4j.Post;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
+import de.hsbo.fbg.sm4c.mining.encode.FacebookDecoder;
+import java.util.Date;
+import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
+import java.util.function.Consumer;
 import static com.mongodb.client.model.Filters.eq;
 
 /**
@@ -33,26 +37,29 @@ public class MongoDbFacebookDao implements FacebookDao {
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> collection;
-    private final FacebookJSONEncoder fbEncoder;
+    private final FacebookEncoder fbEncoder;
+    private final FacebookDecoder fbDecoder;
 
     public MongoDbFacebookDao(String dbHost, int dbPort, String dbName, String dbCollection) {
         mongoClient = new MongoClient(dbHost, dbPort);
         database = mongoClient.getDatabase(dbName);
         collection = database.getCollection(dbCollection);
-        fbEncoder = new FacebookJSONEncoder();
+        fbEncoder = new FacebookEncoder();
+        fbDecoder = new FacebookDecoder();
     }
 
     @Override
-    public void storeFaceBookPosts(List<Post> posts, Object source) {
-        List<Document> postDocs = posts.stream().map(p -> Document.parse(fbEncoder
-                .encodePost(p, source)))
+    public void storeFacebookMessages(List<FacebookMessage> messages) {
+        List<Document> postDocs = messages.stream().map(m -> Document.parse(fbEncoder
+                .encodeMessageToJson(m)).append("timeStamp", m.getCreationTime().toDate()))
                 .collect(Collectors.toList());
         collection.insertMany(postDocs);
     }
 
     @Override
-    public void storeSingleFacebookPost(Post post, Object source) {
-        Document postDoc = Document.parse(fbEncoder.encodePost(post, source));
+    public void storeSingleFacebookMessage(FacebookMessage message) {
+        Document postDoc = Document.parse(fbEncoder.encodeMessageToJson(message))
+                .append("timeStamp", message.getCreationTime().toDate());
         collection.insertOne(postDoc);
     }
 
@@ -68,23 +75,48 @@ public class MongoDbFacebookDao implements FacebookDao {
     }
 
     @Override
+    public List<FacebookMessage> getValuesForTimeSpan(Date startTime, Date endTime) {
+        ArrayList<FacebookMessage> messages = new ArrayList<FacebookMessage>();
+        FindIterable<Document> documents = collection.find(Filters.and(
+                Filters.gte("timeStamp", startTime),
+                Filters.lte("timeStamp", endTime)));
+        documents.forEach(new Consumer<Document>() {
+            @Override
+            public void accept(Document d) {
+                messages.add(fbDecoder.decodeFacebookMessage((Document) d));
+            }
+        });
+        return messages;
+    }
+
+    @Override
     public boolean containsPage(Page page) {
         return collection.find(eq("source.id", page.getId())).first() != null;
     }
 
     @Override
     public boolean containsGroup(Group group) {
-        return collection.find(eq("source.id", group.getId())).first() != null;
+        return collection.find(eq("source.sourceId", group.getId())).first() != null;
     }
 
     @Override
-    public boolean containsPost(Post post) {
-        return collection.find(eq("fb_post.id", post.getId())).first() != null;
+    public boolean containsMessage(FacebookMessage message) {
+        return collection.find(eq("messageId", message.getId())).first() != null;
     }
 
     @Override
     public void deleteValues() {
         collection.drop();
+    }
+
+    @Override
+    public FacebookMessage getValueByFbId(String fbId) {
+        Document doc = collection.find(eq("messageId", fbId)).first();
+        FacebookMessage message = null;
+        if (doc != null) {
+            message = fbDecoder.decodeFacebookMessage(doc);
+        }
+        return message;
     }
 
 }

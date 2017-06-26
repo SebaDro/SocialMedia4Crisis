@@ -13,6 +13,8 @@ import de.hsbo.fbg.sm4c.mining.config.Configuration;
 import de.hsbo.fbg.sm4c.mining.dao.DaoFactory;
 import de.hsbo.fbg.sm4c.mining.dao.FacebookDao;
 import de.hsbo.fbg.sm4c.mining.dao.MongoDbDaoFactory;
+import de.hsbo.fbg.sm4c.mining.encode.FacebookEncoder;
+import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
 import de.hsbo.fbg.sm4c.rest.view.TrainingDataView;
 import facebook4j.Group;
 import facebook4j.Page;
@@ -20,6 +22,7 @@ import facebook4j.Post;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
@@ -43,6 +46,7 @@ public class SimulationController implements InitializingBean {
     private FacebookDao fbDao;
     private FacebookCollector fbCollector;
     private ObjectMapper mapper;
+    private FacebookEncoder fbEncoder;
 
     @RequestMapping(produces = {"application/json"}, value = "/posts", method = RequestMethod.GET)
     public String getPosts() {
@@ -84,20 +88,26 @@ public class SimulationController implements InitializingBean {
                     List<Group> groups = fbCollector.getGroups(k);
                     groups.forEach(g -> {
                         if (!fbDao.containsGroup(g)) {
-                            List<Post> posts = fbCollector.getPostsFromSingleGroup(g,
+                            List<Post> posts = fbCollector.getMessagesFromSingleGroup(g,
                                     req.getStartDate(), req.getEndDate());
+                            List<FacebookMessage> messages = posts.stream()
+                                    .map(p -> fbEncoder.createMessage(p, g))
+                                    .collect(Collectors.toList());
                             if (posts != null && !posts.isEmpty()) {
-                                fbDao.storeFaceBookPosts(posts, g);
+                                fbDao.storeFacebookMessages(messages);
                             }
                         }
                     });
                     List<Page> pages = fbCollector.getPages(k);
-                    pages.forEach(p -> {
-                        if (!fbDao.containsPage(p)) {
-                            List<Post> posts = fbCollector.getPostsFromSinglePage(p,
+                    pages.forEach(fP -> {
+                        if (!fbDao.containsPage(fP)) {
+                            List<Post> posts = fbCollector.getPostsFromSinglePage(fP,
                                     req.getStartDate(), req.getEndDate());
+                            List<FacebookMessage> messages = posts.stream()
+                                    .map(p -> fbEncoder.createMessage(p, fP))
+                                    .collect(Collectors.toList());
                             if (posts != null && !posts.isEmpty()) {
-                                fbDao.storeFaceBookPosts(posts, p);
+                                fbDao.storeFacebookMessages(messages);
                             }
                         }
                     });
@@ -116,5 +126,6 @@ public class SimulationController implements InitializingBean {
         fbDao = daoFactory.createFacebookDao();
         fbCollector = new FacebookCollector();
         mapper = new ObjectMapper();
+        fbEncoder = new FacebookEncoder();
     }
 }

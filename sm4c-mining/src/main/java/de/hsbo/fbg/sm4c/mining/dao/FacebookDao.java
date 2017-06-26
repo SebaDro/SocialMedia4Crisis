@@ -5,9 +5,10 @@
  */
 package de.hsbo.fbg.sm4c.mining.dao;
 
+import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
 import facebook4j.Group;
 import facebook4j.Page;
-import facebook4j.Post;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,17 +17,21 @@ import java.util.List;
  */
 public interface FacebookDao {
 
-    public void storeSingleFacebookPost(Post post, Object source);
+    public void storeSingleFacebookMessage(FacebookMessage message);
 
-    public void storeFaceBookPosts(List<Post> posts, Object source);
+    public void storeFacebookMessages(List<FacebookMessage> messages);
 
     public List<String> getValues();
+    
+    public FacebookMessage getValueByFbId(String fbId);
+    
+    public List<FacebookMessage> getValuesForTimeSpan(Date startTime, Date endTime);
 
     public boolean containsPage(Page page);
 
     public boolean containsGroup(Group group);
 
-    public boolean containsPost(Post post);
+    public boolean containsMessage(FacebookMessage message);
 
     public void deleteValues();
 }

@@ -68,14 +68,18 @@ public class MongoDbFacebookDao implements FacebookDao {
     }
 
     @Override
-    public boolean containsPage(Page p) {
-        return collection.find(eq("source.id", p.getId())).first() != null;
-
+    public boolean containsPage(Page page) {
+        return collection.find(eq("source.id", page.getId())).first() != null;
     }
 
     @Override
-    public boolean containsGroup(Group g) {
-        return collection.find(eq("source.id", g.getId())).first() != null;
+    public boolean containsGroup(Group group) {
+        return collection.find(eq("source.id", group.getId())).first() != null;
+    }
+
+    @Override
+    public boolean containsPost(Post post) {
+        return collection.find(eq("fb_post.id", post.getId())).first() != null;
     }
 
     @Override

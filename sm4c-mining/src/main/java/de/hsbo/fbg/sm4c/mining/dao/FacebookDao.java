@@ -22,9 +22,11 @@ public interface FacebookDao {
 
     public List<String> getValues();
 
-    public boolean containsPage(Page p);
+    public boolean containsPage(Page page);
 
-    public boolean containsGroup(Group g);
+    public boolean containsGroup(Group group);
+
+    public boolean containsPost(Post post);
 
     public void deleteValues();
 }

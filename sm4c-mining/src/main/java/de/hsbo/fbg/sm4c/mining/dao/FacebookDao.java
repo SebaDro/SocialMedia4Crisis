@@ -33,5 +33,7 @@ public interface FacebookDao {
 
     public boolean containsMessage(FacebookMessage message);
 
-    public void deleteValues();
+    public void deleteAllValues();
+    
+    public void deleteValue(FacebookMessage message);
 }

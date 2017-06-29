@@ -72,7 +72,7 @@ public class SimulationController implements InitializingBean {
 
     @RequestMapping(value = "/posts/all", method = RequestMethod.DELETE)
     public ResponseEntity getFacebookSimulationPosts() {
-        fbDao.deleteValues();
+        fbDao.deleteAllValues();
         return new ResponseEntity(HttpStatus.OK);
     }
 

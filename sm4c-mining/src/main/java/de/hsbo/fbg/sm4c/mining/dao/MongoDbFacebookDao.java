@@ -51,7 +51,9 @@ public class MongoDbFacebookDao implements FacebookDao {
     @Override
     public void storeFacebookMessages(List<FacebookMessage> messages) {
         List<Document> postDocs = messages.stream().map(m -> Document.parse(fbEncoder
-                .encodeMessageToJson(m)).append("timeStamp", m.getCreationTime().toDate()))
+                .encodeMessageToJson(m))
+                .append("creationTime", m.getCreationTime().toDate())
+                .append("updateTime", m.getUpdateTime().toDate()))
                 .collect(Collectors.toList());
         collection.insertMany(postDocs);
     }
@@ -59,7 +61,8 @@ public class MongoDbFacebookDao implements FacebookDao {
     @Override
     public void storeSingleFacebookMessage(FacebookMessage message) {
         Document postDoc = Document.parse(fbEncoder.encodeMessageToJson(message))
-                .append("timeStamp", message.getCreationTime().toDate());
+                .append("creationTime", message.getCreationTime().toDate())
+                .append("updateTime", message.getUpdateTime().toDate());
         collection.insertOne(postDoc);
     }
 
@@ -78,8 +81,8 @@ public class MongoDbFacebookDao implements FacebookDao {
     public List<FacebookMessage> getValuesForTimeSpan(Date startTime, Date endTime) {
         ArrayList<FacebookMessage> messages = new ArrayList<FacebookMessage>();
         FindIterable<Document> documents = collection.find(Filters.and(
-                Filters.gte("timeStamp", startTime),
-                Filters.lte("timeStamp", endTime)));
+                Filters.gte("creationTime", startTime),
+                Filters.lte("creationTime", endTime)));
         documents.forEach(new Consumer<Document>() {
             @Override
             public void accept(Document d) {
@@ -96,7 +99,7 @@ public class MongoDbFacebookDao implements FacebookDao {
 
     @Override
     public boolean containsGroup(Group group) {
-        return collection.find(eq("source.sourceId", group.getId())).first() != null;
+        return collection.find(eq("source.id", group.getId())).first() != null;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class MongoDbFacebookDao implements FacebookDao {
     }
 
     @Override
-    public void deleteValues() {
+    public void deleteAllValues() {
         collection.drop();
     }
 
@@ -117,6 +120,11 @@ public class MongoDbFacebookDao implements FacebookDao {
             message = fbDecoder.decodeFacebookMessage(doc);
         }
         return message;
+    }
+
+    @Override
+    public void deleteValue(FacebookMessage message) {
+        collection.deleteOne(eq("messageId", message.getId()));
     }
 
 }

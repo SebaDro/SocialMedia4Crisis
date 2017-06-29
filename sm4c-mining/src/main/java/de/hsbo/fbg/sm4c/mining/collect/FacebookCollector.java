@@ -38,21 +38,40 @@ public class FacebookCollector {
 
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
 
-    private final int GROUP_LIMIT = 10;
+    private final int GROUP_LIMIT = 10000;
     private final int PAGE_LIMIT = 1000;
-    private final int GROUP_POST_LIMIT = 10;
+    private final int GROUP_POST_LIMIT = 1000;
     private final int PAGE_POST_LIMIT = 100;
+
     private final Facebook facebook;
     private final Gson gson;
-
     private final FacebookCSVEncoder fbCsvEncoder;
     private final FacebookEncoder fbEncoder;
+    private final int groupLimit;
+    private final int pageLimit;
+    private final int groupPostLimit;
+    private final int pagePostLimit;
 
     public FacebookCollector() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
         fbEncoder = new FacebookEncoder();
+        groupLimit = GROUP_LIMIT;
+        pageLimit = PAGE_LIMIT;
+        groupPostLimit = GROUP_POST_LIMIT;
+        pagePostLimit = PAGE_POST_LIMIT;
+    }
+
+    public FacebookCollector(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
+        this.facebook = new FacebookFactory().getInstance();
+        gson = new Gson();
+        fbCsvEncoder = new FacebookCSVEncoder();
+        fbEncoder = new FacebookEncoder();
+        this.groupLimit = groupLimit;
+        this.pageLimit = pageLimit;
+        this.groupPostLimit = groupPostLimit;
+        this.pagePostLimit = pagePostLimit;
     }
 
     /**
@@ -65,7 +84,7 @@ public class FacebookCollector {
         List result = new ArrayList();
         try {
             ResponseList<Group> groups = facebook.searchGroups(keywords, new Reading()
-                    .limit(GROUP_LIMIT)
+                    .limit(groupLimit)
                     .fields("id", "description", "email", "name", "privacy", "updated_time", "city"));
             groups.removeIf(g -> g.getPrivacy() == GroupPrivacyType.CLOSED);
             result = groups.stream().collect(Collectors.toList());
@@ -112,7 +131,7 @@ public class FacebookCollector {
         List result = new ArrayList();
         try {
             ResponseList<Page> pages = facebook.searchPages(keywords, new Reading()
-                    .limit(PAGE_LIMIT)
+                    .limit(pageLimit)
                     .fields("id", "description", "emails", "about", "category", "location", "name"));
             result = pages.stream().collect(Collectors.toList());
             LOGGER.info("Retrieved pages for keywords [" + keywords + "]: " + pages.size());
@@ -147,8 +166,8 @@ public class FacebookCollector {
         List<Post> result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
-                    .limit(GROUP_POST_LIMIT)
-                    .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .limit(groupPostLimit)
+                    .fields("id", "created_time", "description", "link", "type", "updated_time", "caption",  "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             if (feeds != null && !feeds.isEmpty()) {
                 result = feeds.stream().collect(Collectors.toList());
@@ -179,8 +198,8 @@ public class FacebookCollector {
         List result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
-                    .limit(GROUP_POST_LIMIT)
-                    .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .limit(groupPostLimit)
+                    .fields("id", "created_time", "link", "caption", "type", "updated_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());
             LOGGER.info("Retrieved posts from group [" + group.getId() + "]: " + feeds.size());
@@ -248,7 +267,7 @@ public class FacebookCollector {
         List<Post> result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
-                    .limit(PAGE_POST_LIMIT)
+                    .limit(pagePostLimit)
                     .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             if (feeds != null && !feeds.isEmpty()) {
@@ -280,7 +299,7 @@ public class FacebookCollector {
         List<Post> result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
-                    .limit(PAGE_POST_LIMIT)
+                    .limit(pagePostLimit)
                     .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());

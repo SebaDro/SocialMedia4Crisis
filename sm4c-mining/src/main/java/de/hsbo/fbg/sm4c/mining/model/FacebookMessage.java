@@ -3,18 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.hsbo.fbg.sm4c.mining.model;
-
 
 /**
  *
  * @author Sebastian Drost
  */
-public class FacebookMessage extends Message{
+public class FacebookMessage extends Message {
 
     private FacebookSource source;
-  
+    private String type;
 
     public FacebookSource getSource() {
         return source;
@@ -22,6 +20,14 @@ public class FacebookMessage extends Message{
 
     public void setSource(FacebookSource source) {
         this.source = source;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String messageType) {
+        this.type = messageType;
     }
 
 }

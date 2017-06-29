@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
 import de.hsbo.fbg.sm4c.mining.model.FacebookSource;
+import de.hsbo.fbg.sm4c.mining.model.Link;
 import facebook4j.Group;
 import facebook4j.Page;
 import facebook4j.Post;
@@ -26,11 +27,11 @@ import org.joda.time.DateTimeZone;
  * @author Sebastian Drost
  */
 public class FacebookEncoder {
-
+    
     private static final Logger LOGGER = LogManager.getLogger(FacebookEncoder.class);
-
+    
     private ObjectMapper mapper;
-
+    
     public FacebookEncoder() {
         mapper = new ObjectMapper();
     }
@@ -46,8 +47,11 @@ public class FacebookEncoder {
         FacebookMessage message = new FacebookMessage();
         message.setId(post.getId());
         message.setContent(post.getMessage());
-        DateTime dt = new DateTime(post.getCreatedTime());
-        message.setCreationTime(dt);
+        DateTime creationTime = new DateTime(post.getCreatedTime());
+        message.setCreationTime(creationTime);
+        DateTime updateTime = new DateTime(post.getUpdatedTime());
+        message.setUpdateTime(updateTime);
+        message.setType(post.getType());
         FacebookSource fbSource = new FacebookSource();
         if (source != null) {
             if (source instanceof Group) {
@@ -115,19 +119,19 @@ public class FacebookEncoder {
      */
     public ObjectNode createMessageNode(FacebookMessage message) {
         ObjectNode root = mapper.createObjectNode();
-
+        
         root.put("messageId", message.getId());
         if (message.getLabel() != null && !message.getLabel().equals("")) {
             root.put("label", message.getLabel());
         } else {
             root.put("label", "");
         }
-        root.put("creationTime", message.getCreationTime().toDateTime(DateTimeZone.UTC).toString());
         root.put("content", message.getContent());
+        root.put("type", message.getType());
         ObjectNode sourceNode = mapper.createObjectNode();
-        sourceNode.put("sourceId", message.getSource().getId());
-        sourceNode.put("sourceName", message.getSource().getName());
-        sourceNode.put("sourceType", message.getSource().getType());
+        sourceNode.put("id", message.getSource().getId());
+        sourceNode.put("name", message.getSource().getName());
+        sourceNode.put("type", message.getSource().getType());
         root.set("source", sourceNode);
         return root;
     }
@@ -146,5 +150,5 @@ public class FacebookEncoder {
         });
         return postArray;
     }
-
+    
 }

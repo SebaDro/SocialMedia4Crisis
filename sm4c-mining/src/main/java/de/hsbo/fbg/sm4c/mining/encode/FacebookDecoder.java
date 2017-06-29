@@ -31,21 +31,24 @@ public class FacebookDecoder {
 
     /**
      * Decodes a MongoDB document to a a FacebookMessage
+     *
      * @param doc MongoDB document
      * @return decoded FacebookMessage
      */
     public FacebookMessage decodeFacebookMessage(Document doc) {
         FacebookMessage message = new FacebookMessage();
         message.setId(doc.getString("messageId"));
-        message.setContent(doc.getString("content"));
         message.setLabel(doc.getString("label"));
+        message.setContent(doc.getString("content"));
+        message.setType(doc.getString("type"));
         FacebookSource source = new FacebookSource();
         Document sourceDoc = (Document) doc.get("source");
-        source.setId(sourceDoc.getString("sourceId"));
-        source.setName(sourceDoc.getString("sourceName"));
-        source.setType(sourceDoc.getString("sourceType"));
+        source.setId(sourceDoc.getString("id"));
+        source.setName(sourceDoc.getString("name"));
+        source.setType(sourceDoc.getString("type"));
         message.setSource(source);
-        message.setCreationTime(new DateTime(doc.getDate("timeStamp")));
+        message.setCreationTime(new DateTime(doc.getDate("creationTime")));
+        message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
         return message;
     }
 }

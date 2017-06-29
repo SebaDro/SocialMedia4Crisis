@@ -17,6 +17,7 @@ public abstract class Message {
     protected String content;
     protected String label;
     protected DateTime creationTime;
+    protected DateTime updateTime;
 
     public String getId() {
         return id;
@@ -49,5 +50,15 @@ public abstract class Message {
     public void setCreationTime(DateTime creationDate) {
         this.creationTime = creationDate;
     }
+
+    public DateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(DateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+    
+    
 
 }

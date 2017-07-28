@@ -1,20 +1,25 @@
 /* app css stylesheet */
+
 .menu {
   list-style: none;
   border-bottom: 0.1em solid black;
   margin-bottom: 2em;
   padding: 0 0 0.5em;
 }
+
 .menu:before {
   content: "[";
 }
+
 .menu:after {
   content: "]";
 }
-.menu > li {
+
+.menu>li {
   display: inline;
 }
-.menu > li + li:before {
+
+.menu>li+li:before {
   content: "|";
   padding-right: 0.3em;
 }
@@ -23,14 +28,15 @@
   background-color: #5E0000;
   padding-top: 5px;
 }
+
 .header-content {
   color: #ffffff;
 }
-.header-content button,
-.header-content a,
-.header-content h1 {
+
+.header-content button, .header-content a, .header-content h1 {
   float: left;
 }
+
 .header-content h1 {
   line-height: 70px;
   margin-top: 0;
@@ -42,14 +48,30 @@
 body {
   height: initial;
 }
+
 body {
   overflow: hidden;
   max-width: 100%;
   max-height: 100%;
 }
-md-sidenav,
-md-sidenav.md-locked-open {
+
+md-checkbox.md-checked.green .md-icon {
+ background: rgba(0, 255, 0, 0.87);
+}
+
+md-sidenav, md-sidenav.md-locked-open {
   width: 250px;
   min-width: 250px;
   max-width: 250px;
+}
+
+md-chips, .md-chips {
+  border-color: red
+}
+md-chips md-chip.md-focused {
+  border-color: #5E0000;
+  background: #5E0000;
+}
+md-input-container:not(.md-input-invalid).md-input-focused .md-input {
+    border-color: #5E0000;
 }

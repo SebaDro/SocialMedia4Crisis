@@ -1,3 +1,46 @@
-<div class="content">
-    <h2>Collection erstellen</h2>
+<div class="content" ng-controller="CreateCollectionCtrl">
+  <h2>Collection erstellen</h2>
+
+
+  <md-card>
+    <md-card-title>
+      <h2 flex md-truncate>Details</h2>
+    </md-card-title>
+    <md-card-content layout="column" layout-align="space-between">
+      <md-input-container class="md-block">
+        <label>Name</label>
+        <input ng-model="newCollection.name" md-maxlength="64">
+      </md-input-container>
+      <md-input-container class="md-block">
+        <label>Beschreibung</label>
+        <input ng-model="newCollection.description" md-maxlength="64">
+      </md-input-container>
+    </md-card-content>
+  </md-card>
+  <md-card>
+    <md-card-title>
+      <h2 flex md-truncate>Dienste</h2>
+    </md-card-title>
+    <md-card-content layout="column" layout-align="space-between" class="green">
+      <md-checkbox ng-model="newCollection.fbCb" aria-label="Facebook Checkbox">
+        Facebook
+      </md-checkbox>
+      <md-checkbox ng-model="newCollection.twitterCb" aria-label="Facebook Checkbox" ng-disabled="true" class="green">
+        Twitter
+      </md-checkbox>
+    </md-card-content>
+  </md-card>
+  <md-card>
+    <md-card-title>
+      <h2 flex md-truncate>Keywords</h2>
+    </md-card-title>
+    <md-card-content layout="column" layout-align="space-between">
+      <p>Bitte geben Sie Keywords an, zu denen eine Collection erstellt werden soll:</p>
+      <md-chips ng-model="newCollection.tags" readonly="CreateCollectionCtrl.readonly" placeholder="Tag hinzufügen" delete-button-label="Tag entfernen" delete-hint="Drücke delete to remove tag" secondary-placeholder="+Tag"></md-chips>
+    </md-card-content>
+  </md-card>
+  <md-button class="md-raised md-secondary" type="button" ng-click="reset()">
+    <md-icon> cancel </md-icon> Zurücketzen</md-button>
+  <md-button class="md-raised md-primary" type="submit" ng-click="submit()">
+    <md-icon> save </md-icon> Erstelle Collection</md-button>
 </div>

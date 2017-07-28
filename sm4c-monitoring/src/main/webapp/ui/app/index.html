@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="sm4cMonitoring" class="no-js">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>SM4C Monitoring</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/bower_components/angular-material/angular-material.css" type="text/css">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons" >
+  <link rel="stylesheet" href="css/app.css" type="text/css">
+
+  <script src="bower_components/angular/angular.js" type="text/javascript"></script>
+  <script src="bower_components/angular-route/angular-route.js" type="text/javascript"></script>
+  <script src="bower_components/angular-aria/angular-aria.js" type="text/javascript"></script>
+  <script src="bower_components/angular-animate/angular-animate.js" type="text/javascript"></script>
+  <script src="bower_components/angular-material/angular-material.js" type="text/javascript"></script>
+  <script src="js/app.js" type="text/javascript"></script>
+  <script src="js/controller/view1.js" type="text/javascript"></script>
+  <script src="js/controller/view2.js" type="text/javascript"></script>
+  <script src="js/controller/sidenav.js" type="text/javascript"></script>
+  <script src="js/controller/header.js" type="text/javascript"></script>
+</head>
+
+<body layout="column">
+  <div class="header">
+    <div ng-include="'templates/partials/header.html'"></div>
+  </div>
+
+  <div layout="row" flex style="overflow:hidden">
+    <div ng-include="'templates/partials/sidenav.html'" layout></div>
+    <md-content layout="column" layout-padding flex>
+      <!-- the actual content -->
+      <div ng-view autoscroll="true" flex></div>
+    </md-content>
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+/* app css stylesheet */
+.menu {
+  list-style: none;
+  border-bottom: 0.1em solid black;
+  margin-bottom: 2em;
+  padding: 0 0 0.5em;
+}
+.menu:before {
+  content: "[";
+}
+.menu:after {
+  content: "]";
+}
+.menu > li {
+  display: inline;
+}
+.menu > li + li:before {
+  content: "|";
+  padding-right: 0.3em;
+}
+
+.header {
+  background-color: #5E0000;
+  padding-top: 5px;
+}
+.header-content {
+  color: #ffffff;
+}
+.header-content button,
+.header-content a,
+.header-content h1 {
+  float: left;
+}
+.header-content h1 {
+  line-height: 70px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 10px;
+  font-size: 50px;
+}
+
+body {
+  height: initial;
+}
+body {
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
+}
+md-sidenav,
+md-sidenav.md-locked-open {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+}

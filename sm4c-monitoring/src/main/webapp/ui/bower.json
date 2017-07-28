@@ -1,0 +1,15 @@
+{
+  "name": "sm4c-monitoring",
+  "description": "Monitoring social media for crisis tasks",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.5.0",
+    "angular-route": "~1.5.0",
+    "angular-loader": "~1.5.0",
+    "angular-mocks": "~1.5.0",
+	"angular-aria": "~1.5.0",
+	"angular-animate": "~1.5.0",
+	"angular-material": "1.1.4"
+  }
+}

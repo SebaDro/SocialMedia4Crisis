@@ -1,0 +1,36 @@
+<md-dialog layout-padding aria-label="Neuen Auftrag anlegen?">
+  <div layout-padding>
+    <form ng-cloak>
+      <md-dialog-content>
+        <h3>Soll die Collection {{newCollection.name}} so angelegt werden?</h3>
+      </md-dialog-content>
+      <div layout="column">
+        <!-- <div layout="row">
+          <div layout=column>
+            <fieldset class="standard">
+              <legend>Facebook Gruppen</legend>
+              <div layout="row" layout-wrap flex>
+                <div flex="50" ng-repeat="group in groups">
+                  <md-checkbox ng-checked="exists(group, selected)" ng-click="toggle(group, selected)">
+                    Test
+                  </md-checkbox>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div layout=column>
+          </div>
+        </div> -->
+        <md-dialog-actions layout="row">
+          <span flex></span>
+          <md-button ng-click="cancel()">
+            <md-icon> cancel </md-icon> Abbrechen
+          </md-button>
+          <md-button ng-click="confirm()">
+            <md-icon> done </md-icon> Auftrag anlegen
+          </md-button>
+        </md-dialog-actions>
+      </div>
+    </form>
+  </div>
+</md-dialog>

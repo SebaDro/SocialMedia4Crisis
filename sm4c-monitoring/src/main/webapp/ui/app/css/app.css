@@ -25,7 +25,7 @@
 }
 
 .header {
-  background-color: #5E0000;
+  background-color: #990000;
   padding-top: 5px;
 }
 
@@ -55,7 +55,7 @@ body {
   max-height: 100%;
 }
 
-md-checkbox.md-checked.green .md-icon {
+/*md-checkbox.md-checked.green .md-icon {
  background: rgba(0, 255, 0, 0.87);
 }
 
@@ -74,4 +74,4 @@ md-chips md-chip.md-focused {
 }
 md-input-container:not(.md-input-invalid).md-input-focused .md-input {
     border-color: #5E0000;
-}
+}*/

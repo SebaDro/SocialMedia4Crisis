@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="de.hsbo.fbg.sm4c.common.model.Collection" table="collection">
+        <meta attribute="class-description">
+            This class contains a collection.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" unique="true" />
+        <property name="description" column="description" type="string" />
+    </class>
+</hibernate-mapping>

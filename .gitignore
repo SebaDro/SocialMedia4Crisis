@@ -12,6 +12,7 @@
 
 *.properties
 nb-configuration.xml
+hibernate.cfg.xml
 
 # Eclipse
 .classpath

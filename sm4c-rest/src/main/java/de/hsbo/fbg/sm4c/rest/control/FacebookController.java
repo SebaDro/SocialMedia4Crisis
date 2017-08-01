@@ -6,14 +6,23 @@
 package de.hsbo.fbg.sm4c.rest.control;
 
 import de.hsbo.fbg.sm4c.mining.collect.FacebookCollector;
+import de.hsbo.fbg.sm4c.rest.encode.GroupEncoder;
+import de.hsbo.fbg.sm4c.rest.encode.PageEncoder;
+import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
+import de.hsbo.fbg.sm4c.rest.view.KeywordView;
 import facebook4j.Group;
 import facebook4j.Page;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +43,36 @@ public class FacebookController implements InitializingBean {
     public String getGroupsAsJSON(@PathVariable("keywords") String keywords) {
         String groups = facebookCollector.getGroupsAsJSON(keywords);
         return groups;
+    }
+
+    @RequestMapping(value = "/groups", method = RequestMethod.POST)
+    public List<FacebookSourceView> collectGroups(@RequestBody List<KeywordView> req) {
+        List<FacebookSourceView> facebookSources = new ArrayList();
+        GroupEncoder groupEncoder = new GroupEncoder();
+        req.forEach(k -> {
+            List<FacebookSourceView> sources = facebookCollector.getGroups(k.getName())
+                    .stream()
+                    .map(g -> groupEncoder.encode(g))
+                    .filter(g -> !facebookSources.stream().anyMatch(fbS -> fbS.getFacebookId().equals(g.getFacebookId())))
+                    .collect(Collectors.toList());
+            facebookSources.addAll(sources);
+        });
+        return facebookSources;
+    }
+
+    @RequestMapping(value = "/pages", method = RequestMethod.POST)
+    public List<FacebookSourceView> collectPages(@RequestBody List<KeywordView> req) {
+        List<FacebookSourceView> facebookSources = new ArrayList();
+        PageEncoder pageEncoder = new PageEncoder();
+        req.forEach(k -> {
+            List<FacebookSourceView> sources = facebookCollector.getPages(k.getName())
+                    .stream()
+                    .map(p -> pageEncoder.encode(p))
+                    .filter(p -> !facebookSources.stream().anyMatch(fbS -> fbS.getFacebookId().equals(p.getFacebookId())))
+                    .collect(Collectors.toList());
+            facebookSources.addAll(sources);
+        });
+        return facebookSources;
     }
 
     @RequestMapping(produces = {"text/csv"}, value = "/groups/{keywords}/csv", method = RequestMethod.GET)

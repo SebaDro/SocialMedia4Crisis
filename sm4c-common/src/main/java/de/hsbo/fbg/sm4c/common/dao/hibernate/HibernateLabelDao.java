@@ -5,18 +5,17 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
-import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
-import de.hsbo.fbg.sm4c.common.model.Collection;
-import java.util.Optional;
+import de.hsbo.fbg.sm4c.common.dao.LabelDao;
+import de.hsbo.fbg.sm4c.common.model.Label;
 import org.hibernate.Session;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class HibernateCollectionDao extends HibernateBaseDao<Collection> implements CollectionDao {
+public class HibernateLabelDao extends HibernateBaseDao<Label> implements LabelDao {
 
-    public HibernateCollectionDao(Session session) {
+    public HibernateLabelDao(Session session) {
         super(session);
     }
 

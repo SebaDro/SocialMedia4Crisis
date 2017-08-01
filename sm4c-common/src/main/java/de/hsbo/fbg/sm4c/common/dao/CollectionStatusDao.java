@@ -5,12 +5,12 @@
  */
 package de.hsbo.fbg.sm4c.common.dao;
 
-import de.hsbo.fbg.sm4c.common.model.Collection;
+import de.hsbo.fbg.sm4c.common.model.CollectionStatus;
 
 /**
  *
  * @author Sebastian Drost
  */
-public interface CollectionDao extends BaseDao<Collection> {
+public interface CollectionStatusDao extends BaseDao<CollectionStatus> {
 
 }

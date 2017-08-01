@@ -10,9 +10,21 @@ package de.hsbo.fbg.sm4c.common.dao;
  * @author Sebastian Drost
  */
 public interface DaoFactory<T extends AutoCloseable> {
-    
+
     T initializeContext();
 
     CollectionDao createCollectionDao(T daoContext);
-    
+
+    SocialMediaServiceDao createSocialMediaServiceDao(T daoContext);
+
+    SourceCategoryDao createSourceCategoryDao(T daoContext);
+
+    CollectionStatusDao createCollectioStatusDao(T daoContext);
+
+    LabelDao createLabelDao(T daoContext);
+
+    KeywordDao createKeywordDao(T daoContext);
+
+    FacebookSourceDao createFacebookSourceDao(T daoContext);
+
 }

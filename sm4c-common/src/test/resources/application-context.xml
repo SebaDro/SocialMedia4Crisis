@@ -14,7 +14,7 @@
     <mvc:annotation-driven />
     <ctx:annotation-config />
     
-    <!-- hibernate -->    
+        <!-- hibernate -->    
     <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection" />
     <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory" />
        

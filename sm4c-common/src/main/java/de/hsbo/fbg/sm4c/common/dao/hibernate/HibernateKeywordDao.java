@@ -5,18 +5,17 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
-import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
-import de.hsbo.fbg.sm4c.common.model.Collection;
-import java.util.Optional;
+import de.hsbo.fbg.sm4c.common.dao.KeywordDao;
+import de.hsbo.fbg.sm4c.common.model.Keyword;
 import org.hibernate.Session;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class HibernateCollectionDao extends HibernateBaseDao<Collection> implements CollectionDao {
+public class HibernateKeywordDao extends HibernateBaseDao<Keyword> implements KeywordDao {
 
-    public HibernateCollectionDao(Session session) {
+    public HibernateKeywordDao(Session session) {
         super(session);
     }
 

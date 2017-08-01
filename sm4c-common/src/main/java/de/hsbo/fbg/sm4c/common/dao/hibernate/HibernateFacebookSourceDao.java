@@ -5,18 +5,17 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
-import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
-import de.hsbo.fbg.sm4c.common.model.Collection;
-import java.util.Optional;
+import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
+import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import org.hibernate.Session;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class HibernateCollectionDao extends HibernateBaseDao<Collection> implements CollectionDao {
+public class HibernateFacebookSourceDao extends HibernateBaseDao<FacebookSource> implements FacebookSourceDao {
 
-    public HibernateCollectionDao(Session session) {
+    public HibernateFacebookSourceDao(Session session) {
         super(session);
     }
 

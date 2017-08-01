@@ -6,6 +6,7 @@
 package de.hsbo.fbg.sm4c.common.dao;
 
 import de.hsbo.fbg.sm4c.common.model.AbstractEntity;
+import de.hsbo.fbg.sm4c.common.model.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +18,13 @@ public interface BaseDao<T extends AbstractEntity> {
 
     Optional<T> retrieveById(long id);
 
+    Optional<T> retrieveByName(String name);
+
     List<T> retrieve();
 
     boolean exists(long id);
 
 //    boolean exists(String name);
-
     T store(T o);
 
     T update(T o);

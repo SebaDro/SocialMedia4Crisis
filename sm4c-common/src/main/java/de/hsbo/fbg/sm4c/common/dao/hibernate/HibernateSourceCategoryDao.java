@@ -5,18 +5,17 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
-import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
-import de.hsbo.fbg.sm4c.common.model.Collection;
-import java.util.Optional;
+import de.hsbo.fbg.sm4c.common.dao.SourceCategoryDao;
+import de.hsbo.fbg.sm4c.common.model.SourceCategory;
 import org.hibernate.Session;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class HibernateCollectionDao extends HibernateBaseDao<Collection> implements CollectionDao {
+public class HibernateSourceCategoryDao extends HibernateBaseDao<SourceCategory> implements SourceCategoryDao {
 
-    public HibernateCollectionDao(Session session) {
+    public HibernateSourceCategoryDao(Session session) {
         super(session);
     }
 

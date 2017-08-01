@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.common.dao;
 
-import de.hsbo.fbg.sm4c.common.model.Collection;
+package de.hsbo.fbg.sm4c.common.model;
+
 
 /**
  *
  * @author Sebastian Drost
  */
-public interface CollectionDao extends BaseDao<Collection> {
-
+public enum CollectionStatusType {
+    AKTIV, GESTOPPT
 }

@@ -10,7 +10,100 @@
         <id name="id" type="long" column="id">
             <generator class="identity"/>
         </id>
-        <property name="name" column="name" type="string" unique="true" />
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
         <property name="description" column="description" type="string" />
+        <property name="creation" column="creation" type="timestamp" />
+        <many-to-one name="status" column="statusid" not-null="true" class="de.hsbo.fbg.sm4c.common.model.CollectionStatus" foreign-key="fk_collection_cat_collectionstatus" cascade="none"/>
+        <!--        <property name="status" column="status">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">de.hsbo.fbg.sm4c.common.model.CollectionStatusType</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>-->
+        <set name="labels" table="collection_label" cascade="save-update" >
+            <key column="collectionid" />
+            <many-to-many column="labelid" class="de.hsbo.fbg.sm4c.common.model.Label" foreign-key="fk_collection_label_cat_label"/>
+        </set>
+        <set name="keywords" table="collection_keyword" cascade="save-update"  >
+            <key column="collectionid" />
+            <many-to-many column="keywordid" class="de.hsbo.fbg.sm4c.common.model.Keyword" foreign-key="fk_collection_keyword_cat_keyword"/>
+        </set>
+        <set name="services" table="collection_socialmediaservice" cascade="none">
+            <key column="collectionid" />
+            <many-to-many column="serviceid" class="de.hsbo.fbg.sm4c.common.model.SocialMediaService" foreign-key="fk_collection_socialmediaservice_cat_socialmediaservice"/>
+        </set>
+        <set name="sources" table="collection_facebooksources" cascade="save-update"  >
+            <key column="collectionid" />
+            <many-to-many column="sourceid" class="de.hsbo.fbg.sm4c.common.model.FacebookSource" foreign-key="fk_collection_facebooksources_cat_facebooksource"/>
+        </set>
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.CollectionStatus" table="collectionstatus">
+        <meta attribute="class-description">
+            This class contains a possible status of a collection.
+        </meta>
+        <id name="id" type="long" column="id" >
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.Keyword" table="keyword">
+        <meta attribute="class-description">
+            This class contains a keyword of a collection.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.Label" table="label">
+        <meta attribute="class-description">
+            This class contains a label of a collection.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.SocialMediaService" table="socialmediaservice">
+        <meta attribute="class-description">
+            This class contains a possible Social Media service a collection will be created for.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
+        <!--        <property name="name" column="name" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">de.hsbo.fbg.sm4c.common.model.SocialMediaServiceType</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>-->
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.FacebookSource" table="facebooksource">
+        <meta attribute="class-description">
+            This class contains a Facebook source for a collection.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="facebookId" column="facebookid" type="string" unique="true" not-null="true"/>
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
+        <property name="description" column="description" type="string" unique="true" not-null="true"/>
+        <many-to-one name="category" column="categoryid" not-null="true" class="de.hsbo.fbg.sm4c.common.model.SourceCategory" foreign-key="fk_facebooksource_cat_sourcecategory" cascade="none"/>
+        <!--                <property name="type" column="type">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">de.hsbo.fbg.sm4c.common.model.SourceCategoryType</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>-->
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.SourceCategory" table="sourcecategory">
+        <meta attribute="class-description">
+            This class contains a type of a FacebookSource.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
     </class>
 </hibernate-mapping>

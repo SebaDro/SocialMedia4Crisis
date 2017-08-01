@@ -5,18 +5,17 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
-import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
-import de.hsbo.fbg.sm4c.common.model.Collection;
-import java.util.Optional;
+import de.hsbo.fbg.sm4c.common.dao.CollectionStatusDao;
+import de.hsbo.fbg.sm4c.common.model.CollectionStatus;
 import org.hibernate.Session;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class HibernateCollectionDao extends HibernateBaseDao<Collection> implements CollectionDao {
+public class HibernateCollectionStatusDao extends HibernateBaseDao<CollectionStatus> implements CollectionStatusDao {
 
-    public HibernateCollectionDao(Session session) {
+    public HibernateCollectionStatusDao(Session session) {
         super(session);
     }
 

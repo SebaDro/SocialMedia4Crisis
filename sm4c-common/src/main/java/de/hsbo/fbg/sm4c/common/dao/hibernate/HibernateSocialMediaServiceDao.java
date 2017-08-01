@@ -5,8 +5,9 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
-import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
-import de.hsbo.fbg.sm4c.common.model.Collection;
+import de.hsbo.fbg.sm4c.common.dao.SocialMediaServiceDao;
+import de.hsbo.fbg.sm4c.common.model.SocialMediaService;
+import de.hsbo.fbg.sm4c.common.model.SocialMediaServiceType;
 import java.util.Optional;
 import org.hibernate.Session;
 
@@ -14,9 +15,9 @@ import org.hibernate.Session;
  *
  * @author Sebastian Drost
  */
-public class HibernateCollectionDao extends HibernateBaseDao<Collection> implements CollectionDao {
+public class HibernateSocialMediaServiceDao extends HibernateBaseDao<SocialMediaService> implements SocialMediaServiceDao {
 
-    public HibernateCollectionDao(Session session) {
+    public HibernateSocialMediaServiceDao(Session session) {
         super(session);
     }
 

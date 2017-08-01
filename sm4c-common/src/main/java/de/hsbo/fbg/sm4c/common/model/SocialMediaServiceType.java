@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.common.dao;
+package de.hsbo.fbg.sm4c.common.model;
 
-import de.hsbo.fbg.sm4c.common.model.Collection;
 
 /**
  *
  * @author Sebastian Drost
  */
-public interface CollectionDao extends BaseDao<Collection> {
-
+public enum SocialMediaServiceType {
+    FACEBOOK, TWITTER
 }

@@ -2,7 +2,8 @@ angular.module('sm4cMonitoring')
   .controller('CreateCollectionCtrl', ['$scope', '$mdDialog', '$http', function($scope, $mdDialog, $http) {
     self.readonly = false;
     $scope.newCollection = {
-      tags: []
+      tags: [],
+      labels: []
     };
     var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
 
@@ -120,12 +121,13 @@ angular.module('sm4cMonitoring')
       var groupsLoaded = false;
       var pagesLoaded = false;
       displayLoadingDialog();
-      var queryTags = "";
+      var payload = new Array();
       $scope.newCollection.tags.forEach(function(element) {
-        queryTags = queryTags + element +"+";
+        var obj = {};
+        obj['name'] = element;
+        payload.push(obj);
       });
-      queryTags = queryTags.slice(0, -1);
-      $http.get(rootURL + '/facebook/groups/' + queryTags + '/json')
+      $http.post(rootURL + '/facebook/groups', payload)
         .then(function success(response) {
           groupsLoaded = true;
           $scope.groups = response.data;
@@ -136,7 +138,7 @@ angular.module('sm4cMonitoring')
         }, function fail(response) {
           $mdDialog.cancel();
         });
-      $http.get(rootURL + '/facebook/pages/' + queryTags + '+hilfe')
+      $http.post(rootURL + '/facebook/pages', payload)
         .then(function success(response) {
           pagesLoaded = true;
           $scope.pages = response.data;

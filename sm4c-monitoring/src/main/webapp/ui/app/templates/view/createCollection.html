@@ -30,7 +30,7 @@
         <h2 flex md-truncate>Dienste</h2>
       </md-card-title>
       <md-card-content layout="column" layout-align="space-between" class="green">
-        <md-checkbox ng-model="newCollection.fbCb" aria-label="Facebook Checkbox">
+        <md-checkbox ng-model="newCollection.fbCb" aria-label="Facebook Checkbox" ng-init="newCollection.fbCb=true" ng-disabled="true">
           Facebook
         </md-checkbox>
         <md-checkbox ng-model="newCollection.twitterCb" aria-label="Facebook Checkbox" ng-disabled="true" class="green">
@@ -89,7 +89,7 @@
     <md-button class="md-raised md-secondary" type="button" ng-click="reset()">
       <md-icon> cancel </md-icon> Zurücketzen
     </md-button>
-    <md-button class="md-raised md-primary" type="submit" ng-click="submit()">
+    <md-button class="md-raised md-primary" type="submit" ng-click="submit($event)">
       <md-icon> save </md-icon> Erstelle Collection
     </md-button>
   </form>

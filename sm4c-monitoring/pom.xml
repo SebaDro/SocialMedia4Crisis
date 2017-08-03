@@ -29,6 +29,10 @@
             <artifactId>sm4c-classify</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sm4c-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.thetransactioncompany</groupId>
             <artifactId>cors-filter</artifactId>
         </dependency>

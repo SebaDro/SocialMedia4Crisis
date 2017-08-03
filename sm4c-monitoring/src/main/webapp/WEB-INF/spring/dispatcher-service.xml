@@ -16,8 +16,10 @@
         http://www.springframework.org/schema/util/spring-util-2.5.xsd">
 
     <mvc:annotation-driven/>
+    <ctx:annotation-config />
     
     <bean class="de.hsbo.fbg.sm4c.rest.control.FacebookController" />
     <bean class="de.hsbo.fbg.sm4c.rest.control.SimulationController" />
+    <bean class="de.hsbo.fbg.sm4c.rest.control.CollectionController" />
   
 </beans>

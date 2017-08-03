@@ -87,8 +87,8 @@
             <generator class="identity"/>
         </id>
         <property name="facebookId" column="facebookid" type="string" unique="true" not-null="true"/>
-        <property name="name" column="name" type="string" unique="true" not-null="true"/>
-        <property name="description" column="description" type="string" unique="true" not-null="true"/>
+        <property name="name" column="name" type="string" />
+        <property name="description" column="description" type="string" />
         <many-to-one name="category" column="categoryid" not-null="true" class="de.hsbo.fbg.sm4c.common.model.SourceCategory" foreign-key="fk_facebooksource_cat_sourcecategory" cascade="none"/>
         <!--                <property name="type" column="type">
             <type name="org.hibernate.type.EnumType">

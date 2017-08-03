@@ -14,6 +14,18 @@
     <mvc:annotation-driven />
     <ctx:annotation-config />
     
+    <!-- static resources -->
+    <mvc:resources mapping="/ui/**" location="/ui/"/>
+    
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver" />
+        <property name="url" value="jdbc:postgresql://localhost:5432/sm4c" />
+        <property name="username" value="postgres" />
+        <property name="password" value="postgres" />
+    </bean>
+    
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.CollectionDecoder" />
+    
     <!-- hibernate -->    
     <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection" />
     <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory" />

@@ -3,27 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.rest.encode;
+package de.hsbo.fbg.sm4c.rest.coding;
 
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
 import de.hsbo.fbg.sm4c.rest.view.SourceCategoryView;
-import facebook4j.Group;
+import facebook4j.Page;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class GroupEncoder {
+public class PageEncoder {
 
-    public FacebookSourceView encode(Group group) {
+    public FacebookSourceView encode(Page page) {
         FacebookSourceView s = new FacebookSourceView();
-        s.setName(group.getName());
-        s.setDescription(group.getDescription());
-        s.setFacebookId(group.getId());
+        s.setName(page.getName());
+        s.setDescription(page.getAbout());
+        s.setFacebookId(page.getId());
         SourceCategoryView sc = new SourceCategoryView();
-        sc.setName("Group");
+        sc.setName("Page");
         s.setSourceCategory(sc);
         return s;
     }
-
 }

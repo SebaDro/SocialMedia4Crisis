@@ -17,7 +17,6 @@ public class FacebookSource extends AbstractEntity implements Serializable {
     private String facebookId;
     private String name;
     private String description;
-//    private SourceCategoryType type;
     private SourceCategory category;
 
     public FacebookSource() {

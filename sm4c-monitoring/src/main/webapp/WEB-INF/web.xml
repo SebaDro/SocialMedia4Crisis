@@ -50,13 +50,14 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>rest</servlet-name>
-        <url-pattern>rest/*</url-pattern>
-    </servlet-mapping>
 
     <!-- listener for making the request available in the MVC controllers -->
     <listener>
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
+    
+    <servlet-mapping>
+        <servlet-name>rest</servlet-name>
+        <url-pattern>rest/*</url-pattern>
+    </servlet-mapping>
 </web-app>

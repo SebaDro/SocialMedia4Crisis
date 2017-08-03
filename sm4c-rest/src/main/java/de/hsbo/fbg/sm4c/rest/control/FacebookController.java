@@ -6,8 +6,8 @@
 package de.hsbo.fbg.sm4c.rest.control;
 
 import de.hsbo.fbg.sm4c.mining.collect.FacebookCollector;
-import de.hsbo.fbg.sm4c.rest.encode.GroupEncoder;
-import de.hsbo.fbg.sm4c.rest.encode.PageEncoder;
+import de.hsbo.fbg.sm4c.rest.coding.GroupEncoder;
+import de.hsbo.fbg.sm4c.rest.coding.PageEncoder;
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
 import de.hsbo.fbg.sm4c.rest.view.KeywordView;
 import facebook4j.Group;

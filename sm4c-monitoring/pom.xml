@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>sm4c-mining</artifactId>
+            <artifactId>sm4c-collect</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -226,12 +226,12 @@
                             <webAppSourceDirectory>${jetty.docroot}</webAppSourceDirectory>
                             <webAppConfig>
                                 <contextPath>/${project.build.finalName}</contextPath>
-                                <extraClasspath>target/classes;../sm4c-rest/target/classes;../sm4c-mining/target/classes;../sm4c-classify/target/classes;../sm4c-common/target/classes</extraClasspath>
+                                <extraClasspath>target/classes;../sm4c-rest/target/classes;../sm4c-collect/target/classes;../sm4c-classify/target/classes;../sm4c-common/target/classes</extraClasspath>
                             </webAppConfig>
                             <scanTargets>
                                 <scanTarget>target/classes</scanTarget>
                                 <scanTarget>../sm4c-rest/target/classes</scanTarget>
-                                <scanTarget>../sm4c-mining/target/classes</scanTarget>
+                                <scanTarget>../sm4c-collect/target/classes</scanTarget>
                                 <scanTarget>../sm4c-classify/target/classes</scanTarget>
                                 <scanTarget>../sm4c-common/target/classes</scanTarget>
                             </scanTargets>

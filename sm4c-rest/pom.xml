@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>sm4c-mining</artifactId>
+            <artifactId>sm4c-collect</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

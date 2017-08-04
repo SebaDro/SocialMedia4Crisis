@@ -7,6 +7,7 @@ package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
 import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
+import java.util.Optional;
 import org.hibernate.Session;
 
 /**
@@ -17,6 +18,11 @@ public class HibernateFacebookSourceDao extends HibernateBaseDao<FacebookSource>
 
     public HibernateFacebookSourceDao(Session session) {
         super(session);
+    }
+
+    @Override
+    public Optional<FacebookSource> retrieveByFacebookId(String facebookId) {
+        return retrieveByKey("facebookid", facebookId);
     }
 
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.rest.common;
+package de.hsbo.fbg.sm4c.common.dao;
 
 /**
  *

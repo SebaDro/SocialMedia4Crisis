@@ -6,11 +6,13 @@
 package de.hsbo.fbg.sm4c.common.dao;
 
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
+import java.util.Optional;
 
 /**
  *
- * @author Seba
+ * @author Sebastian Drost
  */
 public interface FacebookSourceDao extends BaseDao<FacebookSource> {
 
+    Optional<FacebookSource> retrieveByFacebookId(String facebookId);
 }

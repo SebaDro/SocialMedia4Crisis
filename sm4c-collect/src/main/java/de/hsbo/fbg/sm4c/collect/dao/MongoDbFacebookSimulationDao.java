@@ -11,46 +11,46 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import de.hsbo.fbg.sm4c.collect.encode.FacebookEncoder;
+import static com.mongodb.client.model.Filters.eq;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationDecoder;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
+import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
+import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import facebook4j.Group;
 import facebook4j.Page;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
-import de.hsbo.fbg.sm4c.collect.encode.FacebookDecoder;
-import java.util.Date;
-import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
-import java.util.function.Consumer;
-import static com.mongodb.client.model.Filters.eq;
-import java.util.logging.Level;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class MongoDbFacebookDao implements FacebookDao {
+public class MongoDbFacebookSimulationDao implements FacebookSimulationDao {
 
     private static final Logger LOGGER = LogManager.getLogger(MongoDbFacebookDao.class);
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> collection;
-    private final FacebookEncoder fbEncoder;
-    private final FacebookDecoder fbDecoder;
+    private final FacebookSimulationEncoder fbEncoder;
+    private final FacebookSimulationDecoder fbDecoder;
 
-    public MongoDbFacebookDao(String dbHost, int dbPort, String dbName, String dbCollection) {
+    public MongoDbFacebookSimulationDao(String dbHost, int dbPort, String dbName, String dbCollection) {
         mongoClient = new MongoClient(dbHost, dbPort);
         database = mongoClient.getDatabase(dbName);
         collection = database.getCollection(dbCollection);
-        fbEncoder = new FacebookEncoder();
-        fbDecoder = new FacebookDecoder();
+        fbEncoder = new FacebookSimulationEncoder();
+        fbDecoder = new FacebookSimulationDecoder();
     }
 
     @Override
-    public void storeFacebookMessages(List<FacebookMessageDocument> messages) {
+    public void storeFacebookMessages(List<FacebookSimulationMessageDocument> messages) {
         List<Document> postDocs = messages.stream().map(m -> Document.parse(fbEncoder
                 .encodeMessageToJson(m))
                 .append("creationTime", m.getCreationTime().toDate())
@@ -60,7 +60,7 @@ public class MongoDbFacebookDao implements FacebookDao {
     }
 
     @Override
-    public void storeSingleFacebookMessage(FacebookMessageDocument message) {
+    public void storeSingleFacebookMessage(FacebookSimulationMessageDocument message) {
         Document postDoc = Document.parse(fbEncoder.encodeMessageToJson(message))
                 .append("creationTime", message.getCreationTime().toDate())
                 .append("updateTime", message.getUpdateTime().toDate());
@@ -79,19 +79,15 @@ public class MongoDbFacebookDao implements FacebookDao {
     }
 
     @Override
-    public List<FacebookMessageDocument> getValuesForTimeSpan(Date startTime, Date endTime) {
-        ArrayList<FacebookMessageDocument> messages = new ArrayList<FacebookMessageDocument>();
+    public List<FacebookSimulationMessageDocument> getValuesForTimeSpan(Date startTime, Date endTime) {
+        ArrayList<FacebookSimulationMessageDocument> messages = new ArrayList<FacebookSimulationMessageDocument>();
         FindIterable<Document> documents = collection.find(Filters.and(
                 Filters.gte("creationTime", startTime),
                 Filters.lte("creationTime", endTime)));
         documents.forEach(new Consumer<Document>() {
             @Override
             public void accept(Document d) {
-                try {
-                    messages.add(fbDecoder.decodeFacebookMessage((Document) d));
-                } catch (Exception ex) {
-                    LOGGER.error("Could not load the referenced message", ex);
-                }
+                messages.add(fbDecoder.decodeFacebookMessage((Document) d));
             }
         });
         return messages;
@@ -108,7 +104,7 @@ public class MongoDbFacebookDao implements FacebookDao {
     }
 
     @Override
-    public boolean containsMessage(FacebookMessageDocument message) {
+    public boolean containsMessage(FacebookSimulationMessageDocument message) {
         return collection.find(eq("messageId", message.getId())).first() != null;
     }
 
@@ -118,16 +114,11 @@ public class MongoDbFacebookDao implements FacebookDao {
     }
 
     @Override
-    public FacebookMessageDocument getValueByFbId(String fbId){
+    public FacebookSimulationMessageDocument getValueByFbId(String fbId) {
         Document doc = collection.find(eq("messageId", fbId)).first();
-        FacebookMessageDocument message = null;
+        FacebookSimulationMessageDocument message = null;
         if (doc != null) {
-            try {
-                message = fbDecoder.decodeFacebookMessage(doc);
-            } catch (Exception ex) {
-                LOGGER.error("Could not load the refenrenced message", ex);
-                java.util.logging.Logger.getLogger(MongoDbFacebookDao.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            message = fbDecoder.decodeFacebookMessage(doc);
         }
         return message;
     }
@@ -136,5 +127,4 @@ public class MongoDbFacebookDao implements FacebookDao {
     public void deleteValue(FacebookMessageDocument message) {
         collection.deleteOne(eq("messageId", message.getId()));
     }
-
 }

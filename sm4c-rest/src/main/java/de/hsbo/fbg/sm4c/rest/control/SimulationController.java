@@ -8,13 +8,13 @@ package de.hsbo.fbg.sm4c.rest.control;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import de.hsbo.fbg.sm4c.mining.collect.FacebookCollector;
-import de.hsbo.fbg.sm4c.mining.config.Configuration;
-import de.hsbo.fbg.sm4c.mining.dao.DaoFactory;
-import de.hsbo.fbg.sm4c.mining.dao.FacebookDao;
-import de.hsbo.fbg.sm4c.mining.dao.MongoDbDaoFactory;
-import de.hsbo.fbg.sm4c.mining.encode.FacebookEncoder;
-import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
+import de.hsbo.fbg.sm4c.collect.FacebookSimulationCollector;
+import de.hsbo.fbg.sm4c.collect.config.Configuration;
+import de.hsbo.fbg.sm4c.collect.dao.DaoFactory;
+import de.hsbo.fbg.sm4c.collect.dao.FacebookSimulationDao;
+import de.hsbo.fbg.sm4c.collect.dao.MongoDbDaoFactory;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
+import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
 import de.hsbo.fbg.sm4c.rest.view.TrainingDataView;
 import facebook4j.Group;
 import facebook4j.Page;
@@ -43,10 +43,10 @@ public class SimulationController implements InitializingBean {
 
     private static final Logger LOGGER = LogManager.getLogger(SimulationController.class);
 
-    private FacebookDao fbDao;
-    private FacebookCollector fbCollector;
+    private FacebookSimulationDao fbDao;
+    private FacebookSimulationCollector fbCollector;
     private ObjectMapper mapper;
-    private FacebookEncoder fbEncoder;
+    private FacebookSimulationEncoder fbEncoder;
 
     @RequestMapping(produces = {"application/json"}, value = "/posts", method = RequestMethod.GET)
     public String getPosts() {
@@ -90,7 +90,7 @@ public class SimulationController implements InitializingBean {
                         if (!fbDao.containsGroup(g)) {
                             List<Post> posts = fbCollector.getMessagesFromSingleGroup(g,
                                     req.getStartDate(), req.getEndDate());
-                            List<FacebookMessage> messages = posts.stream()
+                            List<FacebookSimulationMessageDocument> messages = posts.stream()
                                     .map(p -> fbEncoder.createMessage(p, g))
                                     .collect(Collectors.toList());
                             if (posts != null && !posts.isEmpty()) {
@@ -103,7 +103,7 @@ public class SimulationController implements InitializingBean {
                         if (!fbDao.containsPage(fP)) {
                             List<Post> posts = fbCollector.getPostsFromSinglePage(fP,
                                     req.getStartDate(), req.getEndDate());
-                            List<FacebookMessage> messages = posts.stream()
+                            List<FacebookSimulationMessageDocument> messages = posts.stream()
                                     .map(p -> fbEncoder.createMessage(p, fP))
                                     .collect(Collectors.toList());
                             if (posts != null && !posts.isEmpty()) {
@@ -123,9 +123,9 @@ public class SimulationController implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         DaoFactory daoFactory = new MongoDbDaoFactory(Configuration.getConfig()
                 .getPropertyValue("db_simulation_collection"));
-        fbDao = daoFactory.createFacebookDao();
-        fbCollector = new FacebookCollector();
+        fbDao = daoFactory.createFacebookSimulationDao();
+        fbCollector = new FacebookSimulationCollector();
         mapper = new ObjectMapper();
-        fbEncoder = new FacebookEncoder();
+        fbEncoder = new FacebookSimulationEncoder();
     }
 }

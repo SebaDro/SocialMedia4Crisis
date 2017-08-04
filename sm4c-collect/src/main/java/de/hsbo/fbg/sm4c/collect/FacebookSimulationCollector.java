@@ -3,15 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.mining.collect;
+package de.hsbo.fbg.sm4c.collect;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.Gson;
-import de.hsbo.fbg.sm4c.mining.encode.FacebookCSVEncoder;
-import de.hsbo.fbg.sm4c.mining.encode.FacebookEncoder;
-import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookCSVEncoder;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookEncoder;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
+import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
+import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -34,9 +36,9 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author Sebastian Drost
  */
-public class FacebookCollector {
+public class FacebookSimulationCollector {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookSimulationCollector.class);
 
     private final int GROUP_LIMIT = 10000;
     private final int PAGE_LIMIT = 1000;
@@ -46,28 +48,28 @@ public class FacebookCollector {
     private final Facebook facebook;
     private final Gson gson;
     private final FacebookCSVEncoder fbCsvEncoder;
-    private final FacebookEncoder fbEncoder;
+    private final FacebookSimulationEncoder fbEncoder;
     private final int groupLimit;
     private final int pageLimit;
     private final int groupPostLimit;
     private final int pagePostLimit;
 
-    public FacebookCollector() {
+    public FacebookSimulationCollector() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
-        fbEncoder = new FacebookEncoder();
+        fbEncoder = new FacebookSimulationEncoder();
         groupLimit = GROUP_LIMIT;
         pageLimit = PAGE_LIMIT;
         groupPostLimit = GROUP_POST_LIMIT;
         pagePostLimit = PAGE_POST_LIMIT;
     }
 
-    public FacebookCollector(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
+    public FacebookSimulationCollector(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
-        fbEncoder = new FacebookEncoder();
+        fbEncoder = new FacebookSimulationEncoder();
         this.groupLimit = groupLimit;
         this.pageLimit = pageLimit;
         this.groupPostLimit = groupPostLimit;
@@ -241,7 +243,7 @@ public class FacebookCollector {
         ArrayNode postArray = mapper.createArrayNode();
         groups.forEach(g -> {
             List<Post> posts = getMessagesFromSingleGroup(g, startDate, endDate);
-            List<FacebookMessage> messages = posts.stream()
+            List<FacebookSimulationMessageDocument> messages = posts.stream()
                     .map(p -> fbEncoder.createMessage(p, g))
                     .collect(Collectors.toList());
             postArray.addAll(fbEncoder.createPostArrayNode(messages));
@@ -250,7 +252,7 @@ public class FacebookCollector {
         try {
             result = mapper.writeValueAsString(postArray);
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FacebookSimulationCollector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }
@@ -343,7 +345,7 @@ public class FacebookCollector {
         ArrayNode postArray = mapper.createArrayNode();
         pages.forEach(p -> {
             List<Post> posts = getPostsFromSinglePage(p, startDate, endDate);
-            List<FacebookMessage> messages = posts.stream()
+            List<FacebookSimulationMessageDocument> messages = posts.stream()
                     .map(fP -> fbEncoder.createMessage(fP, p))
                     .collect(Collectors.toList());
             postArray.addAll(fbEncoder.createPostArrayNode(messages));
@@ -352,7 +354,7 @@ public class FacebookCollector {
         try {
             result = mapper.writeValueAsString(postArray);
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FacebookSimulationCollector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }

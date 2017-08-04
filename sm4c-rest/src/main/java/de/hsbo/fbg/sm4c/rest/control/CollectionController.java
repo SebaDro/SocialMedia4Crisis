@@ -21,7 +21,7 @@ import de.hsbo.fbg.sm4c.common.model.Label;
 import de.hsbo.fbg.sm4c.common.model.SocialMediaService;
 import de.hsbo.fbg.sm4c.common.model.SourceCategory;
 import de.hsbo.fbg.sm4c.rest.coding.CollectionDecoder;
-import de.hsbo.fbg.sm4c.rest.common.RessourceNotFoundException;
+import de.hsbo.fbg.sm4c.common.dao.RessourceNotFoundException;
 import de.hsbo.fbg.sm4c.rest.view.CollectionView;
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
 import java.util.HashSet;

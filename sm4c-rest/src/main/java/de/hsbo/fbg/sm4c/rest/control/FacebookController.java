@@ -5,7 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.rest.control;
 
-import de.hsbo.fbg.sm4c.mining.collect.FacebookCollector;
+import de.hsbo.fbg.sm4c.collect.FacebookSimulationCollector;
 import de.hsbo.fbg.sm4c.rest.coding.GroupEncoder;
 import de.hsbo.fbg.sm4c.rest.coding.PageEncoder;
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
@@ -37,7 +37,7 @@ public class FacebookController implements InitializingBean {
 
     private static final Logger LOGGER = LogManager.getLogger(FacebookController.class);
 
-    private FacebookCollector facebookCollector;
+    private FacebookSimulationCollector facebookCollector;
 
     @RequestMapping(value = "/groups/{keywords}/json", method = RequestMethod.GET)
     public String getGroupsAsJSON(@PathVariable("keywords") String keywords) {
@@ -113,7 +113,7 @@ public class FacebookController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        facebookCollector = new FacebookCollector();
+        facebookCollector = new FacebookSimulationCollector();
     }
 
 }

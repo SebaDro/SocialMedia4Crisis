@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.mining.dao;
+package de.hsbo.fbg.sm4c.collect.dao;
 
 /**
  *
@@ -12,4 +12,6 @@ package de.hsbo.fbg.sm4c.mining.dao;
 public interface DaoFactory {
 
     public FacebookDao createFacebookDao();
+    
+    public FacebookSimulationDao createFacebookSimulationDao();
 }

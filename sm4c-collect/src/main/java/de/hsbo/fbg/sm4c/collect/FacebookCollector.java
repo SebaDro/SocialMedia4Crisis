@@ -3,15 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.mining.collect;
+package de.hsbo.fbg.sm4c.collect;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.Gson;
-import de.hsbo.fbg.sm4c.mining.encode.FacebookCSVEncoder;
-import de.hsbo.fbg.sm4c.mining.encode.FacebookEncoder;
-import de.hsbo.fbg.sm4c.mining.model.FacebookMessage;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookCSVEncoder;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookEncoder;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
+import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
+import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
+import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -46,7 +49,7 @@ public class FacebookCollector {
     private final Facebook facebook;
     private final Gson gson;
     private final FacebookCSVEncoder fbCsvEncoder;
-    private final FacebookEncoder fbEncoder;
+    private final FacebookSimulationEncoder fbEncoder;
     private final int groupLimit;
     private final int pageLimit;
     private final int groupPostLimit;
@@ -56,7 +59,7 @@ public class FacebookCollector {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
-        fbEncoder = new FacebookEncoder();
+        fbEncoder = new FacebookSimulationEncoder();
         groupLimit = GROUP_LIMIT;
         pageLimit = PAGE_LIMIT;
         groupPostLimit = GROUP_POST_LIMIT;
@@ -67,7 +70,7 @@ public class FacebookCollector {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
-        fbEncoder = new FacebookEncoder();
+        fbEncoder = new FacebookSimulationEncoder();
         this.groupLimit = groupLimit;
         this.pageLimit = pageLimit;
         this.groupPostLimit = groupPostLimit;
@@ -162,12 +165,51 @@ public class FacebookCollector {
      * @param endDate end date of the time period
      * @return
      */
+    public List<Post> getMessagesFromSingleSource(FacebookSource source, Date startTime, Date endTime) {
+        List<Post> result = new ArrayList();
+        try {
+            ResponseList<Post> feeds;
+            if (source.getCategory().getName().equals("Group")) {
+                feeds = facebook.getGroupFeed(source.getFacebookId(), new Reading()
+                        .limit(groupPostLimit)
+                        .fields("id", "created_time", "description", "link", "type", "updated_time", "caption", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                        .since(startTime).until(endTime));
+            } else {
+                feeds = facebook.getFeed(source.getFacebookId(), new Reading()
+                        .limit(pagePostLimit)
+                        .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                        .since(startTime).until(endTime));
+            }
+            if (feeds != null && !feeds.isEmpty()) {
+                result = feeds.stream().collect(Collectors.toList());
+                ResponseList<Post> f = facebook.fetchNext(feeds.getPaging());
+                while (f != null && !f.isEmpty()) {
+                    LOGGER.info("Retrieved partial posts from group [" + source.getFacebookId() + "]");
+                    result.addAll(f.stream().collect(Collectors.toList()));
+                    f = facebook.fetchNext(f.getPaging());
+                }
+            }
+            LOGGER.info("Retrieved posts from source [" + source.getFacebookId() + "]: " + result.size());
+        } catch (FacebookException ex) {
+            LOGGER.error("Could not retrieve posts from source", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Fetches posts from the specified group for a specified time period.
+     *
+     * @param group Facebook group
+     * @param startDate start date of the time period
+     * @param endDate end date of the time period
+     * @return
+     */
     public List<Post> getMessagesFromSingleGroup(Group group, Date startDate, Date endDate) {
         List<Post> result = new ArrayList();
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
                     .limit(groupPostLimit)
-                    .fields("id", "created_time", "description", "link", "type", "updated_time", "caption",  "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .fields("id", "created_time", "description", "link", "type", "updated_time", "caption", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
                     .since(startDate).until(endDate));
             if (feeds != null && !feeds.isEmpty()) {
                 result = feeds.stream().collect(Collectors.toList());
@@ -241,7 +283,7 @@ public class FacebookCollector {
         ArrayNode postArray = mapper.createArrayNode();
         groups.forEach(g -> {
             List<Post> posts = getMessagesFromSingleGroup(g, startDate, endDate);
-            List<FacebookMessage> messages = posts.stream()
+            List<FacebookSimulationMessageDocument> messages = posts.stream()
                     .map(p -> fbEncoder.createMessage(p, g))
                     .collect(Collectors.toList());
             postArray.addAll(fbEncoder.createPostArrayNode(messages));
@@ -343,7 +385,7 @@ public class FacebookCollector {
         ArrayNode postArray = mapper.createArrayNode();
         pages.forEach(p -> {
             List<Post> posts = getPostsFromSinglePage(p, startDate, endDate);
-            List<FacebookMessage> messages = posts.stream()
+            List<FacebookSimulationMessageDocument> messages = posts.stream()
                     .map(fP -> fbEncoder.createMessage(fP, p))
                     .collect(Collectors.toList());
             postArray.addAll(fbEncoder.createPostArrayNode(messages));

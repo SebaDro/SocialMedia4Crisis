@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.mining.encode;
+package de.hsbo.fbg.sm4c.collect.encode;
 
 import facebook4j.Group;
 import java.util.List;

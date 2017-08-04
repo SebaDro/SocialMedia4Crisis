@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.mining.dao;
+package de.hsbo.fbg.sm4c.collect.dao;
 
-import de.hsbo.fbg.sm4c.mining.config.Configuration;
+import de.hsbo.fbg.sm4c.collect.config.Configuration;
 
 /**
  *
@@ -28,6 +28,11 @@ public class MongoDbDaoFactory implements DaoFactory {
     @Override
     public FacebookDao createFacebookDao() {
         return new MongoDbFacebookDao(host, port, dbName, colName);
+    }
+
+    @Override
+    public FacebookSimulationDao createFacebookSimulationDao() {
+        return new MongoDbFacebookSimulationDao(host, port, dbName, colName);
     }
 
 }

@@ -3,16 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.common.model;
+package de.hsbo.fbg.sm4c.collect.model;
 
-import java.io.Serializable;
 import org.joda.time.DateTime;
 
 /**
  *
  * @author Sebastian Drost
  */
-public abstract class MessageDocument implements Serializable{
+public abstract class SimulationMessageDocument {
 
     protected String id;
     protected String content;
@@ -59,7 +58,4 @@ public abstract class MessageDocument implements Serializable{
     public void setUpdateTime(DateTime updateTime) {
         this.updateTime = updateTime;
     }
-    
-    
-
 }

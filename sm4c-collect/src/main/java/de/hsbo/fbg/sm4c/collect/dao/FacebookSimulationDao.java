@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package de.hsbo.fbg.sm4c.collect.dao;
 
+import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import facebook4j.Group;
 import facebook4j.Page;
@@ -15,23 +17,23 @@ import java.util.List;
  *
  * @author Sebastian Drost
  */
-public interface FacebookDao {
+public interface FacebookSimulationDao {
 
-    public void storeSingleFacebookMessage(FacebookMessageDocument message);
+    public void storeSingleFacebookMessage(FacebookSimulationMessageDocument message);
 
-    public void storeFacebookMessages(List<FacebookMessageDocument> messages);
+    public void storeFacebookMessages(List<FacebookSimulationMessageDocument> messages);
 
     public List<String> getValues();
     
-    public FacebookMessageDocument getValueByFbId(String fbId);
+    public FacebookSimulationMessageDocument getValueByFbId(String fbId);
     
-    public List<FacebookMessageDocument> getValuesForTimeSpan(Date startTime, Date endTime);
+    public List<FacebookSimulationMessageDocument> getValuesForTimeSpan(Date startTime, Date endTime);
 
     public boolean containsPage(Page page);
 
     public boolean containsGroup(Group group);
 
-    public boolean containsMessage(FacebookMessageDocument message);
+    public boolean containsMessage(FacebookSimulationMessageDocument message);
 
     public void deleteAllValues();
     

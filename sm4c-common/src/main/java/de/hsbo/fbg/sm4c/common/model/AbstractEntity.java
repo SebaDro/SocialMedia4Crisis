@@ -5,11 +5,13 @@
  */
 package de.hsbo.fbg.sm4c.common.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Sebastian Drost
  */
-public class AbstractEntity {
+public class AbstractEntity implements Serializable{
 
     private long id;
 

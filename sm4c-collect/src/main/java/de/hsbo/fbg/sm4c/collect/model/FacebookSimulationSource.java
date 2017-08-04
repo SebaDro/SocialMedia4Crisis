@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.mining.model;
+package de.hsbo.fbg.sm4c.collect.model;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class FacebookSource {
+public class FacebookSimulationSource {
 
     public static String TYPE_GROUP="group";
     public static String TYPE_PAGE="page";

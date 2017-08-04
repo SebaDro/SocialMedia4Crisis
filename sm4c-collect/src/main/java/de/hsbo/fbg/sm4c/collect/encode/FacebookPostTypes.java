@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package de.hsbo.fbg.sm4c.mining.encode;
+package de.hsbo.fbg.sm4c.collect.encode;
 
 /**
  *

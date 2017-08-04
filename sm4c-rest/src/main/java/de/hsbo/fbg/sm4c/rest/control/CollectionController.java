@@ -22,12 +22,15 @@ import de.hsbo.fbg.sm4c.common.model.SocialMediaService;
 import de.hsbo.fbg.sm4c.common.model.SourceCategory;
 import de.hsbo.fbg.sm4c.rest.coding.CollectionDecoder;
 import de.hsbo.fbg.sm4c.common.dao.RessourceNotFoundException;
+import de.hsbo.fbg.sm4c.rest.coding.CollectionEncoder;
 import de.hsbo.fbg.sm4c.rest.view.CollectionView;
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -54,6 +57,9 @@ public class CollectionController {
 
     @Autowired
     private CollectionDecoder collectionDecoder;
+    
+    @Autowired
+    private CollectionEncoder collectionEncoder;
 
     @RequestMapping(value = "/collections", method = RequestMethod.POST)
     public ResponseEntity initiateCollection(@RequestBody CollectionView req) {
@@ -78,6 +84,19 @@ public class CollectionController {
             LOGGER.error("Could not store collection", ex);
         }
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/collections", method = RequestMethod.GET)
+    public List<CollectionView> getCollections() {
+        List<CollectionView> result = new ArrayList();
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            List<Collection> collections = collectionDao.retrieve();
+            result = collections.stream()
+                    .map(c -> collectionEncoder.encode(c))
+                    .collect(Collectors.toList());
+        }
+        return result;
     }
 
     private CollectionStatus retrieveCollectionStatus(String status, Session session) throws RessourceNotFoundException {

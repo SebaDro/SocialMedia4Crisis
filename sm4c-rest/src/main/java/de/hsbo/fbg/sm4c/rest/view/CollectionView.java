@@ -5,6 +5,8 @@
  */
 package de.hsbo.fbg.sm4c.rest.view;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 import java.util.List;
 import org.joda.time.DateTime;
 
@@ -18,14 +20,24 @@ public class CollectionView {
 
     }
 
+    private long id;
     private String name;
-    private String description;
-    private DateTime creation;
+    private String description; 
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss Z")
+    private Date creation;
     private String collectionStatus;
     private List<String> labels;
     private List<String> keywords;
     private List<String> services;
     private List<FacebookSourceView> facebookSources;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -43,11 +55,11 @@ public class CollectionView {
         this.description = description;
     }
 
-    public DateTime getCreation() {
+    public Date getCreation() {
         return creation;
     }
 
-    public void setCreation(DateTime creation) {
+    public void setCreation(Date creation) {
         this.creation = creation;
     }
 

@@ -27,6 +27,7 @@ public class CollectionEncoder {
     
     public CollectionView encode (Collection c){
         CollectionView cv = new CollectionView();
+        cv.setId(c.getId());
         cv.setName(c.getName());
         cv.setDescription(c.getDescription());
         cv.setCollectionStatus(c.getStatus().getName());
@@ -34,7 +35,7 @@ public class CollectionEncoder {
                 .map(s -> sourceEncoder.encode(s))
                 .collect(Collectors.toList());
         cv.setFacebookSources(fsv);
-        cv.setCreation(new DateTime(c.getCreation()));
+        cv.setCreation(c.getCreation());
         List<String> keywords = c.getKeywords().stream().map(k -> k.getName()).collect(Collectors.toList());
         cv.setKeywords(keywords);
         List<String> labels = c.getLabels().stream().map(l -> l.getName()).collect(Collectors.toList());

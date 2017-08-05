@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package de.hsbo.fbg.sm4c.collect.config;
+package de.hsbo.fbg.common.config;
 
 import java.io.IOException;
 import java.io.InputStream;

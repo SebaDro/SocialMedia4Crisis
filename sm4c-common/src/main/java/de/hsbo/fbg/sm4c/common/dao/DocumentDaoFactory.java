@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.collect.dao;
+
+package de.hsbo.fbg.sm4c.common.dao;
 
 /**
  *
  * @author Sebastian Drost
  */
-public interface DaoFactory {
-
-    public FacebookDao createFacebookDao();
+public interface DocumentDaoFactory <T>{
     
-    public FacebookSimulationDao createFacebookSimulationDao();
+    FacebookMessageDocumentDao createFacebookMessageDocumentDao(T daoContext);
+
 }

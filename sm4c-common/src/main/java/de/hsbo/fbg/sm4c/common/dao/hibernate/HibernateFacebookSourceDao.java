@@ -22,7 +22,7 @@ public class HibernateFacebookSourceDao extends HibernateBaseDao<FacebookSource>
 
     @Override
     public Optional<FacebookSource> retrieveByFacebookId(String facebookId) {
-        return retrieveByKey("facebookid", facebookId);
+        return retrieveByKey("facebookId", facebookId);
     }
 
 }

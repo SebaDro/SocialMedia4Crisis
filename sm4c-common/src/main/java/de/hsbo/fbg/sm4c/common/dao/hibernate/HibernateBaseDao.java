@@ -60,7 +60,7 @@ public class HibernateBaseDao<T extends AbstractEntity> {
 //    public boolean exists(String name) {
 //
 //    }
-    public T store(T o) throws PersistenceException {
+    public T store(T o) {
         Transaction t = session.beginTransaction();
         session.save(o);
         t.commit();
@@ -68,7 +68,7 @@ public class HibernateBaseDao<T extends AbstractEntity> {
 
     }
 
-    public T update(T o) throws PersistenceException {
+    public T update(T o){
         Transaction t = session.beginTransaction();
         session.update(o);
         t.commit();

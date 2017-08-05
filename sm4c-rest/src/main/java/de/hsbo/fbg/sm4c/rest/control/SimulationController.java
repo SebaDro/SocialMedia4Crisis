@@ -9,10 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import de.hsbo.fbg.sm4c.collect.FacebookSimulationCollector;
-import de.hsbo.fbg.sm4c.collect.config.Configuration;
-import de.hsbo.fbg.sm4c.collect.dao.DaoFactory;
+import de.hsbo.fbg.common.config.Configuration;
 import de.hsbo.fbg.sm4c.collect.dao.FacebookSimulationDao;
-import de.hsbo.fbg.sm4c.collect.dao.MongoDbDaoFactory;
+import de.hsbo.fbg.sm4c.collect.dao.MongoDbFacebookSimulationDao;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
 import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
 import de.hsbo.fbg.sm4c.rest.view.TrainingDataView;
@@ -121,9 +120,12 @@ public class SimulationController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        DaoFactory daoFactory = new MongoDbDaoFactory(Configuration.getConfig()
-                .getPropertyValue("db_simulation_collection"));
-        fbDao = daoFactory.createFacebookSimulationDao();
+        Configuration conf = Configuration.getConfig();
+        fbDao = new MongoDbFacebookSimulationDao(
+                conf.getPropertyValue("db_host"), 
+                Integer.parseInt(conf.getPropertyValue("db_port")),
+                conf.getPropertyValue("db_sim_name"),
+                conf.getPropertyValue("db_sim_collection"));
         fbCollector = new FacebookSimulationCollector();
         mapper = new ObjectMapper();
         fbEncoder = new FacebookSimulationEncoder();

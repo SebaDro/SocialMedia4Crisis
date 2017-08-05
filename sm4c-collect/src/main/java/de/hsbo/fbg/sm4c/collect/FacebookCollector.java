@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.Gson;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookCSVEncoder;
-import de.hsbo.fbg.sm4c.collect.encode.FacebookEncoder;
+import de.hsbo.fbg.sm4c.common.coding.FacebookMessageDocumentEncoder;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
 import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;

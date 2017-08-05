@@ -65,7 +65,7 @@
             <artifactId>log4j-core</artifactId>
         </dependency>
     </dependencies>
-    <build>
+<!--    <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
@@ -81,5 +81,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 </project>

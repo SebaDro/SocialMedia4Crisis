@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.collect.encode;
 
+import de.hsbo.fbg.sm4c.common.coding.FacebookMessageDocumentDecoder;
 import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
 import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationSource;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +19,7 @@ import org.joda.time.DateTime;
  */
 public class FacebookSimulationDecoder {
 
-    private static final Logger LOGGER = LogManager.getLogger(FacebookDecoder.class);
+    private static final Logger LOGGER = LogManager.getLogger(FacebookMessageDocumentDecoder.class);
 
     /**
      * Decodes a MongoDB document to a a FacebookMessage

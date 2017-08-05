@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -32,7 +33,7 @@ public class HibernateDatabaseConnection implements InitializingBean, Disposable
         this.sessionFactory.close();
     }
 
-    public Session createSession() {
+    public Session createSession() throws HibernateException {
         return this.sessionFactory.openSession();
     }
 }

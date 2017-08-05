@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.collect.encode;
+package de.hsbo.fbg.sm4c.common.coding;
 
 import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
@@ -12,8 +12,6 @@ import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
-import facebook4j.Facebook;
-import facebook4j.FacebookFactory;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,16 +25,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Sebastian Drost
  */
-public class FacebookDecoder {
+public class FacebookMessageDocumentDecoder {
 
-    private static final Logger LOGGER = LogManager.getLogger(FacebookDecoder.class);
+    private static final Logger LOGGER = LogManager.getLogger(FacebookMessageDocumentDecoder.class);
 
-    private Facebook facebook;
     @Autowired
     private DaoFactory<Session> daoFactory;
 
-    public FacebookDecoder() {
-        facebook = new FacebookFactory().getInstance();
+    public FacebookMessageDocumentDecoder() {
+
     }
 
     /**
@@ -45,7 +42,7 @@ public class FacebookDecoder {
      * @param doc MongoDB document
      * @return decoded FacebookMessage
      */
-    public FacebookMessageDocument decodeFacebookMessage(Document doc) throws Exception{
+    public FacebookMessageDocument decodeFacebookMessage(Document doc) throws Exception {
 
         FacebookMessageDocument message = new FacebookMessageDocument();
         message.setId(doc.getString("messageId"));

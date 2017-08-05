@@ -6,13 +6,15 @@
 package de.hsbo.fbg.sm4c.common.model;
 
 import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import org.joda.time.DateTime;
 
 /**
  *
  * @author Sebastian Drost
  */
-public abstract class MessageDocument implements Serializable{
+public abstract class MessageDocument implements Serializable {
 
     protected String id;
     protected String content;
@@ -59,7 +61,5 @@ public abstract class MessageDocument implements Serializable{
     public void setUpdateTime(DateTime updateTime) {
         this.updateTime = updateTime;
     }
-    
-    
 
 }

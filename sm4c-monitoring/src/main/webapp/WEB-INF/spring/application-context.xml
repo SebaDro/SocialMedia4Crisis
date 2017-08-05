@@ -25,6 +25,7 @@
     </bean>
     
     <bean class="de.hsbo.fbg.sm4c.rest.coding.CollectionDecoder" />
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.CollectionEncoder"/>
     
     <!-- hibernate -->    
     <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection" />

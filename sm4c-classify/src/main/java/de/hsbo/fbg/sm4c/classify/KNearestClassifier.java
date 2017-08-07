@@ -43,43 +43,12 @@ public class KNearestClassifier extends AbstractClassifier {
 
     public KNearestClassifier() {
         this.classifier = instantiateClassifier();
-        this.transformer = createTransformer();
+        this.transformer = createBasicTransformer();
     }
 
     public void setKNN(int k) {
         this.k = k;
         ((IBk) classifier).setKNN(k);
-    }
-
-    private DtmTransformer createTransformer() {
-        StringToWordVector filter = new StringToWordVector();
-        //downcase tokens
-        filter.setLowerCaseTokens(true);
-
-        //binary weighting of word occurence
-        filter.setOutputWordCounts(false);
-
-        //Set stopwords from a file
-        WordsFromFile stopwordHandler = new WordsFromFile();
-        URL url = this.getClass().getClassLoader().getResource(DEFAULT_STOP_WORD_LIST);
-
-        //Set german Snowball stemmer
-        SnowballStemmer stemmer = new SnowballStemmer("german");
-        filter.setStemmer((Stemmer) stemmer);
-
-        WordTokenizer tokenizer = new WordTokenizer();
-        filter.setTokenizer(tokenizer);
-
-        File stopWordFile;
-        try {
-            stopWordFile = new File(url.toURI());
-            stopwordHandler.setStopwords(stopWordFile);
-            filter.setStopwordsHandler(stopwordHandler);
-
-        } catch (URISyntaxException ex) {
-            LOGGER.error("Could not load stop words", ex);
-        }
-        return new DtmTransformer(filter);
     }
 
     @Override

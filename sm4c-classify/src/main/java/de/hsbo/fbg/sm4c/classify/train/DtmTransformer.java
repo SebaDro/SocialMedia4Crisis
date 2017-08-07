@@ -41,6 +41,10 @@ public class DtmTransformer {
         this.filter = filter;
     }
 
+    public StringToWordVector getFilter() {
+        return filter;
+    }
+
     public void setInputFormat(Dataset dataset) {
         try {
             filter.setInputFormat(dataset.getModelDataset());

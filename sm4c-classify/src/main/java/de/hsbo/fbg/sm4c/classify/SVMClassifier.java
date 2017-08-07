@@ -29,42 +29,7 @@ public class SVMClassifier extends AbstractClassifier {
 
     public SVMClassifier() {
         this.classifier = instantiateClassifier();
-        this.transformer = createTransfomer();
-    }
-
-    private DtmTransformer createTransfomer() {
-        StringToWordVector filter = new StringToWordVector();
-        //downcase tokens
-        filter.setLowerCaseTokens(true);
-
-        //binary weighting of word occurence
-        filter.setOutputWordCounts(false);
-
-        //Set stopwords from a file
-        WordsFromFile stopwordHandler = new WordsFromFile();
-        URL url = this.getClass().getClassLoader().getResource(DEFAULT_STOP_WORD_LIST);
-
-        //Set german Snowball stemmer
-        SnowballStemmer stemmer = new SnowballStemmer("german");
-        filter.setStemmer((Stemmer) stemmer);
-
-        //Use Tf-Idf weights
-//        filter.setIDFTransform(true);
-//        filter.setOutputWordCounts(true);
-        //Set tokenizer per word
-        WordTokenizer tokenizer = new WordTokenizer();
-        filter.setTokenizer(tokenizer);
-
-        File stopWordFile;
-        try {
-            stopWordFile = new File(url.toURI());
-            stopwordHandler.setStopwords(stopWordFile);
-            filter.setStopwordsHandler(stopwordHandler);
-
-        } catch (URISyntaxException ex) {
-            LOGGER.error("Could not load stop words", ex);
-        }
-        return new DtmTransformer(filter);
+        this.transformer = createBasicTransformer();
     }
 
     @Override

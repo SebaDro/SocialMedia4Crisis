@@ -50,13 +50,14 @@ public class FacebookMessageDocumentDecoder {
         message.setContent(doc.getString("content"));
         message.setType(doc.getString("type"));
         Document sourceDoc = (Document) doc.get("source");
-        FacebookSource source;
-        try {
-            source = retrieveFacebookSource(sourceDoc.getString("id"));
-            message.setSource(source);
-        } catch (Exception ex) {
-            LOGGER.error("Can not decode referenced document", ex);
-        }
+//        FacebookSource source;
+//        try {
+//            source = retrieveFacebookSource(sourceDoc.getString("id"));
+//            message.setSource(source);
+//        } catch (Exception ex) {
+//            LOGGER.error("Can not decode referenced document", ex);
+//        }
+//        FacebookSource source = new 
         message.setCreationTime(new DateTime(doc.getDate("creationTime")));
         message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
         return message;

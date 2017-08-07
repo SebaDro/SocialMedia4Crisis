@@ -36,5 +36,9 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
     public MongoCollection getContext(Collection collection) {
         return database.getCollection(collection.getName());
     }
+    
+        public MongoCollection getContext(String collection) {
+        return database.getCollection(collection);
+    }
 
 }

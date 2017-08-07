@@ -27,10 +27,9 @@ import facebook4j.ResponseList;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Collector class for fetching different content from the Facebook Graph API
@@ -39,7 +38,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class FacebookCollector {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
+    private static final Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
 
     private final int GROUP_LIMIT = 10000;
     private final int PAGE_LIMIT = 1000;
@@ -292,7 +291,7 @@ public class FacebookCollector {
         try {
             result = mapper.writeValueAsString(postArray);
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Could not encode referenced array", ex);
         }
         return result;
     }
@@ -394,7 +393,7 @@ public class FacebookCollector {
         try {
             result = mapper.writeValueAsString(postArray);
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(FacebookCollector.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Could not encode referenced array", ex);
         }
         return result;
     }

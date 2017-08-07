@@ -15,7 +15,7 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @author Sebastian Drost
  */
-public class MongoDatabaseConnection implements InitializingBean, DisposableBean {
+public class MongoSimulationDatabaseConnection implements InitializingBean, DisposableBean {
 
     private MongoClient mongoClient;
     private MongoDatabase database;
@@ -25,7 +25,7 @@ public class MongoDatabaseConnection implements InitializingBean, DisposableBean
     public void afterPropertiesSet() {
         String dbHost = Configuration.getConfig().getPropertyValue("db_host");
         String dbPort = Configuration.getConfig().getPropertyValue("db_port");
-        dbName = Configuration.getConfig().getPropertyValue("db_name");
+        dbName = Configuration.getConfig().getPropertyValue("db_sim_name");
         this.mongoClient = new MongoClient(dbHost, Integer.parseInt(dbPort));
     }
 

@@ -6,8 +6,6 @@
 package de.hsbo.fbg.sm4c.common.model;
 
 import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import org.joda.time.DateTime;
 
 /**

@@ -5,12 +5,12 @@
  */
 package de.hsbo.fbg.sm4c.common.dao;
 
-import de.hsbo.fbg.sm4c.common.model.SourceCategory;
+import de.hsbo.fbg.sm4c.common.model.SourceType;
 
 /**
  *
  * @author Sebastian Drost
  */
-public interface SourceCategoryDao extends BaseDao<SourceCategory> {
+public interface SourceTypeDao extends BaseDao<SourceType> {
 
 }

@@ -12,14 +12,13 @@ import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
 import de.hsbo.fbg.sm4c.common.dao.KeywordDao;
 import de.hsbo.fbg.sm4c.common.dao.LabelDao;
 import de.hsbo.fbg.sm4c.common.dao.SocialMediaServiceDao;
-import de.hsbo.fbg.sm4c.common.dao.SourceCategoryDao;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.CollectionStatus;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import de.hsbo.fbg.sm4c.common.model.Keyword;
 import de.hsbo.fbg.sm4c.common.model.Label;
 import de.hsbo.fbg.sm4c.common.model.SocialMediaService;
-import de.hsbo.fbg.sm4c.common.model.SourceCategory;
+import de.hsbo.fbg.sm4c.common.model.SourceType;
 import de.hsbo.fbg.sm4c.rest.coding.CollectionDecoder;
 import de.hsbo.fbg.sm4c.common.dao.RessourceNotFoundException;
 import de.hsbo.fbg.sm4c.rest.coding.CollectionEncoder;
@@ -41,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
 
 /**
  *
@@ -67,7 +67,7 @@ public class CollectionController {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
 
             Collection collection = collectionDecoder.decode(req);
-            CollectionStatus status = retrieveCollectionStatus(req.getCollectionStatus(), session);
+            CollectionStatus status = retrieveCollectionStatus(req.getStatus(), session);
             Set<Keyword> keywords = retrieveKeywords(req.getKeywords(), session);
             Set<Label> labels = retrieveLabels(req.getLabels(), session);
             Set<FacebookSource> sources = retrieveSources(req.getFacebookSources(), session);
@@ -142,7 +142,7 @@ public class CollectionController {
 
     private Set<FacebookSource> retrieveSources(List<FacebookSourceView> facebookSources, Session session) {
         FacebookSourceDao sourceDao = daoFactory.createFacebookSourceDao(session);
-        SourceCategoryDao categoryDao = daoFactory.createSourceCategoryDao(session);
+        SourceTypeDao categoryDao = daoFactory.createSourceTypeDao(session);
         Set<FacebookSource> result = new HashSet<>();
         facebookSources.forEach(s -> {
             try {
@@ -151,11 +151,11 @@ public class CollectionController {
                     result.add(source.get());
                 } else {
                     FacebookSource sou = new FacebookSource();
-                    Optional<SourceCategory> category = categoryDao.retrieveByName(s.getSourceCategory().getName());
+                    Optional<SourceType> category = categoryDao.retrieveByName(s.getSourceType().getName());
                     if (!category.isPresent()) {
                         throw new RessourceNotFoundException("The specified source is not supported.");
                     }
-                    sou.setCategory(category.get());
+                    sou.setType(category.get());
                     sou.setName(s.getName());
                     sou.setDescription(s.getDescription());
                     sou.setFacebookId(s.getFacebookId());

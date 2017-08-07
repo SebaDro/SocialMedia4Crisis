@@ -17,7 +17,7 @@ public interface DaoFactory<T extends AutoCloseable> {
 
     SocialMediaServiceDao createSocialMediaServiceDao(T daoContext);
 
-    SourceCategoryDao createSourceCategoryDao(T daoContext);
+    SourceTypeDao createSourceTypeDao(T daoContext);
 
     CollectionStatusDao createCollectioStatusDao(T daoContext);
 

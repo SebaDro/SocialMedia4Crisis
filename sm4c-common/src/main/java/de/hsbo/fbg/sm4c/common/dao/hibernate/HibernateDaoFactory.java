@@ -12,9 +12,9 @@ import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
 import de.hsbo.fbg.sm4c.common.dao.KeywordDao;
 import de.hsbo.fbg.sm4c.common.dao.LabelDao;
 import de.hsbo.fbg.sm4c.common.dao.SocialMediaServiceDao;
-import de.hsbo.fbg.sm4c.common.dao.SourceCategoryDao;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
 
 /**
  *
@@ -48,8 +48,8 @@ public class HibernateDaoFactory implements DaoFactory<Session> {
     }
 
     @Override
-    public SourceCategoryDao createSourceCategoryDao(Session daoContext) {
-        return new HibernateSourceCategoryDao(daoContext);
+    public SourceTypeDao createSourceTypeDao(Session daoContext) {
+        return new HibernateSourceTypeDao(daoContext);
     }
 
     @Override

@@ -14,12 +14,6 @@
         <property name="description" column="description" type="string" />
         <property name="creation" column="creation" type="timestamp" />
         <many-to-one name="status" column="statusid" not-null="true" class="de.hsbo.fbg.sm4c.common.model.CollectionStatus" foreign-key="fk_collection_cat_collectionstatus" cascade="none"/>
-        <!--        <property name="status" column="status">
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">de.hsbo.fbg.sm4c.common.model.CollectionStatusType</param>
-                <param name="useNamed">true</param>
-            </type>
-        </property>-->
         <set name="labels" table="collection_label" cascade="save-update" >
             <key column="collectionid" />
             <many-to-many column="labelid" class="de.hsbo.fbg.sm4c.common.model.Label" foreign-key="fk_collection_label_cat_label"/>
@@ -72,12 +66,6 @@
             <generator class="identity"/>
         </id>
         <property name="name" column="name" type="string" unique="true" not-null="true"/>
-        <!--        <property name="name" column="name" not-null="true">
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">de.hsbo.fbg.sm4c.common.model.SocialMediaServiceType</param>
-                <param name="useNamed">true</param>
-            </type>
-        </property>-->
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.FacebookSource" table="facebooksource">
         <meta attribute="class-description">
@@ -89,15 +77,9 @@
         <property name="facebookId" column="facebookid" type="string" unique="true" not-null="true"/>
         <property name="name" column="name" type="string" />
         <property name="description" column="description" type="string" />
-        <many-to-one name="category" column="categoryid" not-null="true" class="de.hsbo.fbg.sm4c.common.model.SourceCategory" foreign-key="fk_facebooksource_cat_sourcecategory" cascade="none"/>
-        <!--                <property name="type" column="type">
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">de.hsbo.fbg.sm4c.common.model.SourceCategoryType</param>
-                <param name="useNamed">true</param>
-            </type>
-        </property>-->
+        <many-to-one name="type" column="typeid" not-null="true" class="de.hsbo.fbg.sm4c.common.model.SourceType" foreign-key="fk_facebooksource_cat_sourcetype" cascade="none"/>
     </class>
-    <class name="de.hsbo.fbg.sm4c.common.model.SourceCategory" table="sourcecategory">
+    <class name="de.hsbo.fbg.sm4c.common.model.SourceType" table="sourcetype">
         <meta attribute="class-description">
             This class contains a type of a FacebookSource.
         </meta>

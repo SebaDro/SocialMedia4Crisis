@@ -11,12 +11,12 @@ import java.io.Serializable;
  *
  * @author Sebastian Drost
  */
-public class SourceCategory extends AbstractEntity implements Serializable {
+public class SourceType extends AbstractEntity implements Serializable {
 
     private long id;
     private String name;
 
-    public SourceCategory() {
+    public SourceType() {
 
     }
 

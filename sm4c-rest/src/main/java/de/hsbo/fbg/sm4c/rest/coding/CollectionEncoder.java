@@ -30,7 +30,7 @@ public class CollectionEncoder {
         cv.setId(c.getId());
         cv.setName(c.getName());
         cv.setDescription(c.getDescription());
-        cv.setCollectionStatus(c.getStatus().getName());
+        cv.setStatus(c.getStatus().getName());
         List<FacebookSourceView> fsv = c.getSources().stream()
                 .map(s -> sourceEncoder.encode(s))
                 .collect(Collectors.toList());

@@ -6,7 +6,7 @@
 package de.hsbo.fbg.sm4c.rest.coding;
 
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
-import de.hsbo.fbg.sm4c.rest.view.SourceCategoryView;
+import de.hsbo.fbg.sm4c.rest.view.SourceTypeView;
 import facebook4j.Group;
 
 /**
@@ -20,7 +20,7 @@ public class GroupEncoder {
         s.setName(group.getName());
         s.setDescription(group.getDescription());
         s.setFacebookId(group.getId());
-        SourceCategoryView sc = new SourceCategoryView();
+        SourceTypeView sc = new SourceTypeView();
         sc.setName("Group");
         s.setSourceCategory(sc);
         return s;

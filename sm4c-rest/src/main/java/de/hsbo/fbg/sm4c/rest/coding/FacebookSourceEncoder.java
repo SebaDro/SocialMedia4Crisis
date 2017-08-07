@@ -7,7 +7,7 @@ package de.hsbo.fbg.sm4c.rest.coding;
 
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
-import de.hsbo.fbg.sm4c.rest.view.SourceCategoryView;
+import de.hsbo.fbg.sm4c.rest.view.SourceTypeView;
 
 /**
  *
@@ -20,8 +20,8 @@ public class FacebookSourceEncoder {
         sv.setName(s.getName());
         sv.setDescription(s.getDescription());
         sv.setFacebookId(s.getFacebookId());
-        SourceCategoryView scv = new SourceCategoryView();
-        scv.setName(s.getCategory().getName());
+        SourceTypeView scv = new SourceTypeView();
+        scv.setName(s.getType().getName());
         sv.setSourceCategory(scv);
         return sv;
     }

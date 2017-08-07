@@ -25,7 +25,7 @@ public class CollectionView {
     private String description; 
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss Z")
     private Date creation;
-    private String collectionStatus;
+    private String status;
     private List<String> labels;
     private List<String> keywords;
     private List<String> services;
@@ -63,12 +63,12 @@ public class CollectionView {
         this.creation = creation;
     }
 
-    public String getCollectionStatus() {
-        return collectionStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public void setCollectionStatus(String collectionStatus) {
-        this.collectionStatus = collectionStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public List<String> getLabels() {

@@ -17,7 +17,7 @@ public class FacebookSource extends AbstractEntity implements Serializable {
     private String facebookId;
     private String name;
     private String description;
-    private SourceCategory category;
+    private SourceType type;
 
     public FacebookSource() {
 
@@ -62,11 +62,11 @@ public class FacebookSource extends AbstractEntity implements Serializable {
 //    public void setType(SourceCategoryType type) {
 //        this.type = type;
 //    }
-    public SourceCategory getCategory() {
-        return category;
+    public SourceType getType() {
+        return type;
     }
 
-    public void setCategory(SourceCategory category) {
-        this.category = category;
+    public void setType(SourceType type) {
+        this.type = type;
     }
 }

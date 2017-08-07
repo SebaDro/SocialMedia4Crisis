@@ -9,9 +9,9 @@ package de.hsbo.fbg.sm4c.rest.view;
  *
  * @author Sebastian Drost
  */
-public class SourceCategoryView {
+public class SourceTypeView {
 
-    public SourceCategoryView() {
+    public SourceTypeView() {
 
     }
 

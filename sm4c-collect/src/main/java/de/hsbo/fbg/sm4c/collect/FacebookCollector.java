@@ -169,7 +169,7 @@ public class FacebookCollector {
         List<Post> result = new ArrayList();
         try {
             ResponseList<Post> feeds;
-            if (source.getCategory().getName().equals("Group")) {
+            if (source.getType().getName().equals("group")) {
                 feeds = facebook.getGroupFeed(source.getFacebookId(), new Reading()
                         .limit(groupPostLimit)
                         .fields("id", "created_time", "description", "link", "type", "updated_time", "caption", "from", "likes", "message", "parent_id", "picture", "place", "reactions")

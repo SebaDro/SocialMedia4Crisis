@@ -6,7 +6,7 @@
 package de.hsbo.fbg.sm4c.rest.coding;
 
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
-import de.hsbo.fbg.sm4c.rest.view.SourceCategoryView;
+import de.hsbo.fbg.sm4c.rest.view.SourceTypeView;
 import facebook4j.Page;
 
 /**
@@ -20,7 +20,7 @@ public class PageEncoder {
         s.setName(page.getName());
         s.setDescription(page.getAbout());
         s.setFacebookId(page.getId());
-        SourceCategoryView sc = new SourceCategoryView();
+        SourceTypeView sc = new SourceTypeView();
         sc.setName("Page");
         s.setSourceCategory(sc);
         return s;

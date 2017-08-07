@@ -5,17 +5,17 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
-import de.hsbo.fbg.sm4c.common.dao.SourceCategoryDao;
-import de.hsbo.fbg.sm4c.common.model.SourceCategory;
+import de.hsbo.fbg.sm4c.common.model.SourceType;
 import org.hibernate.Session;
+import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class HibernateSourceCategoryDao extends HibernateBaseDao<SourceCategory> implements SourceCategoryDao {
+public class HibernateSourceTypeDao extends HibernateBaseDao<SourceType> implements SourceTypeDao {
 
-    public HibernateSourceCategoryDao(Session session) {
+    public HibernateSourceTypeDao(Session session) {
         super(session);
     }
 

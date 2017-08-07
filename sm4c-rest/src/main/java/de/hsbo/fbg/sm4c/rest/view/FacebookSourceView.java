@@ -18,7 +18,7 @@ public class FacebookSourceView {
     private String facebookId;
     private String name;
     private String description;
-    private SourceCategoryView sourceCategory;
+    private SourceTypeView sourceType;
 
     public String getFacebookId() {
         return facebookId;
@@ -44,12 +44,12 @@ public class FacebookSourceView {
         this.description = description;
     }
 
-    public SourceCategoryView getSourceCategory() {
-        return sourceCategory;
+    public SourceTypeView getSourceType() {
+        return sourceType;
     }
 
-    public void setSourceCategory(SourceCategoryView sourceCategory) {
-        this.sourceCategory = sourceCategory;
+    public void setSourceCategory(SourceTypeView sourceType) {
+        this.sourceType = sourceType;
     }
 
 }

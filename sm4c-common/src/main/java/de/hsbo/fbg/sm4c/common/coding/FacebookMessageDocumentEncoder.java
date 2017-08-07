@@ -115,7 +115,7 @@ public class FacebookMessageDocumentEncoder {
         ObjectNode sourceNode = mapper.createObjectNode();
         sourceNode.put("id", message.getSource().getFacebookId());
         sourceNode.put("name", message.getSource().getName());
-        sourceNode.put("type", message.getSource().getCategory().getName());
+        sourceNode.put("type", message.getSource().getType().getName());
         root.set("source", sourceNode);
         return root;
     }

@@ -13,6 +13,7 @@ import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import java.util.Optional;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -29,7 +30,6 @@ public class FacebookMessageDocumentDecoder {
 
     private static final Logger LOGGER = LogManager.getLogger(FacebookMessageDocumentDecoder.class);
 
-    @Autowired
     private DaoFactory<Session> daoFactory;
 
     public FacebookMessageDocumentDecoder() {
@@ -42,7 +42,7 @@ public class FacebookMessageDocumentDecoder {
      * @param doc MongoDB document
      * @return decoded FacebookMessage
      */
-    public FacebookMessageDocument decodeFacebookMessage(Document doc) throws Exception {
+    public FacebookMessageDocument decodeFacebookMessage(Document doc) {
 
         FacebookMessageDocument message = new FacebookMessageDocument();
         message.setId(doc.getString("messageId"));
@@ -50,29 +50,37 @@ public class FacebookMessageDocumentDecoder {
         message.setContent(doc.getString("content"));
         message.setType(doc.getString("type"));
         Document sourceDoc = (Document) doc.get("source");
-        FacebookSource source = retrieveFacebookSource(sourceDoc.getString("id"));
-//        FacebookSource source = new FacebookSource();
-//        source.setId(sourceDoc.getString("id"));
-//        source.setName(sourceDoc.getString("name"));
-//        source.setType(sourceDoc.getString("type"));
-        message.setSource(source);
+        FacebookSource source;
+        try {
+            source = retrieveFacebookSource(sourceDoc.getString("id"));
+            message.setSource(source);
+        } catch (Exception ex) {
+            LOGGER.error("Can not decode referenced document", ex);
+        }
         message.setCreationTime(new DateTime(doc.getDate("creationTime")));
         message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
         return message;
     }
 
-    private FacebookSource retrieveFacebookSource(String facebookId) throws Exception {
+    private FacebookSource retrieveFacebookSource(String facebookId) throws RessourceNotFoundException {
         HibernateDatabaseConnection dbc = new HibernateDatabaseConnection();
-        dbc.afterPropertiesSet();
-        daoFactory = new HibernateDaoFactory(dbc);
+        try {
+            dbc.afterPropertiesSet();
+            daoFactory = new HibernateDaoFactory(dbc);
+        } catch (Exception ex) {
+            LOGGER.error("Could not instantiate DB connection", ex);
+        }
+        FacebookSource result;
         try (Session session = (Session) daoFactory.initializeContext()) {
+
             FacebookSourceDao sourceDao = daoFactory.createFacebookSourceDao(session);
             Optional<FacebookSource> source = sourceDao.retrieveByFacebookId(facebookId);
             if (!source.isPresent()) {
                 throw new RessourceNotFoundException("The referenced source is not available");
             }
-            return source.get();
+            result = source.get();
         }
-
+        return result;
     }
+
 }

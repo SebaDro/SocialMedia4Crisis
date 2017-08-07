@@ -5,11 +5,8 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.mongo;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,29 +17,12 @@ import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import de.hsbo.fbg.sm4c.common.dao.FacebookMessageDocumentDao;
-import static com.mongodb.client.model.Filters.eq;
 import de.hsbo.fbg.sm4c.common.coding.FacebookMessageDocumentDecoder;
 import de.hsbo.fbg.sm4c.common.coding.FacebookMessageDocumentEncoder;
-import de.hsbo.fbg.sm4c.common.model.Collection;
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.core.GenericTypeResolver;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.eq;
+import de.hsbo.fbg.sm4c.common.dao.RessourceNotFoundException;
 
 /**
  *
@@ -67,14 +47,23 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
         Document doc = dbCollection.find(eq("messageId", id)).first();
         FacebookMessageDocument message = null;
         if (doc != null) {
-            try {
-                message = messageDocDecoder.decodeFacebookMessage(doc);
-            } catch (Exception ex) {
-                LOGGER.error("Could not load the refenrenced message", ex);
-                java.util.logging.Logger.getLogger(MongoFacebookMessageDocumentDao.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            message = messageDocDecoder.decodeFacebookMessage(doc);
         }
         return message;
+    }
+
+    @Override
+    public List<FacebookMessageDocument> retrieveTrainingData() {
+        ArrayList<FacebookMessageDocument> messages = new ArrayList<>();
+        FindIterable<Document> documents = dbCollection.find(eq("training", true));
+        FacebookMessageDocument message = null;
+        documents.forEach(new Consumer<Document>() {
+            @Override
+            public void accept(Document d) {
+                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
+            }
+        });
+        return messages;
     }
 
     @Override
@@ -84,11 +73,7 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
         documents.forEach(new Consumer<Document>() {
             @Override
             public void accept(Document d) {
-                try {
-                    messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-                } catch (Exception ex) {
-                    LOGGER.error("Could not load the referenced message", ex);
-                }
+                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
             }
         });
         return messages;
@@ -103,11 +88,7 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
         documents.forEach(new Consumer<Document>() {
             @Override
             public void accept(Document d) {
-                try {
-                    messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-                } catch (Exception ex) {
-                    LOGGER.error("Could not load the referenced message", ex);
-                }
+                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
             }
         });
         return messages;
@@ -151,4 +132,11 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
 //    public boolean containsGroup(Group group) {
 //        return dbCollection.find(eq("source.id", group.getId())).first() != null;
 //    }
+    @Override
+    public void update(FacebookMessageDocument doc, String field) {
+        Document updatedDoc = messageDocEncoder.encodeMessageToDocument(doc);
+        dbCollection.updateOne(
+                eq("messageId", doc.getId()),
+                new Document("$set", new Document(field, updatedDoc.get(field))));
+    }
 }

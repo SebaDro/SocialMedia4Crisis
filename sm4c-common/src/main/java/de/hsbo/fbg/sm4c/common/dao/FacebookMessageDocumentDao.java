@@ -20,6 +20,8 @@ public interface FacebookMessageDocumentDao {
     FacebookMessageDocument retrieveById(String id);
 
     List<FacebookMessageDocument> retrieve();
+    
+    List<FacebookMessageDocument> retrieveTrainingData();
 
     List<FacebookMessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
 
@@ -28,6 +30,8 @@ public interface FacebookMessageDocumentDao {
     void store(FacebookMessageDocument doc);
 
     void store(List<FacebookMessageDocument> docs);
+    
+    void update(FacebookMessageDocument doc, String field);
 
     void remove(FacebookMessageDocument doc);
     

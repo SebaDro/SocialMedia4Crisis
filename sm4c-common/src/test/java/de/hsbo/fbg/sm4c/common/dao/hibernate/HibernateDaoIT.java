@@ -12,14 +12,13 @@ import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
 import de.hsbo.fbg.sm4c.common.dao.KeywordDao;
 import de.hsbo.fbg.sm4c.common.dao.LabelDao;
 import de.hsbo.fbg.sm4c.common.dao.SocialMediaServiceDao;
-import de.hsbo.fbg.sm4c.common.dao.SourceCategoryDao;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.CollectionStatus;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import de.hsbo.fbg.sm4c.common.model.Keyword;
 import de.hsbo.fbg.sm4c.common.model.Label;
 import de.hsbo.fbg.sm4c.common.model.SocialMediaService;
-import de.hsbo.fbg.sm4c.common.model.SourceCategory;
+import de.hsbo.fbg.sm4c.common.model.SourceType;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -31,6 +30,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
 
 /**
  *
@@ -55,7 +55,7 @@ public class HibernateDaoIT {
     public void roundTrip() {
         CollectionDao collectionDao = daoFactory.createCollectionDao(session);
         SocialMediaServiceDao socialMediaServiceDao = daoFactory.createSocialMediaServiceDao(session);
-        SourceCategoryDao sourceCategoryDao = daoFactory.createSourceCategoryDao(session);
+        SourceTypeDao sourceCategoryDao = daoFactory.createSourceTypeDao(session);
         CollectionStatusDao collectionStatusDao = daoFactory.createCollectioStatusDao(session);
         LabelDao labelDao = daoFactory.createLabelDao(session);
         KeywordDao keywordDao = daoFactory.createKeywordDao(session);
@@ -63,31 +63,31 @@ public class HibernateDaoIT {
 
         Keyword keyword1 = new Keyword();
         Keyword keyword2 = new Keyword();
-        keyword1.setName("hochwasser");
-        keyword2.setName("hilfe");
+        keyword1.setName("Keyword Test 1");
+        keyword2.setName("Keyword Test 2");
         Set<Keyword> keywords = new HashSet();
         Collections.addAll(keywords, keyword1, keyword2);
 
         Label label1 = new Label();
         Label label2 = new Label();
-        label1.setName("relief");
-        label2.setName("non relief");
+        label1.setName("Label Test 1");
+        label2.setName("Label Test 2");
         Set<Label> labels = new HashSet();
         Collections.addAll(labels, label1, label2);
 
-        SourceCategory category1 = sourceCategoryDao.retrieveByName("Group").get();
-        SourceCategory category2 = sourceCategoryDao.retrieveByName("Page").get();
+        SourceType category1 = sourceCategoryDao.retrieveByName("group").get();
+        SourceType category2 = sourceCategoryDao.retrieveByName("page").get();
 
         FacebookSource source1 = new FacebookSource();
-        source1.setFacebookId("123Test");
-        source1.setName("Hochwasserhilfe Magdeburg");
-        source1.setDescription("Hier werden Sie geholfen");
-        source1.setCategory(category1);
+        source1.setFacebookId("Source ID Test 1");
+        source1.setName("Source Name Test 1");
+        source1.setDescription("Source Description Test 1");
+        source1.setType(category1);
         FacebookSource source2 = new FacebookSource();
-        source2.setFacebookId("456Test");
-        source2.setName("Hochwasser 2013");
-        source2.setDescription("Aktuelle Updates");
-        source2.setCategory(category2);
+        source2.setFacebookId("Source ID Test 2");
+        source2.setName("Source Name Test 2");
+        source2.setDescription("Source Description Test 2");
+        source2.setType(category2);
         Set<FacebookSource> sources = new HashSet();
         Collections.addAll(sources, source1, source2);
 
@@ -98,8 +98,8 @@ public class HibernateDaoIT {
         CollectionStatus status = collectionStatusDao.retrieveByName("gestoppt").get();
 
         Collection collection = new Collection();
-        collection.setName("Hochwasser");
-        collection.setDescription("Hochwasser 2013");
+        collection.setName("Collection Name Test");
+        collection.setDescription("Collection Description Test");
         collection.setCreation(DateTime.now().toDate());
         collection.setLabels(labels);
         collection.setStatus(status);

@@ -30,6 +30,7 @@ public class CollectionView {
     private List<String> keywords;
     private List<String> services;
     private List<FacebookSourceView> facebookSources;
+    private long documentCount;
 
     public long getId() {
         return id;
@@ -101,6 +102,14 @@ public class CollectionView {
 
     public void setFacebookSources(List<FacebookSourceView> facebookSources) {
         this.facebookSources = facebookSources;
+    }
+    
+    public long getDocumentCount() {
+        return documentCount;
+    }
+
+    public void setDocumentCount(long documentCount) {
+        this.documentCount = documentCount;
     }
 
 }

@@ -5,12 +5,15 @@
  */
 package de.hsbo.fbg.sm4c.rest.control;
 
+import com.mongodb.client.MongoCollection;
 import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
 import de.hsbo.fbg.sm4c.common.dao.CollectionStatusDao;
 import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
+import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
 import de.hsbo.fbg.sm4c.common.dao.KeywordDao;
 import de.hsbo.fbg.sm4c.common.dao.LabelDao;
+import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import de.hsbo.fbg.sm4c.common.dao.SocialMediaServiceDao;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.CollectionStatus;
@@ -41,6 +44,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
+import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection;
+import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  *
@@ -48,18 +55,29 @@ import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
  */
 @RestController
 @RequestMapping(produces = {"application/json"})
-public class CollectionController {
+public class CollectionController implements InitializingBean{
 
     private static final Logger LOGGER = LogManager.getLogger(CollectionController.class);
 
     @Autowired
     private DaoFactory<Session> daoFactory;
+    
+    
 
     @Autowired
     private CollectionDecoder collectionDecoder;
-    
+
     @Autowired
     private CollectionEncoder collectionEncoder;
+    
+    DocumentDaoFactory documentDaoFactory;
+    
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        MongoDatabaseConnection con = new MongoDatabaseConnection();
+        con.afterPropertiesSet();
+        documentDaoFactory = new MongoDocumentDaoFactory(con);
+    }
 
     @RequestMapping(value = "/collections", method = RequestMethod.POST)
     public ResponseEntity initiateCollection(@RequestBody CollectionView req) {
@@ -97,6 +115,24 @@ public class CollectionController {
                     .collect(Collectors.toList());
         }
         return result;
+    }
+
+    @RequestMapping(value = "/collections/{id}", method = RequestMethod.GET)
+    public CollectionView getCollection(@PathVariable("id") String id) throws RessourceNotFoundException {
+        List<CollectionView> result = new ArrayList();
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));      
+            if (collection.isPresent()) {
+                MongoCollection mongoCollection = (MongoCollection)documentDaoFactory.getContext(collection.get());
+                MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
+                
+                CollectionView cv = collectionEncoder.encode(collection.get());
+                cv.setDocumentCount(documentDao.count());
+                return cv;
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
     }
 
     private CollectionStatus retrieveCollectionStatus(String status, Session session) throws RessourceNotFoundException {
@@ -186,5 +222,7 @@ public class CollectionController {
         });
         return result;
     }
+
+
 
 }

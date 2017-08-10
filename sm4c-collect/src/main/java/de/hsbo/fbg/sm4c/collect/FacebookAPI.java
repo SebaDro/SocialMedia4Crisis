@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.Gson;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookCSVEncoder;
-import de.hsbo.fbg.sm4c.common.coding.FacebookMessageDocumentEncoder;
+import de.hsbo.fbg.sm4c.common.coding.MessageDocumentEncoder;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
 import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
@@ -36,9 +36,9 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Sebastian Drost
  */
-public class FacebookCollector {
+public class FacebookAPI {
 
-    private static final Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
+    private static final Logger LOGGER = LogManager.getLogger(FacebookAPI.class);
 
     private final int GROUP_LIMIT = 10000;
     private final int PAGE_LIMIT = 1000;
@@ -54,7 +54,7 @@ public class FacebookCollector {
     private final int groupPostLimit;
     private final int pagePostLimit;
 
-    public FacebookCollector() {
+    public FacebookAPI() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
@@ -65,7 +65,7 @@ public class FacebookCollector {
         pagePostLimit = PAGE_POST_LIMIT;
     }
 
-    public FacebookCollector(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
+    public FacebookAPI(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();

@@ -1,27 +1,24 @@
-///*
-// * To change this license header, choose License Headers in Project Properties.
-// * To change this template file, choose Tools | Templates
-// * and open the template in the editor.
-// */
-//package de.hsbo.fbg.sm4c.collect;
-//
-//import de.hsbo.fbg.sm4c.collect.encode.FacebookEncoder;
-//import de.hsbo.fbg.sm4c.common.model.FacebookSource;
-//import de.hsbo.fbg.sm4c.common.model.MessageDocument;
-//import facebook4j.Post;
-//import java.util.Iterator;
-//import java.util.List;
-//import java.util.stream.Collectors;
-//import org.apache.spark.storage.StorageLevel;
-//import org.apache.spark.streaming.receiver.Receiver;
-//import org.joda.time.DateTime;
-//
-///**
-// *
-// * @author Sebastian Drost
-// */
-//public class FacebookReceiver extends Receiver<MessageDocument> {
-//    
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package de.hsbo.fbg.sm4c.collect;
+
+import de.hsbo.fbg.sm4c.common.model.FacebookSource;
+import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import facebook4j.Post;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.joda.time.DateTime;
+
+/**
+ *
+ * @author Sebastian Drost
+ */
+public class FacebookReceiver {
+    
 //    private List<FacebookSource> sources;
 //    private DateTime startTime;
 //    private DateTime endTime;
@@ -37,9 +34,7 @@
 //     * @param intervall the time intervall in seconds between the pollings Graph
 //     * API
 //     */
-//    public FacebookReceiver(List<FacebookSource> sources, long intervall) {
-//        super(StorageLevel.MEMORY_AND_DISK_2());
-//        
+//    public FacebookReceiver(List<FacebookSource> sources, long intervall) {       
 //        this.sources = sources;
 //        this.startTime = null;
 //        this.endTime = null;
@@ -100,4 +95,4 @@
 //            messages.forEach(m -> store(m));
 //        }
 //    }
-//}
+}

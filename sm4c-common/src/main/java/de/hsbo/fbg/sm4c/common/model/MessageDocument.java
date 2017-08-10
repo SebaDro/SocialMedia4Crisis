@@ -17,6 +17,7 @@ public abstract class MessageDocument implements Serializable {
     protected String id;
     protected String content;
     protected String label;
+    protected String service;
     protected DateTime creationTime;
     protected DateTime updateTime;
 
@@ -44,6 +45,14 @@ public abstract class MessageDocument implements Serializable {
         this.label = label;
     }
 
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
+    }
+
     public DateTime getCreationTime() {
         return creationTime;
     }
@@ -58,6 +67,10 @@ public abstract class MessageDocument implements Serializable {
 
     public void setUpdateTime(DateTime updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public void setType(String type) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

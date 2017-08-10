@@ -5,7 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.collect.dao;
 
-import de.hsbo.fbg.sm4c.common.dao.mongo.MongoFacebookMessageDocumentDao;
+import de.hsbo.fbg.sm4c.common.dao.mongo.MongoMessageDocumentDao;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -28,6 +28,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.eq;
 
 /**
  *
@@ -35,7 +37,7 @@ import static com.mongodb.client.model.Filters.eq;
  */
 public class MongoDbFacebookSimulationDao implements FacebookSimulationDao {
 
-    private static final Logger LOGGER = LogManager.getLogger(MongoFacebookMessageDocumentDao.class);
+    private static final Logger LOGGER = LogManager.getLogger(MongoMessageDocumentDao.class);
 
     private final MongoClient mongoClient;
     private final MongoDatabase database;

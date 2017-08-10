@@ -8,12 +8,14 @@ package de.hsbo.fbg.sm4c.classify;
 import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import de.hsbo.fbg.sm4c.classify.train.DocumentTermMatrix;
 import de.hsbo.fbg.sm4c.classify.train.DtmTransformer;
-import static de.hsbo.fbg.sm4c.classify.train.DtmTransformer.DEFAULT_STOP_WORD_LIST;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Random;
+import java.util.jar.Attributes;
 import org.apache.logging.log4j.LogManager;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -35,9 +37,17 @@ public abstract class AbstractClassifier {
 
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(AbstractClassifier.class);
 
+    public static final String DEFAULT_STOP_WORD_LIST = "german_stopwords_plain.txt";
+
     protected Classifier classifier;
     protected Dataset trainingData;
+    protected DocumentTermMatrix matrix;
     protected DtmTransformer transformer;
+
+    public AbstractClassifier() {
+        this.classifier = instantiateClassifier();
+        transformer = createBasicTransformer();
+    }
 
     /**
      * Trains the classifier with a labeled training dataset
@@ -47,7 +57,7 @@ public abstract class AbstractClassifier {
     public void trainClassifier(Dataset trainingData) {
         this.trainingData = trainingData;
         this.transformer.setInputFormat(trainingData);
-        DocumentTermMatrix matrix = this.transformer.createDocumentTermMatrix(trainingData);
+        this.matrix = this.transformer.createDocumentTermMatrix(trainingData);
         try {
             classifier.buildClassifier(matrix.getDtm());
         } catch (Exception ex) {
@@ -130,6 +140,8 @@ public abstract class AbstractClassifier {
         WordTokenizer tokenizer = new WordTokenizer();
         filter.setTokenizer(tokenizer);
 
+        filter.setWordsToKeep(10000);
+
         //Set stopwords from a file
         WordsFromFile stopwordHandler = new WordsFromFile();
         URL url = this.getClass().getClassLoader().getResource(DEFAULT_STOP_WORD_LIST);
@@ -145,6 +157,14 @@ public abstract class AbstractClassifier {
         return new DtmTransformer(filter);
     }
 
-    protected abstract Classifier instantiateClassifier();
+    public ArrayList<Attribute> getAttributes() {
+        ArrayList<Attribute> result = new ArrayList<>();
+        Enumeration<Attribute> ettributeEnmu = this.matrix.getDtm().enumerateAttributes();
+        while (ettributeEnmu.hasMoreElements()) {
+            result.add(ettributeEnmu.nextElement());
+        }
+        return result;
+    }
 
+    protected abstract Classifier instantiateClassifier();
 }

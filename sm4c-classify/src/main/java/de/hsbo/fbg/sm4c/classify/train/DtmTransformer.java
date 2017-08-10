@@ -29,7 +29,6 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 public class DtmTransformer {
 
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(DtmTransformer.class);
-    public static final String DEFAULT_STOP_WORD_LIST = "german_stopwords_plain.txt";
 
     /**
      * The filter used to generate the word counts.

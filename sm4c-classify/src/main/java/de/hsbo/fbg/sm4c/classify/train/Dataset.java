@@ -37,7 +37,7 @@ public class Dataset {
                 .map(l -> l.getName())
                 .collect(Collectors.toList());
         attributes.add(new Attribute("class", classValues));
-        modelDataset = new Instances(col.getName(), attributes, 1000);
+        modelDataset = new Instances(col.getName(), attributes, 10000);
         modelDataset.setClassIndex(modelDataset.numAttributes()-1);
     }
 

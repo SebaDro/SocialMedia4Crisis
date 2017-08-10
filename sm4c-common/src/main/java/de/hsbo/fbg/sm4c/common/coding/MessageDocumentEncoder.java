@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
+import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.common.model.Services;
+import java.math.BigDecimal;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,36 +23,17 @@ import org.bson.Document;
  *
  * @author Sebastian Drost
  */
-public class FacebookMessageDocumentEncoder {
+public class MessageDocumentEncoder {
 
-    private static final Logger LOGGER = LogManager.getLogger(FacebookMessageDocumentEncoder.class);
+    private static final Logger LOGGER = LogManager.getLogger(MessageDocumentEncoder.class);
 
     private ObjectMapper mapper;
 
-    public FacebookMessageDocumentEncoder() {
+    public MessageDocumentEncoder() {
         mapper = new ObjectMapper();
     }
 
-//    /**
-//     * Creates a Facebook message from a Facebook post
-//     *
-//     * @param post Facebook post
-//     * @param source the page or group the post was published
-//     * @return Facebook message
-//     */
-//    public FacebookMessageDocument createMessage(Post post, FacebookSource source) {
-//        FacebookMessageDocument message = new FacebookMessageDocument();
-//        message.setId(post.getId());
-//        message.setContent(post.getMessage());
-//        DateTime creationTime = new DateTime(post.getCreatedTime());
-//        message.setCreationTime(creationTime);
-//        DateTime updateTime = new DateTime(post.getUpdatedTime());
-//        message.setUpdateTime(updateTime);
-//        message.setType(post.getType());
-//        message.setSource(source);
-//        return message;
-//    }
-    public Document encodeMessageToDocument(FacebookMessageDocument message) {
+    public Document encodeMessageToDocument(MessageDocument message) {
         Document doc = Document.parse(encodeMessageToJson(message))
                 .append("creationTime", message.getCreationTime().toDate())
                 .append("updateTime", message.getUpdateTime().toDate());
@@ -62,33 +46,14 @@ public class FacebookMessageDocumentEncoder {
      * @param message message to encode
      * @return message as JSON string
      */
-    public String encodeMessageToJson(FacebookMessageDocument message) {
+    public String encodeMessageToJson(MessageDocument message) {
         String result = "";
-        ObjectNode postNode = createMessageNode(message);
+        ObjectNode postNode = null;
+        if (message.getService().equals(Services.FACEBOOK.toString())) {
+            postNode = createFacebookMessageNode((FacebookMessageDocument) message);
+        }
         try {
             result = mapper.writeValueAsString(postNode);
-        } catch (JsonProcessingException ex) {
-            LOGGER.error("Could not encode post", ex);
-        }
-        return result;
-    }
-
-    /**
-     * Encodes a list of Facebook messages into a JSON Array string
-     *
-     * @param messages messages to encode
-     * @return messages as JSON Array string
-     */
-    public String encodeMessagesToJson(List<FacebookMessageDocument> messages) {
-        ObjectNode root = mapper.createObjectNode();
-        ArrayNode postArray = mapper.createArrayNode();
-        messages.forEach(p -> {
-            ObjectNode node = createMessageNode(p);
-            postArray.add(node);
-        });
-        String result = "";
-        try {
-            result = mapper.writeValueAsString(postArray);
         } catch (JsonProcessingException ex) {
             LOGGER.error("Could not encode post", ex);
         }
@@ -101,7 +66,7 @@ public class FacebookMessageDocumentEncoder {
      * @param message Facebook message
      * @return JSON ObjectNode
      */
-    public ObjectNode createMessageNode(FacebookMessageDocument message) {
+    public ObjectNode createFacebookMessageNode(FacebookMessageDocument message) {
         ObjectNode root = mapper.createObjectNode();
 
         root.put("messageId", message.getId());
@@ -111,7 +76,9 @@ public class FacebookMessageDocumentEncoder {
             root.put("label", "");
         }
         root.put("content", message.getContent());
+        root.put("service", message.getService());
         root.put("type", message.getType());
+
         ObjectNode sourceNode = mapper.createObjectNode();
         sourceNode.put("id", message.getSource().getFacebookId());
         sourceNode.put("name", message.getSource().getName());
@@ -120,19 +87,39 @@ public class FacebookMessageDocumentEncoder {
         return root;
     }
 
-    /**
-     * Creates a JSON ArrayNode from a List of Facebook messages
-     *
-     * @param messages List of Facebook messages
-     * @return JSON ArrayNode
-     */
-    public ArrayNode createPostArrayNode(List<FacebookMessageDocument> messages) {
-        ArrayNode postArray = mapper.createArrayNode();
-        messages.forEach(m -> {
-            ObjectNode node = createMessageNode(m);
-            postArray.add(node);
-        });
-        return postArray;
-    }
-
+//    /**
+//     * Encodes a list of Facebook messages into a JSON Array string
+//     *
+//     * @param messages messages to encode
+//     * @return messages as JSON Array string
+//     */
+//    public String encodeMessagesToJson(List<FacebookMessageDocument> messages) {
+//        ObjectNode root = mapper.createObjectNode();
+//        ArrayNode postArray = mapper.createArrayNode();
+//        messages.forEach(p -> {
+//            ObjectNode node = createFacebookMessageNode(p);
+//            postArray.add(node);
+//        });
+//        String result = "";
+//        try {
+//            result = mapper.writeValueAsString(postArray);
+//        } catch (JsonProcessingException ex) {
+//            LOGGER.error("Could not encode post", ex);
+//        }
+//        return result;
+//    }
+//    /**
+//     * Creates a JSON ArrayNode from a List of Facebook messages
+//     *
+//     * @param messages List of Facebook messages
+//     * @return JSON ArrayNode
+//     */
+//    public ArrayNode createPostArrayNode(List<FacebookMessageDocument> messages) {
+//        ArrayNode postArray = mapper.createArrayNode();
+//        messages.forEach(m -> {
+//            ObjectNode node = createFacebookMessageNode(m);
+//            postArray.add(node);
+//        });
+//        return postArray;
+//    }
 }

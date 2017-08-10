@@ -12,27 +12,27 @@ import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
+import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.common.model.Services;
 import java.util.Optional;
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class for decoding Faceook messages
  *
  * @author Sebastian Drost
  */
-public class FacebookMessageDocumentDecoder {
+public class MessageDocumentDecoder {
 
-    private static final Logger LOGGER = LogManager.getLogger(FacebookMessageDocumentDecoder.class);
+    private static final Logger LOGGER = LogManager.getLogger(MessageDocumentDecoder.class);
 
     private DaoFactory<Session> daoFactory;
 
-    public FacebookMessageDocumentDecoder() {
+    public MessageDocumentDecoder() {
 
     }
 
@@ -42,22 +42,25 @@ public class FacebookMessageDocumentDecoder {
      * @param doc MongoDB document
      * @return decoded FacebookMessage
      */
-    public FacebookMessageDocument decodeFacebookMessage(Document doc) {
-
-        FacebookMessageDocument message = new FacebookMessageDocument();
+    public MessageDocument decodeFacebookMessage(Document doc) {
+        MessageDocument message = null;
+        if (doc.getString("service").equals(Services.FACEBOOK)) {
+            message = new FacebookMessageDocument();
+            message.setService(Services.FACEBOOK.toString());
+            ((FacebookMessageDocument) message).setType(doc.getString("type"));
+            Document sourceDoc = (Document) doc.get("source");
+            FacebookSource source;
+            try {
+                source = retrieveFacebookSource(sourceDoc.getString("id"));
+                ((FacebookMessageDocument) message).setSource(source);
+            } catch (Exception ex) {
+                LOGGER.error("Can not decode referenced document", ex);
+            }
+        }
         message.setId(doc.getString("messageId"));
         message.setLabel(doc.getString("label"));
         message.setContent(doc.getString("content"));
-        message.setType(doc.getString("type"));
-        Document sourceDoc = (Document) doc.get("source");
-//        FacebookSource source;
-//        try {
-//            source = retrieveFacebookSource(sourceDoc.getString("id"));
-//            message.setSource(source);
-//        } catch (Exception ex) {
-//            LOGGER.error("Can not decode referenced document", ex);
-//        }
-//        FacebookSource source = new 
+
         message.setCreationTime(new DateTime(doc.getDate("creationTime")));
         message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
         return message;

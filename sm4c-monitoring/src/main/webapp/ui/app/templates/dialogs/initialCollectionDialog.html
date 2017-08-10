@@ -1,0 +1,20 @@
+<md-dialog layout-padding aria-label="Nachrichten ermitteln?">
+  <div layout-padding>
+    <form ng-cloak>
+      <md-dialog-content>
+        <div layout="column" layout-sm="column" layout-align="space-around center" layout-margin>
+          Es wurden keine Nachrichten zu der Collection gefunden. Möchten Sie einen initialen Nachrichtenabruf starten?
+        </div>
+      </md-dialog-content>
+      <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button ng-click="cancel()">
+          <md-icon> cancel </md-icon> Abbrechen
+        </md-button>
+        <md-button ng-click="confirm()">
+          <md-icon> done </md-icon> Nachrichten ermitteln
+        </md-button>
+      </md-dialog-actions>
+    </form>
+  </div>
+</md-dialog>

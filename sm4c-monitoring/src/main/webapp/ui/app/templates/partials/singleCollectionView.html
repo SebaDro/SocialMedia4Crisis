@@ -1,0 +1,67 @@
+<md-card>
+  <md-card-title>
+    <md-toolbar class="overview">
+      <div class="md-toolbar-tools">
+        <h2 flex md-truncate>{{collection.name}}</h2>
+        <md-button ng-click="relocateTo('/collection/'+collection.id)" layout-align="end start">
+          <md-icon md-svg-icon="images/icons/forward_white.svg"></md-icon>
+          Details
+        </md-button>
+      </div>
+    </md-toolbar>
+  </md-card-title>
+  <md-card-content layout="column" layout-align="space-between">
+    <div class="collection-content-wrapper">
+      <table class="collection-content">
+        <tbody>
+          <tr>
+            <th>Beschreibung</th>
+            <td>
+              {{collection.description}}
+            </td>
+          </tr>
+          <tr>
+            <th>Keywords</th>
+            <td>
+              <ul>
+                <li ng-repeat="keyword in collection.keywords">
+                  "{{keyword}}"
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th>Labels</th>
+            <td>
+              <ul>
+                <li ng-repeat="label in collection.labels">
+                  "{{label}}"
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th>Anzahl Sources</th>
+            <td>
+              {{collection.facebookSources.length}}
+            </td>
+          </tr>
+          <tr>
+            <th>Status</th>
+            <td>
+              <div layout="row" layout-align="start center">
+                <div>{{collection.status}}</div>
+                <div style="margin-left:20px">
+                  <md-button class="md-icon-button">
+                    <md-icon md-svg-icon="images/icons/play_black.svg"></md-icon>
+                  </md-button>
+                  <md-button class="md-icon-button" ng-disabled="true">
+                    <md-icon md-svg-icon="images/icons/stop_black.svg"></md-icon>
+                  </md-button>
+                </div>
+              </div>
+          </tr>
+        </tbody>
+      </table </md-card-content>
+    </div>
+</md-card>

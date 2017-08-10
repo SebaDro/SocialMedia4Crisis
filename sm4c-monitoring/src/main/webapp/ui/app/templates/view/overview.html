@@ -1,3 +1,8 @@
-<div class="content">
+<div class="content" ng-controller="OverviewCtrl">
     <h2>Vorhandene Collections</h2>
+    <div>
+    <section ng-repeat="collection in collections" ng-include="'templates/partials/singleCollectionView.html'">
+
+    </section>
+  </div>
 </div>

@@ -1,0 +1,99 @@
+<div layout="column">
+  <h1 class="md-display-1">{{collection.name}}</h1>
+  <h2 class="md-title">{{collection.description}}</h3>
+  <section>
+  </section>
+  <section>
+    <md-card>
+      <md-card-header>
+        <md-card-header-text>
+          <h2>Dienste</h2>
+        </md-card-header-text>
+        <md-button class="md-fab md-mini" layout-align="end center">
+          <md-icon md-svg-icon="images/icons/create_black.svg" style="color: greenyellow;"></md-icon>
+        </md-button>
+      </md-card-header>
+      <md-card-content layout="column" layout-align="space-between">
+        <div class="collection-details" layout="column">
+          <div layout=column>
+            <md-checkbox ng-model="newCollection.fbCb" aria-label="Facebook Checkbox" ng-init="newCollection.fbCb=true" ng-disabled="true">
+              Facebook
+            </md-checkbox>
+            <md-checkbox ng-model="newCollection.twitterCb" aria-label="Facebook Checkbox" ng-disabled="true">
+              Twitter
+            </md-checkbox>
+          </div>
+      </md-card-content>
+    </md-card>
+  </section>
+  <section>
+    <md-card>
+      <md-card-header>
+        <md-card-header-text>
+          <h2>Keywords</h2>
+        </md-card-header-text>
+        <md-button class="md-fab md-mini" layout-align="end center">
+          <md-icon md-svg-icon="images/icons/create_black.svg" style="color: greenyellow;"></md-icon>
+        </md-button>
+      </md-card-header>
+      <md-card-content layout="column" layout-align="space-between">
+        <div class="collection-details" layout="column">
+          <md-chips ng-model="collection.keywords" readonly="true" placeholder="Tag hinzufügen" delete-button-label="Tag entfernen" delete-hint="Drücke Entfernen um Tag zu entfernen" secondary-placeholder="+Tag"></md-chips>
+        </div>
+      </md-card-content>
+    </md-card>
+  </section>
+  <section>
+    <md-card>
+      <md-card-header>
+        <md-card-header-text>
+          <h2>Labels</h2>
+        </md-card-header-text>
+        <md-button class="md-fab md-mini" layout-align="end center">
+          <md-icon md-svg-icon="images/icons/create_black.svg" style="color: greenyellow;"></md-icon>
+        </md-button>
+      </md-card-header>
+      <md-card-content layout="column" layout-align="space-between">
+        <div class="collection-details" layout="column">
+          <md-chips ng-model="collection.labels" readonly="true" placeholder="Label hinzufügen" delete-button-label="Label entfernen" delete-hint="Drücke Entfernen um Label zu entfernen" secondary-placeholder="+Label"></md-chips>
+        </div>
+      </md-card-content>
+    </md-card>
+  </section>
+  <section>
+    <md-card>
+      <md-card-header>
+        <md-card-header-text>
+          <h2>Sources</h2>
+        </md-card-header-text>
+        <md-button class="md-fab md-mini" layout-align="end center">
+          <md-icon md-svg-icon="images/icons/create_black.svg" style="color: greenyellow;"></md-icon>
+        </md-button>
+      </md-card-header>
+      <md-card-content layout="column" layout-align="space-between">
+        <div style="max-height: 300px" layout="row">
+          <fieldset style="overflow: scroll;" class="standard" flex="50">
+            <legend>Facebook Gruppen</legend>
+            <div layout="column" layout-wrap flex>
+              <div ng-repeat="group in groups">
+                <md-checkbox ng-checked="exists(group, selectedGroups)" ng-click="toggle(group, selectedGroups)" ng-disabled="true">
+                  {{group.name}}
+                </md-checkbox>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset style="overflow: scroll;" class="standard" flex="50">
+            <legend>Facebook Seiten</legend>
+            <div layout="column" layout-wrap flex>
+              <div flex="50" ng-repeat="page in pages">
+                <md-checkbox ng-checked="exists(page, selectedPages)" ng-click="toggle(page, selectedPages)" ng-disabled="true">
+                  {{page.name}}
+                </md-checkbox>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </md-card-content>
+    </md-card>
+  </section>
+  </div>

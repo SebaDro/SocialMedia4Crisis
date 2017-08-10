@@ -13,8 +13,8 @@ sm4cMonitoring.config(['$locationProvider', '$routeProvider', function($location
     .when('/create', {
       templateUrl: 'templates/view/createCollection.html',
     })
-    .when('/collection', {
-      templateUrl: 'templates/view/collectionDetails.html',
+    .when('/collection/:id', {
+      templateUrl: 'templates/view/collectionManager.html',
     }).otherwise({
       redirectTo: '/overview'
     });

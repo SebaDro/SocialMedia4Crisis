@@ -29,11 +29,11 @@
       <md-card-title>
         <h2 flex md-truncate>Dienste</h2>
       </md-card-title>
-      <md-card-content layout="column" layout-align="space-between" class="green">
+      <md-card-content layout="column" layout-align="space-between">
         <md-checkbox ng-model="newCollection.fbCb" aria-label="Facebook Checkbox" ng-init="newCollection.fbCb=true" ng-disabled="true">
           Facebook
         </md-checkbox>
-        <md-checkbox ng-model="newCollection.twitterCb" aria-label="Facebook Checkbox" ng-disabled="true" class="green">
+        <md-checkbox ng-model="newCollection.twitterCb" aria-label="Facebook Checkbox" ng-disabled="true" >
           Twitter
         </md-checkbox>
       </md-card-content>
@@ -44,7 +44,7 @@
       </md-card-title>
       <md-card-content layout="column" layout-align="space-between">
         <p>Bitte geben Sie Tags an, die als Suchbergriffe für die Erstellung einer Collection verwendet werden sollen:</p>
-        <md-chips ng-model="newCollection.tags" readonly="CreateCollectionCtrl.readonly" placeholder="Tag hinzufügen" delete-button-label="Tag entfernen" delete-hint="Drücke Entfernen um Tag zu entfernen" secondary-placeholder="+Tag"></md-chips>
+        <md-chips ng-model="newCollection.tags" placeholder="Tag hinzufügen" delete-button-label="Tag entfernen" delete-hint="Drücke Entfernen um Tag zu entfernen" secondary-placeholder="+Tag"></md-chips>
         <div><md-button flex class="md-raised"  ng-click="loadSources()"><md-icon> update </md-icon>Gruppen & Seiten ermitteln </md-button></div>
       </md-card-content>
     </md-card>
@@ -83,7 +83,7 @@
       </md-card-title>
       <md-card-content layout="column" layout-align="space-between">
         <p>Bitte geben Sie Labels für die Klassifizierung an:</p>
-        <md-chips ng-model="newCollection.labels" readonly="CreateCollectionCtrl.readonly" placeholder="Label hinzufügen" delete-button-label="Label entfernen" delete-hint="Drücke Entfernen um Label zu entfernen" secondary-placeholder="+Tag"></md-chips>
+        <md-chips ng-model="newCollection.labels" readonly="CreateCollectionCtrl.readonly" placeholder="Label hinzufügen" delete-button-label="Label entfernen" delete-hint="Drücke Entfernen um Label zu entfernen" secondary-placeholder="+Label"></md-chips>
       </md-card-content>
     </md-card>
     <md-button class="md-raised md-secondary" type="button" ng-click="reset()">

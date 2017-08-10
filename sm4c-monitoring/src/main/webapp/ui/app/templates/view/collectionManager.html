@@ -1,0 +1,21 @@
+<div ng-cloak ng-controller="CollectionDetailsCtrl">
+  <md-content>
+    <md-tabs md-dynamic-height md-border-bottom>
+      <md-tab label="Details">
+        <md-content class="md-padding">
+          <div ng-include="'templates/partials/collectionDetails.html'"></div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Classification" md-on-select=checkDocuments()>
+        <md-content class="md-padding">
+          <div ng-include="'templates/partials/collectionTrainer.html'"></div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Karte">
+        <md-content class="md-padding">
+          <div ng-include="'templates/partials/collectionMap.html'"></div>
+        </md-content>
+      </md-tab>
+    </md-tabs>
+  </md-content>
+</div>

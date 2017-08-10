@@ -18,7 +18,6 @@ import org.springframework.beans.factory.InitializingBean;
 public class MongoSimulationDatabaseConnection implements InitializingBean, DisposableBean {
 
     private MongoClient mongoClient;
-    private MongoDatabase database;
     private String dbName;
 
     @Override

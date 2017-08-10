@@ -15,37 +15,36 @@ import org.bson.Document;
 import java.util.Date;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import de.hsbo.fbg.sm4c.common.dao.FacebookMessageDocumentDao;
-import de.hsbo.fbg.sm4c.common.coding.FacebookMessageDocumentDecoder;
-import de.hsbo.fbg.sm4c.common.coding.FacebookMessageDocumentEncoder;
+import de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder;
+import de.hsbo.fbg.sm4c.common.coding.MessageDocumentEncoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import static com.mongodb.client.model.Filters.eq;
-import de.hsbo.fbg.sm4c.common.dao.RessourceNotFoundException;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentDao {
+public class MongoMessageDocumentDao implements MessageDocumentDao {
 
-    private static final Logger LOGGER = LogManager.getLogger(MongoFacebookMessageDocumentDao.class);
+    private static final Logger LOGGER = LogManager.getLogger(MongoMessageDocumentDao.class);
 
     private final MongoCollection<Document> dbCollection;
-    private final FacebookMessageDocumentEncoder messageDocEncoder;
-    private final FacebookMessageDocumentDecoder messageDocDecoder;
+    private final MessageDocumentEncoder messageDocEncoder;
+    private final MessageDocumentDecoder messageDocDecoder;
 
-    public MongoFacebookMessageDocumentDao(MongoCollection dbCollection) {
+    public MongoMessageDocumentDao(MongoCollection dbCollection) {
         this.dbCollection = dbCollection;
-        messageDocEncoder = new FacebookMessageDocumentEncoder();
-        messageDocDecoder = new FacebookMessageDocumentDecoder();
+        messageDocEncoder = new MessageDocumentEncoder();
+        messageDocDecoder = new MessageDocumentDecoder();
     }
 
     @Override
-    public FacebookMessageDocument retrieveById(String id) {
+    public MessageDocument retrieveById(String id) {
         Document doc = dbCollection.find(eq("messageId", id)).first();
-        FacebookMessageDocument message = null;
+        MessageDocument message = null;
         if (doc != null) {
             message = messageDocDecoder.decodeFacebookMessage(doc);
         }
@@ -53,8 +52,8 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
     }
 
     @Override
-    public List<FacebookMessageDocument> retrieveTrainingData() {
-        ArrayList<FacebookMessageDocument> messages = new ArrayList<>();
+    public List<MessageDocument> retrieveTrainingData() {
+        ArrayList<MessageDocument> messages = new ArrayList();
         FindIterable<Document> documents = dbCollection.find(eq("training", true));
         FacebookMessageDocument message = null;
         documents.forEach(new Consumer<Document>() {
@@ -67,8 +66,8 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
     }
 
     @Override
-    public List<FacebookMessageDocument> retrieve() {
-        ArrayList<FacebookMessageDocument> messages = new ArrayList<FacebookMessageDocument>();
+    public List<MessageDocument> retrieve() {
+        ArrayList<MessageDocument> messages = new ArrayList();
         FindIterable<Document> documents = dbCollection.find();
         documents.forEach(new Consumer<Document>() {
             @Override
@@ -80,8 +79,8 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
     }
 
     @Override
-    public List<FacebookMessageDocument> retrieveForTimeSpan(Date startTime, Date endTime) {
-        ArrayList<FacebookMessageDocument> messages = new ArrayList<FacebookMessageDocument>();
+    public List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime) {
+        ArrayList<MessageDocument> messages = new ArrayList();
         FindIterable<Document> documents = dbCollection.find(Filters.and(
                 Filters.gte("creationTime", startTime),
                 Filters.lte("creationTime", endTime)));
@@ -95,26 +94,26 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
     }
 
     @Override
-    public boolean exists(FacebookMessageDocument doc) {
+    public boolean exists(MessageDocument doc) {
         return dbCollection.find(eq("messageId", doc.getId())).first() != null;
     }
 
     @Override
-    public void store(FacebookMessageDocument doc) {
-        Document postDoc = messageDocEncoder.encodeMessageToDocument(doc);
+    public void store(MessageDocument doc) {
+        Document postDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument)doc);
         dbCollection.insertOne(postDoc);
     }
 
     @Override
-    public void store(List<FacebookMessageDocument> docs) {
+    public void store(List<MessageDocument> docs) {
         List<Document> postDocs = docs.stream().map(m -> messageDocEncoder
-                .encodeMessageToDocument(m))
+                .encodeMessageToDocument((FacebookMessageDocument)m))
                 .collect(Collectors.toList());
         dbCollection.insertMany(postDocs);
     }
 
     @Override
-    public void remove(FacebookMessageDocument doc) {
+    public void remove(MessageDocument doc) {
         dbCollection.deleteOne(eq("messageId", doc.getId()));
     }
 
@@ -133,8 +132,8 @@ public class MongoFacebookMessageDocumentDao implements FacebookMessageDocumentD
 //        return dbCollection.find(eq("source.id", group.getId())).first() != null;
 //    }
     @Override
-    public void update(FacebookMessageDocument doc, String field) {
-        Document updatedDoc = messageDocEncoder.encodeMessageToDocument(doc);
+    public void update(MessageDocument doc, String field) {
+        Document updatedDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument)doc);
         dbCollection.updateOne(
                 eq("messageId", doc.getId()),
                 new Document("$set", new Document(field, updatedDoc.get(field))));

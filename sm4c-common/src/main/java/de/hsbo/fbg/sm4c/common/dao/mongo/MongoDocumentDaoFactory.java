@@ -9,8 +9,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
-import de.hsbo.fbg.sm4c.common.dao.FacebookMessageDocumentDao;
 import de.hsbo.fbg.sm4c.common.model.Collection;
+import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 
 /**
  *
@@ -29,15 +29,15 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
     }
 
     @Override
-    public FacebookMessageDocumentDao createFacebookMessageDocumentDao(MongoCollection daoContext) {
-        return new MongoFacebookMessageDocumentDao(daoContext);
+    public MessageDocumentDao createFacebookMessageDocumentDao(MongoCollection daoContext) {
+        return new MongoMessageDocumentDao(daoContext);
     }
 
     public MongoCollection getContext(Collection collection) {
         return database.getCollection(collection.getName());
     }
-    
-        public MongoCollection getContext(String collection) {
+
+    public MongoCollection getContext(String collection) {
         return database.getCollection(collection);
     }
 

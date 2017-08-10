@@ -7,6 +7,7 @@ package de.hsbo.fbg.sm4c.common.dao;
 
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
+import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -15,25 +16,25 @@ import java.util.Optional;
  *
  * @author Sebastian Drost
  */
-public interface FacebookMessageDocumentDao {
+public interface MessageDocumentDao {
 
-    FacebookMessageDocument retrieveById(String id);
+    MessageDocument retrieveById(String id);
 
-    List<FacebookMessageDocument> retrieve();
+    List<MessageDocument> retrieve();
     
-    List<FacebookMessageDocument> retrieveTrainingData();
+    List<MessageDocument> retrieveTrainingData();
 
-    List<FacebookMessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
+    List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
 
-    boolean exists(FacebookMessageDocument doc);
+    boolean exists(MessageDocument doc);
 
-    void store(FacebookMessageDocument doc);
+    void store(MessageDocument doc);
 
-    void store(List<FacebookMessageDocument> docs);
+    void store(List<MessageDocument> docs);
     
-    void update(FacebookMessageDocument doc, String field);
+    void update(MessageDocument doc, String field);
 
-    void remove(FacebookMessageDocument doc);
+    void remove(MessageDocument doc);
     
     void removeAll();
 

@@ -110,51 +110,10 @@ angular.module('sm4cMonitoring')
           });
         };
 
-        // /*
-        //  * this method is used to display a confirmation dialog
-        //  * before sending out the JSON payload to the kernel API
-        //  */
-        // var displayConfirmationDialog = function() {
-        //   $mdDialog.show({
-        //       controller: DialogController,
-        //       templateUrl: 'templates/partials/checkSourcesDialog.html',
-        //       parent: angular.element(document.body),
-        //       clickOutsideToClose: true,
-        //       // locals: {
-        //       //   tasks: [payload]
-        //       // }
-        //     })
-        //     .then(function(confirmed) {
-        //       if (confirmed) {
-        //         console.info('POSTing confirmed');
-        //         // postToKernel(payload);
-        //       }
-        //     }, function() {
-        //       console.info('POSTing cancelled');
-        //     });
-        // };
-        //
-        // /*
-        //  * controller used in the above dialog
-        //  */
-        // var DialogController = ['$scope', '$mdDialog', function DialogController($scope, $mdDialog) {
-        //   $scope.hide = function() {
-        //     $mdDialog.hide();
-        //   };
-        //
-        //   $scope.cancel = function() {
-        //     $mdDialog.cancel();
-        //   };
-        //
-        //   $scope.confirm = function() {
-        //     $mdDialog.hide(true);
-        //   };
-        // }];
-
         var displayLoadingDialog = function() {
           $mdDialog.show({
               controller: LoadingDialogController,
-              templateUrl: 'templates/partials/loadingSourcesDialog.html',
+              templateUrl: 'templates/dialogs/loadingSourcesDialog.html',
               parent: angular.element(document.body),
               clickOutsideToClose: false,
               // locals: {

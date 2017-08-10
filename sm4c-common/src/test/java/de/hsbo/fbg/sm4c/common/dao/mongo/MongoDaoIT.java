@@ -7,7 +7,6 @@ package de.hsbo.fbg.sm4c.common.dao.mongo;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import de.hsbo.fbg.sm4c.common.dao.FacebookMessageDocumentDao;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
@@ -20,6 +19,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 
 /**
  *
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class MongoDaoIT {
     
     private MongoDocumentDaoFactory documentDaoFactory;
-    private FacebookMessageDocumentDao documentDao;
+    private MessageDocumentDao documentDao;
     
     @Before
     public void setup() {

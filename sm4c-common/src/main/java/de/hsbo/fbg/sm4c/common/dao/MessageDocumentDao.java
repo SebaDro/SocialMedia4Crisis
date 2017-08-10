@@ -25,6 +25,8 @@ public interface MessageDocumentDao {
     List<MessageDocument> retrieveTrainingData();
 
     List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
+    
+    long count();
 
     boolean exists(MessageDocument doc);
 

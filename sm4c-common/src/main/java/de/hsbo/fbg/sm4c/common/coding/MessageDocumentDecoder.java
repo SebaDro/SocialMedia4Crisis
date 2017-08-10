@@ -43,9 +43,8 @@ public class MessageDocumentDecoder {
      * @return decoded FacebookMessage
      */
     public MessageDocument decodeFacebookMessage(Document doc) {
-        MessageDocument message = null;
-        if (doc.getString("service").equals(Services.FACEBOOK)) {
-            message = new FacebookMessageDocument();
+        MessageDocument message = new FacebookMessageDocument();
+        if (doc.getString("service").equals(Services.FACEBOOK.toString())) {
             message.setService(Services.FACEBOOK.toString());
             ((FacebookMessageDocument) message).setType(doc.getString("type"));
             Document sourceDoc = (Document) doc.get("source");

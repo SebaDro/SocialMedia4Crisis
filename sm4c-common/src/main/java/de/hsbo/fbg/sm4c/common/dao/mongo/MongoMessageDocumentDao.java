@@ -138,4 +138,9 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
                 eq("messageId", doc.getId()),
                 new Document("$set", new Document(field, updatedDoc.get(field))));
     }
+
+    @Override
+    public long count() {
+        return dbCollection.count();
+    }
 }

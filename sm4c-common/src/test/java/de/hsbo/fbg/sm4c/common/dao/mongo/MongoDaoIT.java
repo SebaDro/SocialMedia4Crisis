@@ -34,8 +34,8 @@ public class MongoDaoIT {
     public void setup() {
         MongoDatabaseConnection con = new MongoDatabaseConnection();
         con.afterPropertiesSet();
-        MongoDatabase db = con.getDatabase();
-        documentDaoFactory = new MongoDocumentDaoFactory(db);
+//        MongoDatabase db = con.getDatabase();
+        documentDaoFactory = new MongoDocumentDaoFactory(con);
     }
     
     @Test
@@ -64,6 +64,7 @@ public class MongoDaoIT {
         document.setSource(source);
         document.setType("Link");
         document.setUpdateTime(dt);
+        document.setService("Facebook");
         
         documentDao.store(document);
         

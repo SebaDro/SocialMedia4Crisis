@@ -11,21 +11,25 @@ import com.mongodb.client.MongoDatabase;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author Sebastian Drost
  */
 public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollection> {
+//    @Autowired
+    private MongoDatabaseConnection mongoConnection;
 
     private MongoDatabase database;
 
     public MongoDocumentDaoFactory() {
-
+        database = mongoConnection.getDatabase();
     }
 
-    public MongoDocumentDaoFactory(MongoDatabase database) {
-        this.database = database;
+    public MongoDocumentDaoFactory(MongoDatabaseConnection connection) {
+        this.mongoConnection = connection;
+        this.database = connection.getDatabase();
     }
 
     @Override

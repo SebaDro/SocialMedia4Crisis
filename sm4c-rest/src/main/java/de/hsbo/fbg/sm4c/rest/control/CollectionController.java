@@ -6,6 +6,7 @@
 package de.hsbo.fbg.sm4c.rest.control;
 
 import com.mongodb.client.MongoCollection;
+import de.hsbo.fbg.sm4c.collect.FacebookCollector;
 import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
 import de.hsbo.fbg.sm4c.common.dao.CollectionStatusDao;
 import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
@@ -46,6 +47,9 @@ import org.springframework.web.bind.annotation.RestController;
 import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory;
+import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.rest.view.TimeDefinitionView;
+import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -55,23 +59,21 @@ import org.springframework.web.bind.annotation.PathVariable;
  */
 @RestController
 @RequestMapping(produces = {"application/json"})
-public class CollectionController implements InitializingBean{
+public class CollectionController implements InitializingBean {
 
     private static final Logger LOGGER = LogManager.getLogger(CollectionController.class);
 
     @Autowired
     private DaoFactory<Session> daoFactory;
-    
-    
 
     @Autowired
     private CollectionDecoder collectionDecoder;
 
     @Autowired
     private CollectionEncoder collectionEncoder;
-    
+
     DocumentDaoFactory documentDaoFactory;
-    
+
     @Override
     public void afterPropertiesSet() throws Exception {
         MongoDatabaseConnection con = new MongoDatabaseConnection();
@@ -104,6 +106,26 @@ public class CollectionController implements InitializingBean{
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/collections/{id}/documents", method = RequestMethod.POST)
+    public ResponseEntity initiateCollection(@PathVariable("id") String id, @RequestBody TimeDefinitionView req) throws Exception {
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
+            if (collection.isPresent()) {
+//                FacebookCollector collector = new FacebookCollector(collection.get());
+//                List<MessageDocument> documents = collector.collectMessages(req.getStartTime(), req.getEndTime());
+
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
+                MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
+                List<MessageDocument> documents = documentDao.retrieve();
+//                documentDao.store(documents);
+                return new ResponseEntity(documents.size(),HttpStatus.OK);
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
+
+    }
+
     @RequestMapping(value = "/collections", method = RequestMethod.GET)
     public List<CollectionView> getCollections() {
         List<CollectionView> result = new ArrayList();
@@ -122,11 +144,11 @@ public class CollectionController implements InitializingBean{
         List<CollectionView> result = new ArrayList();
         try (Session session = daoFactory.initializeContext()) {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
-            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));      
+            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
             if (collection.isPresent()) {
-                MongoCollection mongoCollection = (MongoCollection)documentDaoFactory.getContext(collection.get());
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
                 MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
-                
+
                 CollectionView cv = collectionEncoder.encode(collection.get());
                 cv.setDocumentCount(documentDao.count());
                 return cv;
@@ -222,7 +244,5 @@ public class CollectionController implements InitializingBean{
         });
         return result;
     }
-
-
 
 }

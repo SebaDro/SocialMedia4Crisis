@@ -1,17 +1,42 @@
 <md-dialog layout-padding aria-label="Nachrichten ermitteln?">
   <div layout-padding>
-    <form ng-cloak>
+    <form ng-cloak name="timeForm">
       <md-dialog-content>
-        <div layout="column" layout-sm="column" layout-align="space-around center" layout-margin>
-          Es wurden keine Nachrichten zu der Collection gefunden. Möchten Sie einen initialen Nachrichtenabruf starten?
+        <div layout-sm="column" layout-align="space-around center" layout-margin>
+          <p>Es wurden keine Nachrichten zu der Collection gefunden. Möchten Sie einen initialen Nachrichtenabruf starten?</p>
+          <div layout-gt-xs="row">
+            <div flex-gt-xs>
+
+              <h4>Startdatum</h4>
+              <md-input-container class="md-block">
+                <label>Datum eingeben</label>
+                <md-datepicker ng-model="startDate" md-placeholder="Datum" md-current-view="year" ng-required="true" name="startdate">
+                </md-datepicker>
+                <div ng-messages="timeForm.startDate.$error" ng-if="timeForm.$submitted || timeForm.taskType.$touched">
+                  <div ng-message="required">Diese Angabe wird benötigt.</div>
+                </div>
+              </md-input-container>
+            </div>
+            <div flex-gt-xs>
+              <h4>Enddatum</h4>
+              <md-input-container class="md-block">
+                <label>Enddatum eingeben</label>
+                <md-datepicker ng-model="endDate" md-placeholder="Datum" md-current-view="year" ng-required="true" name="enddate">
+                </md-datepicker>
+                <div ng-messages="timeForm.endDate.$error" ng-if="timeForm.$submitted || timeForm.taskType.$touched">
+                  <div ng-message="required">Diese Angabe wird benötigt.</div>
+                </div>
+              </md-input-container>
+            </div>
+          </div>
         </div>
       </md-dialog-content>
       <md-dialog-actions layout="row">
         <span flex></span>
-        <md-button ng-click="cancel()">
+        <md-button class="md-raised md-secondary" ng-click="cancel()" type=button>
           <md-icon> cancel </md-icon> Abbrechen
         </md-button>
-        <md-button ng-click="confirm()">
+        <md-button class="md-raised md-primary" ng-click="confirm()" type=submit>
           <md-icon> done </md-icon> Nachrichten ermitteln
         </md-button>
       </md-dialog-actions>

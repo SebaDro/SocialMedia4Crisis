@@ -4,7 +4,7 @@
       <md-dialog-content>
         <div layout="column" layout-sm="column" layout-align="space-around center" layout-margin>
           <h3>Bitte warten.</h3>
-          <h3>Facebook Gruppen und Seiten werden ermittelt...</h3>
+          <h3>{{loadingDialogContent}}</h3>
           <md-progress-circular layout-margin md-mode="indeterminate"></md-progress-circular>
         </div>
       </md-dialog-content>
@@ -13,9 +13,6 @@
         <md-button ng-click="cancel()">
           <md-icon> cancel </md-icon> Abbrechen
         </md-button>
-        <!-- <md-button ng-click="confirm()">
-          <md-icon> done </md-icon> Auftrag anlegen
-        </md-button> -->
       </div>
       </md-dialog-actions>
     </form>

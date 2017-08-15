@@ -7,6 +7,7 @@ angular.module('sm4cMonitoring')
       };
       var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
 
+
       var toast = $mdToast.simple()
         .textContent("Collection konnte nicht angelegt werden")
         .action('Schliessen')
@@ -130,6 +131,7 @@ angular.module('sm4cMonitoring')
         };
 
         var LoadingDialogController = ['$scope', '$mdDialog', function LoadingDialogController($scope, $mdDialog) {
+            $scope.loadingDialogContent="Facebook Gruppen und Seiten werden ermittelt...";
           $scope.hide = function() {
             $mdDialog.hide();
           };

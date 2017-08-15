@@ -106,3 +106,6 @@ md-toolbar.overview {
 div.collection-details{
   margin-left: 20px;
 }
+.md-icon-button[disabled] svg {
+  fill: rgba(0, 0, 0, 0.26);
+}

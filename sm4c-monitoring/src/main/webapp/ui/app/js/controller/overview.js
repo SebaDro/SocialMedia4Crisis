@@ -8,6 +8,14 @@ angular.module('sm4cMonitoring')
       console.warn(err);
     });
 
+    $scope.isActive = function(collection){
+      if(collection.status==="aktiv"){
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
     $scope.relocateTo = function(target) {
       $location.path(target);
     };

@@ -45,7 +45,7 @@
       <md-card-content layout="column" layout-align="space-between">
         <p>Bitte geben Sie Tags an, die als Suchbergriffe für die Erstellung einer Collection verwendet werden sollen:</p>
         <md-chips ng-model="newCollection.tags" placeholder="Tag hinzufügen" delete-button-label="Tag entfernen" delete-hint="Drücke Entfernen um Tag zu entfernen" secondary-placeholder="+Tag"></md-chips>
-        <div><md-button flex class="md-raised"  ng-click="loadSources()"><md-icon> update </md-icon>Gruppen & Seiten ermitteln </md-button></div>
+        <div><md-button flex class="md-raised" ng-disabled="checkTags()"  ng-click="loadSources()"><md-icon md-svg-icon="images/icons/update_black_18px.svg"></md-icon>Gruppen & Seiten ermitteln </md-button></div>
       </md-card-content>
     </md-card>
     <md-card  ng-show="checkSources()">

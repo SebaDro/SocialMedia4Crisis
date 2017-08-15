@@ -16,6 +16,7 @@ angular.module('sm4cMonitoring')
         return false;
       }
     }
+    
     $scope.relocateTo = function(target) {
       $location.path(target);
     };

@@ -164,6 +164,14 @@ angular.module('sm4cMonitoring')
           }
         }
 
+        $scope.checkTags = function() {
+          if ($scope.newCollection.tags.length===0) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+
         $scope.loadSources = function() {
           var groupsLoaded = false;
           var pagesLoaded = false;

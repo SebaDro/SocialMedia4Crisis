@@ -1,19 +1,19 @@
-<div ng-cloak ng-controller="CollectionDetailsCtrl">
+<div ng-cloak ng-controller="CollectionManagerCtrl">
   <md-content>
-    <md-tabs md-dynamic-height md-border-bottom>
+    <md-tabs md-dynamic-height md-border-bottom md-selected="currentTab">
       <md-tab label="Details">
         <md-content class="md-padding">
           <div ng-include="'templates/partials/collectionDetails.html'"></div>
         </md-content>
       </md-tab>
-      <md-tab label="Classification" md-on-select=checkDocuments()>
+      <md-tab label="Training" md-on-select="onTrainerSelected()" ng-disabled="!collection">
         <md-content class="md-padding">
-          <div ng-include="'templates/partials/collectionTrainer.html'"></div>
+          <div ng-include="'templates/partials/collectionTrainer.html'" ng-if="collection"></div>
         </md-content>
       </md-tab>
-      <md-tab label="Karte">
+      <md-tab label="Karte" ng-disabled="!collection">
         <md-content class="md-padding">
-          <div ng-include="'templates/partials/collectionMap.html'"></div>
+          <div ng-include="'templates/partials/collectionMap.html'" ng-if="collection"></div>
         </md-content>
       </md-tab>
     </md-tabs>

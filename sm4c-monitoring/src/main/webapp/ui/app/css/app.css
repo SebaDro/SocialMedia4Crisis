@@ -109,3 +109,6 @@ div.collection-details{
 .md-icon-button[disabled] svg {
   fill: rgba(0, 0, 0, 0.26);
 }
+.md-button[disabled] svg {
+  fill: rgba(0, 0, 0, 0.26);
+}

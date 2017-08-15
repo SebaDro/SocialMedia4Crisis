@@ -22,6 +22,9 @@ import org.apache.logging.log4j.Logger;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.nor;
+import java.util.Collections;
+import java.util.Random;
 
 /**
  *
@@ -45,9 +48,6 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     public MessageDocument retrieveById(String id) {
         FindIterable<Document> document = dbCollection.find(eq("messageId", id));
         MessageDocument message = messageDocDecoder.decodeFacebookMessages(document).get(0);
-//        if (doc != null) {
-//            message = messageDocDecoder.decodeFacebookMessage(doc);
-//        }
         return message;
     }
 
@@ -56,13 +56,6 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
 
         FindIterable<Document> documents = dbCollection.find(eq("training", true));
         List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
-//        FacebookMessageDocument message = null;
-//        documents.forEach(new Consumer<Document>() {
-//            @Override
-//            public void accept(Document d) {
-//                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-//            }
-//        });
         return messages;
     }
 
@@ -70,12 +63,6 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     public List<MessageDocument> retrieve() {
         FindIterable<Document> documents = dbCollection.find();
         List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
-//        documents.forEach(new Consumer<Document>() {
-//            @Override
-//            public void accept(Document d) {
-//                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-//            }
-//        });
         return messages;
     }
 
@@ -86,13 +73,29 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
                 Filters.gte("creationTime", startTime),
                 Filters.lte("creationTime", endTime)));
         List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
-//        documents.forEach(new Consumer<Document>() {
-//            @Override
-//            public void accept(Document d) {
-//                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-//            }
-//        });
         return messages;
+    }
+
+    @Override
+    public List<MessageDocument> retrieveUnlabeledData(int size) {
+//        FindIterable<Document> documents = dbCollection.find(
+//                Filters.or(
+//                        Filters.and(
+//                                Filters.nor(Filters.exists("training")),
+//                                Filters.eq("label", "")),
+//                        Filters.and(
+//                                Filters.eq("training", false),
+//                                Filters.eq("label", ""))));
+        FindIterable<Document> documents = dbCollection.find(
+                Filters.and(
+                        Filters.eq("training", false),
+                        Filters.eq("label", "")));
+        List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
+        Random random = new Random();
+        random.setSeed(42);
+        Collections.shuffle(messages, random);
+
+        return messages.subList(0, size + 1);
     }
 
     @Override
@@ -124,15 +127,6 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
         dbCollection.drop();
     }
 
-    //    @Override
-//    public boolean containsPage(Page page) {
-//        return dbCollection.find(eq("source.id", page.getId())).first() != null;
-//    }
-//
-//    @Override
-//    public boolean containsGroup(Group group) {
-//        return dbCollection.find(eq("source.id", group.getId())).first() != null;
-//    }
     @Override
     public void update(MessageDocument doc, String field) {
         Document updatedDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument) doc);
@@ -145,4 +139,5 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     public long count() {
         return dbCollection.count();
     }
+
 }

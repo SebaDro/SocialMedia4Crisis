@@ -15,6 +15,7 @@ import java.util.Set;
  */
 public class Collection extends AbstractEntity implements Serializable {
 
+    private long id;
     private String name;
     private String description;
     private Date creation;
@@ -24,9 +25,18 @@ public class Collection extends AbstractEntity implements Serializable {
     private Set<Keyword> keywords;
     private Set<SocialMediaService> services;
     private Set<FacebookSource> sources;
+    private Model model;
 
     public Collection() {
 
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -60,7 +70,6 @@ public class Collection extends AbstractEntity implements Serializable {
 //    public void setStatus(CollectionStatusType status) {
 //        this.status = status;
 //    }
-
     public CollectionStatus getStatus() {
         return status;
     }
@@ -68,6 +77,7 @@ public class Collection extends AbstractEntity implements Serializable {
     public void setStatus(CollectionStatus status) {
         this.status = status;
     }
+
     public Set<Label> getLabels() {
         return labels;
     }
@@ -98,6 +108,14 @@ public class Collection extends AbstractEntity implements Serializable {
 
     public void setSources(Set<FacebookSource> sources) {
         this.sources = sources;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
     }
 
 }

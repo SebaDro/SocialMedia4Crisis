@@ -26,7 +26,11 @@
     
     <bean class="de.hsbo.fbg.sm4c.rest.coding.CollectionDecoder" />
     <bean class="de.hsbo.fbg.sm4c.rest.coding.CollectionEncoder"/>
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.ModelEncoder"/>
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder"/>
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.FacebookSourceEncoder"/>
     <bean class="de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder"/>
+    
     
     <!-- hibernate -->    
     <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection" />

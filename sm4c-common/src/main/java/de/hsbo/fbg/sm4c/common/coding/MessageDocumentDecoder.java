@@ -79,7 +79,7 @@ public class MessageDocumentDecoder {
                     message.setId(doc.getString("messageId"));
                     message.setLabel(doc.getString("label"));
                     message.setContent(doc.getString("content"));
-
+                    message.setTraining(doc.getBoolean("training"));
                     message.setCreationTime(new DateTime(doc.getDate("creationTime")));
                     message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
                     result.add(message);

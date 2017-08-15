@@ -30,6 +30,8 @@
             <key column="collectionid" />
             <many-to-many column="sourceid" class="de.hsbo.fbg.sm4c.common.model.FacebookSource" foreign-key="fk_collection_facebooksources_cat_facebooksource"/>
         </set>
+        <one-to-one name="model" class="de.hsbo.fbg.sm4c.common.model.Model" cascade="all">
+        </one-to-one>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.CollectionStatus" table="collectionstatus">
         <meta attribute="class-description">
@@ -77,7 +79,7 @@
         <property name="facebookId" column="facebookid" type="string" unique="true" not-null="true"/>
         <property name="name" column="name" type="string" />
         <property name="description" column="description" type="string" />
-        <many-to-one name="type" column="typeid" not-null="true" class="de.hsbo.fbg.sm4c.common.model.SourceType" foreign-key="fk_facebooksource_cat_sourcetype" cascade="none"/>
+        <many-to-one name="type" column="typeid" class="de.hsbo.fbg.sm4c.common.model.SourceType" foreign-key="fk_facebooksource_cat_sourcetype" cascade="save-update"/>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.SourceType" table="sourcetype">
         <meta attribute="class-description">
@@ -87,5 +89,27 @@
             <generator class="identity"/>
         </id>
         <property name="name" column="name" type="string" unique="true" not-null="true"/>
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.Model" table="model">
+        <meta attribute="class-description">
+            This class contains a model for classifying.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="path" column="path" type="string" unique="true" not-null="true"/>
+        <one-to-one name="evaluation" class="de.hsbo.fbg.sm4c.common.model.EvaluationResult" cascade="all">
+        </one-to-one>
+    </class>
+    <class name="de.hsbo.fbg.sm4c.common.model.EvaluationResult" table="evaluation">
+        <meta attribute="class-description">
+            This class contains the evaluation for a model.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="summary" column="summary" type="string"/>
+        <property name="classDetails" column="classdetails" type="string"/>
+        <property name="confusionMatrix" column="confusionmatrix" type="string"/>
     </class>
 </hibernate-mapping>

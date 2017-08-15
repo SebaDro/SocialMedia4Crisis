@@ -34,6 +34,7 @@ public class FacebookSimulationDecoder {
         message.setLabel(doc.getString("label"));
         message.setContent(doc.getString("content"));
         message.setType(doc.getString("type"));
+        message.setTraining(doc.getBoolean("training"));
         Document sourceDoc = (Document) doc.get("source");
         FacebookSimulationSource source = new FacebookSimulationSource();
         source.setId(sourceDoc.getString("id"));

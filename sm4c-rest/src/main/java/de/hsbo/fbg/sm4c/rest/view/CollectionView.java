@@ -16,21 +16,22 @@ import org.joda.time.DateTime;
  */
 public class CollectionView {
 
-    public CollectionView() {
-
-    }
-
     private long id;
     private String name;
     private String description; 
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss Z")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Date creation;
     private String status;
     private List<String> labels;
     private List<String> keywords;
     private List<String> services;
     private List<FacebookSourceView> facebookSources;
+    private ModelView model;
     private long documentCount;
+
+    public CollectionView() {
+
+    }
 
     public long getId() {
         return id;
@@ -103,6 +104,16 @@ public class CollectionView {
     public void setFacebookSources(List<FacebookSourceView> facebookSources) {
         this.facebookSources = facebookSources;
     }
+
+    public ModelView getModel() {
+        return model;
+    }
+
+    public void setModel(ModelView model) {
+        this.model = model;
+    }
+    
+    
     
     public long getDocumentCount() {
         return documentCount;

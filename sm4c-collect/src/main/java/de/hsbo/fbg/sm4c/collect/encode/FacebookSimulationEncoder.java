@@ -49,6 +49,7 @@ public class FacebookSimulationEncoder {
         FacebookMessageDocument message = new FacebookMessageDocument();
         message.setId(post.getId());
         message.setContent(post.getMessage());
+        message.setTraining(false);
         DateTime creationTime = new DateTime(post.getCreatedTime());
         message.setCreationTime(creationTime);
         DateTime updateTime = new DateTime(post.getUpdatedTime());

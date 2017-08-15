@@ -78,7 +78,7 @@ public class MessageDocumentEncoder {
         root.put("content", message.getContent());
         root.put("service", message.getService());
         root.put("type", message.getType());
-
+        root.put("training", message.isTraining());
         ObjectNode sourceNode = mapper.createObjectNode();
         sourceNode.put("id", message.getSource().getFacebookId());
         sourceNode.put("name", message.getSource().getName());

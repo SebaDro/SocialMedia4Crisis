@@ -3,19 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.classify;
+
+package de.hsbo.fbg.sm4c.rest.view;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class EvaluationResult {
-
+public class ModelView {
     private String summary;
-    private String confusionMatrix;
     private String classDetails;
+    private String confusionMatrix;
     
-    public EvaluationResult(){
+    public ModelView(){
         
     }
 
@@ -27,14 +27,6 @@ public class EvaluationResult {
         this.summary = summary;
     }
 
-    public String getConfusionMatrix() {
-        return confusionMatrix;
-    }
-
-    public void setConfusionMatrix(String confusionMatrix) {
-        this.confusionMatrix = confusionMatrix;
-    }
-
     public String getClassDetails() {
         return classDetails;
     }
@@ -42,5 +34,14 @@ public class EvaluationResult {
     public void setClassDetails(String classDetails) {
         this.classDetails = classDetails;
     }
+
+    public String getConfusionMatrix() {
+        return confusionMatrix;
+    }
+
+    public void setConfusionMatrix(String confusionMatrix) {
+        this.confusionMatrix = confusionMatrix;
+    }
+    
     
 }

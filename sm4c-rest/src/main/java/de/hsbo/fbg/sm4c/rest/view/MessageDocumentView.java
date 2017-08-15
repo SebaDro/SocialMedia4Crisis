@@ -3,24 +3,34 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.common.model;
+package de.hsbo.fbg.sm4c.rest.view;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 import org.joda.time.DateTime;
 
 /**
  *
  * @author Sebastian Drost
  */
-public abstract class MessageDocument implements Serializable {
+public class MessageDocumentView {
 
-    protected String id;
-    protected String content;
-    protected String label;
-    protected String service;
-    protected boolean training;
-    protected DateTime creationTime;
-    protected DateTime updateTime;
+    private String id;
+    private String content;
+    private String label;
+    private String service;
+    private boolean training;
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private Date creationTime;
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private Date updateTime;
+    
+    private String type;
+    private FacebookSourceView facebookSource;
+    
+    public MessageDocumentView(){
+        
+    }
 
     public String getId() {
         return id;
@@ -61,25 +71,40 @@ public abstract class MessageDocument implements Serializable {
     public void setTraining(boolean training) {
         this.training = training;
     }
-
-    public DateTime getCreationTime() {
+    
+    public Date getCreationTime() {
         return creationTime;
     }
 
-    public void setCreationTime(DateTime creationDate) {
-        this.creationTime = creationDate;
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
     }
 
-    public DateTime getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(DateTime updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 
-    public void setType(String type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String getType() {
+        return type;
     }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public FacebookSourceView getFacebookSource() {
+        return facebookSource;
+    }
+
+    public void setFacebookSource(FacebookSourceView facebookSource) {
+        this.facebookSource = facebookSource;
+    }
+    
+    
+    
 
 }

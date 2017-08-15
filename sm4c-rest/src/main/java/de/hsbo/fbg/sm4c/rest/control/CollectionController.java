@@ -48,6 +48,9 @@ import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder;
+import de.hsbo.fbg.sm4c.rest.coding.ModelEncoder;
+import de.hsbo.fbg.sm4c.rest.view.MessageDocumentView;
 import de.hsbo.fbg.sm4c.rest.view.TimeDefinitionView;
 import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
@@ -71,6 +74,12 @@ public class CollectionController implements InitializingBean {
 
     @Autowired
     private CollectionEncoder collectionEncoder;
+
+    @Autowired
+    private ModelEncoder modelEncoder;
+
+    @Autowired
+    private MessageDocumentEncoder messageDocumentEncoder;
 
     DocumentDaoFactory documentDaoFactory;
 
@@ -119,11 +128,10 @@ public class CollectionController implements InitializingBean {
                 MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
                 List<MessageDocument> documents = documentDao.retrieve();
 //                documentDao.store(documents);
-                return new ResponseEntity(documents.size(),HttpStatus.OK);
+                return new ResponseEntity(documents.size(), HttpStatus.OK);
             }
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
-
     }
 
     @RequestMapping(value = "/collections", method = RequestMethod.GET)
@@ -150,8 +158,32 @@ public class CollectionController implements InitializingBean {
                 MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
 
                 CollectionView cv = collectionEncoder.encode(collection.get());
+                if (collection.get().getModel() != null) {
+                    cv.setModel(modelEncoder.encode(collection.get().getModel()));
+                }
                 cv.setDocumentCount(documentDao.count());
                 return cv;
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
+    }
+
+    @RequestMapping(value = "/collections/{id}/documents/limit/{limit}", method = RequestMethod.GET)
+    public List<MessageDocumentView> getCollectionDocuments(@PathVariable("id") String id, @PathVariable("limit") String limit) throws RessourceNotFoundException {
+        List<MessageDocumentView> result = new ArrayList();
+
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
+            if (collection.isPresent()) {
+
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
+                MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
+                List<MessageDocument> documents = documentDao.retrieveUnlabeledData(Integer.parseInt(limit));
+                result = documents.stream()
+                        .map(d -> messageDocumentEncoder.encode(d))
+                        .collect(Collectors.toList());
+                return result;
             }
             throw new RessourceNotFoundException("The referenced collection is not available");
         }

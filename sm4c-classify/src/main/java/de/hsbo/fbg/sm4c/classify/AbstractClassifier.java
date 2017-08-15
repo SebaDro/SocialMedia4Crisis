@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.classify;
 
+import de.hsbo.fbg.sm4c.common.model.EvaluationResult;
 import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import de.hsbo.fbg.sm4c.classify.train.DocumentTermMatrix;
 import de.hsbo.fbg.sm4c.classify.train.DtmTransformer;

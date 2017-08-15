@@ -34,6 +34,7 @@ public class FacebookDecoder {
         DateTime updateTime = new DateTime(post.getUpdatedTime());
         message.setUpdateTime(updateTime);
         message.setService(Services.FACEBOOK.toString());
+        message.setTraining(false);
         ((FacebookMessageDocument) message).setType(post.getType());
         ((FacebookMessageDocument) message).setSource(source);
         return message;

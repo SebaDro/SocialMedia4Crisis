@@ -16,6 +16,7 @@ public abstract class SimulationMessageDocument {
     protected String id;
     protected String content;
     protected String label;
+    protected boolean training;
     protected DateTime creationTime;
     protected DateTime updateTime;
 
@@ -42,6 +43,15 @@ public abstract class SimulationMessageDocument {
     public void setLabel(String label) {
         this.label = label;
     }
+
+    public boolean isTraining() {
+        return training;
+    }
+
+    public void setTraining(boolean training) {
+        this.training = training;
+    }
+   
 
     public DateTime getCreationTime() {
         return creationTime;

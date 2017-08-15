@@ -23,6 +23,8 @@ public interface MessageDocumentDao {
     List<MessageDocument> retrieve();
     
     List<MessageDocument> retrieveTrainingData();
+    
+    List<MessageDocument> retrieveUnlabeledData(int size);
 
     List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
     

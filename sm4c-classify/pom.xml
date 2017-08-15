@@ -10,7 +10,25 @@
     <packaging>jar</packaging>
     <name>sm4c-classify</name>
     
+    <repositories>
+        <repository>
+            <id>arcgis</id>
+            <url>https://esri.bintray.com/arcgis</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>arcgis-plugin</id>
+            <url>https://esri.bintray.com/arcgis</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sm4c-common</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-tools</artifactId>
@@ -25,6 +43,37 @@
             <groupId>nz.ac.waikato.cms.weka</groupId>
             <artifactId>weka-stable</artifactId>
             <version>3.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.rholder</groupId>
+            <artifactId>snowball-stemmer</artifactId>
+            <version>1.3.0.581.1</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>3.8.0</version>
+            <classifier>models-german</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.esri.arcgisruntime</groupId>
+            <artifactId>arcgis-java</artifactId>
+            <version>100.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geonames</groupId>
+            <artifactId>geonames</artifactId>
+            <version>1.0</version>
+        </dependency>     
+        <dependency>
+            <groupId>com.googlecode.combinatoricslib</groupId>
+            <artifactId>combinatoricslib</artifactId>
+            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -42,5 +91,19 @@
         </dependency>
 
     </dependencies>
+    
+    <build>
+        <plugins>
+            <!--ArcGIS Java Maven Plugin-->
+            <plugin>
+                <groupId>com.esri.arcgisruntime</groupId>
+                <artifactId>arcgis-java-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <version>100.1.0</version>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     
 </project>

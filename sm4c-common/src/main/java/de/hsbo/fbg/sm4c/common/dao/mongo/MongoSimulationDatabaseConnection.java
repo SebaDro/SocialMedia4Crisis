@@ -15,7 +15,7 @@ import org.springframework.beans.factory.InitializingBean;
  *
  * @author Sebastian Drost
  */
-public class MongoSimulationDatabaseConnection implements InitializingBean, DisposableBean {
+public class MongoSimulationDatabaseConnection extends MongoDatabaseConnection implements InitializingBean, DisposableBean {
 
     private MongoClient mongoClient;
     private String dbName;

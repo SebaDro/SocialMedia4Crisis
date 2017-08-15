@@ -43,53 +43,55 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
 
     @Override
     public MessageDocument retrieveById(String id) {
-        Document doc = dbCollection.find(eq("messageId", id)).first();
-        MessageDocument message = null;
-        if (doc != null) {
-            message = messageDocDecoder.decodeFacebookMessage(doc);
-        }
+        FindIterable<Document> document = dbCollection.find(eq("messageId", id));
+        MessageDocument message = messageDocDecoder.decodeFacebookMessages(document).get(0);
+//        if (doc != null) {
+//            message = messageDocDecoder.decodeFacebookMessage(doc);
+//        }
         return message;
     }
 
     @Override
     public List<MessageDocument> retrieveTrainingData() {
-        ArrayList<MessageDocument> messages = new ArrayList();
+
         FindIterable<Document> documents = dbCollection.find(eq("training", true));
-        FacebookMessageDocument message = null;
-        documents.forEach(new Consumer<Document>() {
-            @Override
-            public void accept(Document d) {
-                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-            }
-        });
+        List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
+//        FacebookMessageDocument message = null;
+//        documents.forEach(new Consumer<Document>() {
+//            @Override
+//            public void accept(Document d) {
+//                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
+//            }
+//        });
         return messages;
     }
 
     @Override
     public List<MessageDocument> retrieve() {
-        ArrayList<MessageDocument> messages = new ArrayList();
         FindIterable<Document> documents = dbCollection.find();
-        documents.forEach(new Consumer<Document>() {
-            @Override
-            public void accept(Document d) {
-                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-            }
-        });
+        List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
+//        documents.forEach(new Consumer<Document>() {
+//            @Override
+//            public void accept(Document d) {
+//                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
+//            }
+//        });
         return messages;
     }
 
     @Override
     public List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime) {
-        ArrayList<MessageDocument> messages = new ArrayList();
+
         FindIterable<Document> documents = dbCollection.find(Filters.and(
                 Filters.gte("creationTime", startTime),
                 Filters.lte("creationTime", endTime)));
-        documents.forEach(new Consumer<Document>() {
-            @Override
-            public void accept(Document d) {
-                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
-            }
-        });
+        List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
+//        documents.forEach(new Consumer<Document>() {
+//            @Override
+//            public void accept(Document d) {
+//                messages.add(messageDocDecoder.decodeFacebookMessage((Document) d));
+//            }
+//        });
         return messages;
     }
 
@@ -100,14 +102,14 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
 
     @Override
     public void store(MessageDocument doc) {
-        Document postDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument)doc);
+        Document postDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument) doc);
         dbCollection.insertOne(postDoc);
     }
 
     @Override
     public void store(List<MessageDocument> docs) {
         List<Document> postDocs = docs.stream().map(m -> messageDocEncoder
-                .encodeMessageToDocument((FacebookMessageDocument)m))
+                .encodeMessageToDocument((FacebookMessageDocument) m))
                 .collect(Collectors.toList());
         dbCollection.insertMany(postDocs);
     }
@@ -133,7 +135,7 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
 //    }
     @Override
     public void update(MessageDocument doc, String field) {
-        Document updatedDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument)doc);
+        Document updatedDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument) doc);
         dbCollection.updateOne(
                 eq("messageId", doc.getId()),
                 new Document("$set", new Document(field, updatedDoc.get(field))));

@@ -28,8 +28,7 @@ public class SimulationCollector extends Collector {
         super(collection);
         MongoSimulationDatabaseConnection con = new MongoSimulationDatabaseConnection();
         con.afterPropertiesSet();
-        MongoDatabase db = con.getDatabase();
-        DocumentDaoFactory documentDaoFactory = new MongoDocumentDaoFactory(db);
+        DocumentDaoFactory documentDaoFactory = new MongoDocumentDaoFactory(con);
         MongoCollection col = (MongoCollection) documentDaoFactory.getContext(collection);
         documentDao = documentDaoFactory.createFacebookMessageDocumentDao(con);
     }

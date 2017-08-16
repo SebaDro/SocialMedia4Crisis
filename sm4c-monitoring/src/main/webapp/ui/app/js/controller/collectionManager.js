@@ -12,11 +12,11 @@ var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
 
 
 
-    // $scope.onTrainerSelected = function(){
-    //   if ($scope.collection.documentCount === 0) {
-    //       displayInitialCollectionDialog();
-    //     }
-    // };
+    $scope.onTrainerSelected = function(){
+      if ($scope.collection.documentCount === 0) {
+          displayInitialCollectionDialog();
+        }
+    };
 
     var displayInitialCollectionDialog = function() {
       $mdDialog.show({
@@ -100,9 +100,6 @@ var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
       $scope.cancel = function() {
         $mdDialog.cancel();
       };
-      // $scope.confirm = function() {
-      //   $mdDialog.hide(true);
-      // };
     }];
 
 

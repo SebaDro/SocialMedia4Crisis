@@ -112,3 +112,7 @@ div.collection-details{
 .md-button[disabled] svg {
   fill: rgba(0, 0, 0, 0.26);
 }
+.document-div {
+  width: 400px;
+  overflow-y: scroll;
+}

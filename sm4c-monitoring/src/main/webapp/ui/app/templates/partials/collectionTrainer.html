@@ -23,15 +23,50 @@
       </md-card-header-text>
     </md-card-header>
     <md-card-content layout="column" layout-align="space-between">
-      <div layout="column">
+      <div layout="column" layout-margin >
+        <h3>1) Auswahl der Trainingsdaten</h3>
         <p>Wählen Sie zunächst aus, wieviele Trainingsdaten Sie klassifizieren möchten:</p>
         <md-slider-container>
-          <md-slider flex md-discrete step="100" min="0" max="{{collection.documentCount}}" ng-model="trainingSize" aria-label="trainingSize" id="sizeSlider" ng-change="sliderChanged()">
+          <md-slider flex md-discrete step="100" min="0" max="{{collection.documentCount}}" ng-model="trainingSize" aria-label="trainingSize" id="sizeSlider" ng-change="sliderChanged()" ng-disabled="documents">
           </md-slider>
         </md-slider-container>
-        <div><md-button flex class="md-raised" ng-disabled="checkTrainingSize()"  ng-click="loadTrainingData()"><md-icon md-svg-icon="images/icons/update_black_18px.svg"></md-icon>Trainingsdaten abrufen</md-button></div>
+        <div>
+          <md-button flex class="md-raised" ng-disabled="checkTrainingSize()" ng-click="loadTrainingData()" ng-disabled="documents">
+            <md-icon md-svg-icon="images/icons/update_black_18px.svg"></md-icon>Trainingsdaten abrufen</md-button>
+        </div>
+      </div>
+      <md-divider></md-divider>
+
+      <div  layout="column" layout-margin>
+        <h3>2) Klassifizierung</h3>
+        <p ng-show="!documents">Es wurden noch keine Trainingsdaten ausgewählt</p>
+        <p ng-show="documents">Klassifizieren Sie die ausgewählten Nachrichten durch die Auswahl einer der vorgegebenen Labels:</p>
+        <div layout="row" layout-align="center center" layout-margin ng-show="documents">
+          <div>
+            <md-button class="md-raised" ng-click="previous()" ng-disabled="currentIndex == 0">
+              <md-icon md-svg-icon="images/icons/keyboard_arrow_left_black.svg"></md-icon>
+            </md-button>
+          </div>
+          <md-whiteframe class="md-whiteframe-1dp" layout-padding layout="column" style="height:400px">
+            <div class="document-div" layout-align="center start" layout="row" ng-repeat="document in documents | limitTo: 1 : currentIndex" flex>
+              <p>{{document.content}}</p>
+            </div>
+            <md-divider></md-divider>
+            <div layout="column" >
+              <p>Labels zur Auswahl:</p>
+              <md-radio-group ng-model="classifiedLabel">
+                <md-radio-button ng-repeat="label in collection.labels" value="{{label}}" ng-disabled=" d.isDisabled ">{{label}}</md-radio-button>
+              </md-radio-group>
+            </div>
+          </md-whiteframe>
+          <div>
+            <md-button class="md-raised" ng-click="next()" ng-disabled="currentIndex == maxIndex">
+              <md-icon md-svg-icon="images/icons/keyboard_arrow_right_black.svg"></md-icon>
+            </md-button>
+            <div/>
+          </div>
+        </div>
       </div>
     </md-card-content>
   </md-card>
-
-</div>
+  </div>

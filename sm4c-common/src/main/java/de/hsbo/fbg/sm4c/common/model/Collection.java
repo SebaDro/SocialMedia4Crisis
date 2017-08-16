@@ -15,7 +15,6 @@ import java.util.Set;
  */
 public class Collection extends AbstractEntity implements Serializable {
 
-    private long id;
     private String name;
     private String description;
     private Date creation;
@@ -29,14 +28,6 @@ public class Collection extends AbstractEntity implements Serializable {
 
     public Collection() {
 
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -14,19 +14,10 @@ import java.io.Serializable;
  */
 public class Keyword extends AbstractEntity implements Serializable{
     
-    private long id;
     private String name;
     
     public Keyword (){
         
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {

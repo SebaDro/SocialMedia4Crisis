@@ -13,19 +13,10 @@ import java.io.Serializable;
  */
 public class CollectionStatus extends AbstractEntity implements Serializable {
 
-    private long id;
     private String name;
 
     public CollectionStatus() {
 
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {

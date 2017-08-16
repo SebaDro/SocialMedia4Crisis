@@ -13,7 +13,6 @@ import java.io.Serializable;
  */
 public class FacebookSource extends AbstractEntity implements Serializable {
 
-    private long id;
     private String facebookId;
     private String name;
     private String description;
@@ -21,14 +20,6 @@ public class FacebookSource extends AbstractEntity implements Serializable {
 
     public FacebookSource() {
 
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getFacebookId() {

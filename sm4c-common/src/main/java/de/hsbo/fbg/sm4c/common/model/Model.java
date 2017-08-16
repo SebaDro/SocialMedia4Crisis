@@ -6,26 +6,19 @@
 
 package de.hsbo.fbg.sm4c.common.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Sebastian Drost
  */
-public class Model {
+public class Model extends AbstractEntity implements Serializable{
     
-    private long id;
     private String path;
     private EvaluationResult evaluation;
     
     public Model(){
         
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getPath() {

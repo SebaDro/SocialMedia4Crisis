@@ -69,7 +69,7 @@
         </id>
         <property name="name" column="name" type="string" unique="true" not-null="true"/>
     </class>
-    <class name="de.hsbo.fbg.sm4c.common.model.FacebookSource" table="facebooksource">
+    <class name="de.hsbo.fbg.sm4c.common.model.FacebookSource" table="facebooksource" >
         <meta attribute="class-description">
             This class contains a Facebook source for a collection.
         </meta>
@@ -79,7 +79,7 @@
         <property name="facebookId" column="facebookid" type="string" unique="true" not-null="true"/>
         <property name="name" column="name" type="string" />
         <property name="description" column="description" type="string" />
-        <many-to-one name="type" column="typeid" class="de.hsbo.fbg.sm4c.common.model.SourceType" foreign-key="fk_facebooksource_cat_sourcetype" cascade="save-update"/>
+        <many-to-one name="type" column="typeid" class="de.hsbo.fbg.sm4c.common.model.SourceType" foreign-key="fk_facebooksource_cat_sourcetype" cascade="save-update" lazy="false" fetch="join"/>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.SourceType" table="sourcetype">
         <meta attribute="class-description">

@@ -48,6 +48,7 @@ import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.common.model.Status;
 import de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder;
 import de.hsbo.fbg.sm4c.rest.coding.ModelEncoder;
 import de.hsbo.fbg.sm4c.rest.view.MessageDocumentView;
@@ -91,12 +92,12 @@ public class CollectionController implements InitializingBean {
     }
 
     @RequestMapping(value = "/collections", method = RequestMethod.POST)
-    public ResponseEntity initiateCollection(@RequestBody CollectionView req) {
+    public ResponseEntity initiateCollection(@RequestBody CollectionView req) throws RessourceNotFoundException {
         try (Session session = daoFactory.initializeContext()) {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
 
             Collection collection = collectionDecoder.decode(req);
-            CollectionStatus status = retrieveCollectionStatus(req.getStatus(), session);
+            CollectionStatus status = retrieveCollectionStatus(Status.STOPPED.toString(), session);
             Set<Keyword> keywords = retrieveKeywords(req.getKeywords(), session);
             Set<Label> labels = retrieveLabels(req.getLabels(), session);
             Set<FacebookSource> sources = retrieveSources(req.getFacebookSources(), session);
@@ -109,8 +110,6 @@ public class CollectionController implements InitializingBean {
             collection.setServices(services);
 
             collectionDao.store(collection);
-        } catch (RessourceNotFoundException ex) {
-            LOGGER.error("Could not store collection", ex);
         }
         return new ResponseEntity(HttpStatus.OK);
     }
@@ -125,7 +124,7 @@ public class CollectionController implements InitializingBean {
 //                List<MessageDocument> documents = collector.collectMessages(req.getStartTime(), req.getEndTime());
 
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
-                MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
                 List<MessageDocument> documents = documentDao.retrieve();
 //                documentDao.store(documents);
                 return new ResponseEntity(documents.size(), HttpStatus.OK);
@@ -155,7 +154,7 @@ public class CollectionController implements InitializingBean {
             Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
             if (collection.isPresent()) {
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
-                MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
 
                 CollectionView cv = collectionEncoder.encode(collection.get());
                 if (collection.get().getModel() != null) {
@@ -178,7 +177,7 @@ public class CollectionController implements InitializingBean {
             if (collection.isPresent()) {
 
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
-                MessageDocumentDao documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCollection);
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
                 List<MessageDocument> documents = documentDao.retrieveUnlabeledData(Integer.parseInt(limit));
                 result = documents.stream()
                         .map(d -> messageDocumentEncoder.encode(d))
@@ -188,6 +187,28 @@ public class CollectionController implements InitializingBean {
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
     }
+    
+        @RequestMapping(value = "/collections/{id}/documents/training/", method = RequestMethod.GET)
+    public List<MessageDocumentView> getTrainingCollectionDocuments(@PathVariable("id") String id, @PathVariable("limit") String limit) throws RessourceNotFoundException {
+        List<MessageDocumentView> result = new ArrayList();
+
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
+            if (collection.isPresent()) {
+
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
+                List<MessageDocument> documents = documentDao.retrieveTrainingData();
+                result = documents.stream()
+                        .map(d -> messageDocumentEncoder.encode(d))
+                        .collect(Collectors.toList());
+                return result;
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
+    }
+    
 
     private CollectionStatus retrieveCollectionStatus(String status, Session session) throws RessourceNotFoundException {
         CollectionStatusDao statusDao = daoFactory.createCollectioStatusDao(session);

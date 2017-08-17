@@ -5,12 +5,15 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.hibernate;
 
+import de.hsbo.fbg.sm4c.common.dao.ClassifierDao;
 import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
 import de.hsbo.fbg.sm4c.common.dao.CollectionStatusDao;
 import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
+import de.hsbo.fbg.sm4c.common.dao.EvaluationResultDao;
 import de.hsbo.fbg.sm4c.common.dao.FacebookSourceDao;
 import de.hsbo.fbg.sm4c.common.dao.KeywordDao;
 import de.hsbo.fbg.sm4c.common.dao.LabelDao;
+import de.hsbo.fbg.sm4c.common.dao.ModelDao;
 import de.hsbo.fbg.sm4c.common.dao.SocialMediaServiceDao;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +73,21 @@ public class HibernateDaoFactory implements DaoFactory<Session> {
     @Override
     public FacebookSourceDao createFacebookSourceDao(Session daoContext) {
         return new HibernateFacebookSourceDao(daoContext);
+    }
+
+    @Override
+    public ModelDao createModelDao(Session daoContext) {
+        return new HibernateModelDao(daoContext);
+    }
+
+    @Override
+    public ClassifierDao createClassifierDao(Session daoContext) {
+        return new HibernateClassifierDao(daoContext);
+    }
+
+    @Override
+    public EvaluationResultDao createEvaluationResultDao(Session daoContext) {
+        return new HibernateEvaluationResultDao(daoContext);
     }
 
 }

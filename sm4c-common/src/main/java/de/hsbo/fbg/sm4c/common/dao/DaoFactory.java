@@ -26,5 +26,10 @@ public interface DaoFactory<T extends AutoCloseable> {
     KeywordDao createKeywordDao(T daoContext);
 
     FacebookSourceDao createFacebookSourceDao(T daoContext);
+    
+    ModelDao createModelDao(T daoContext);
 
+    ClassifierDao createClassifierDao(T daoContext);
+    
+    EvaluationResultDao createEvaluationResultDao(T daoContext);
 }

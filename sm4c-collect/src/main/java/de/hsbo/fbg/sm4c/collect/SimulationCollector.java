@@ -30,7 +30,7 @@ public class SimulationCollector extends Collector {
         con.afterPropertiesSet();
         DocumentDaoFactory documentDaoFactory = new MongoDocumentDaoFactory(con);
         MongoCollection col = (MongoCollection) documentDaoFactory.getContext(collection);
-        documentDao = documentDaoFactory.createFacebookMessageDocumentDao(con);
+        documentDao = documentDaoFactory.createMessageDocumentDao(con);
     }
 
     @Override

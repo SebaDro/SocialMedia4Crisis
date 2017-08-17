@@ -33,7 +33,7 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
     }
 
     @Override
-    public MessageDocumentDao createFacebookMessageDocumentDao(MongoCollection daoContext) {
+    public MessageDocumentDao createMessageDocumentDao(MongoCollection daoContext) {
         return new MongoMessageDocumentDao(daoContext);
     }
 

@@ -78,14 +78,6 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
 
     @Override
     public List<MessageDocument> retrieveUnlabeledData(int size) {
-//        FindIterable<Document> documents = dbCollection.find(
-//                Filters.or(
-//                        Filters.and(
-//                                Filters.nor(Filters.exists("training")),
-//                                Filters.eq("label", "")),
-//                        Filters.and(
-//                                Filters.eq("training", false),
-//                                Filters.eq("label", ""))));
         FindIterable<Document> documents = dbCollection.find(
                 Filters.and(
                         Filters.eq("training", false),
@@ -95,7 +87,7 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
         random.setSeed(42);
         Collections.shuffle(messages, random);
 
-        return messages.subList(0, size + 1);
+        return messages.subList(0, size);
     }
 
     @Override

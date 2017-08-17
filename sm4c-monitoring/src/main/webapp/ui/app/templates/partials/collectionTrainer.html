@@ -8,22 +8,44 @@
       </md-card-header-text>
     </md-card-header>
     <md-card-content layout="column" layout-align="space-between">
-      <div layout="column">
-        <md-content flex layout-padding ng-show="!collection.model">
+      <div layout="column" ng-show="!collection.modelSummary && checkTrainingDataSize()">
+        <md-content flex layout-padding>
           <h3>Model ist nicht vorhanden</h3>
           <p>Bitte klassifizieren Sie zunächst einige Trainingsdaten, um anschließend ein Model zu erstellen.</p>
         </md-content>
       </div>
+      <div layout="column" ng-show="!collection.modelSummary && !checkTrainingDataSize()">
+        <md-content flex layout-padding>
+          <h3>Model ist nicht vorhanden</h3>
+          <p>Es sind Trainingsdaten vorhanden, um ein Model zu erstellen.</p>
+        </md-content>
+        <div>
+          <md-button flex class="md-raised" ng-disabled="checkTrainingDataSize()" ng-click="createModel()">
+            <md-icon md-svg-icon="images/icons/update_black_18px.svg"></md-icon>Model erstellen</md-button>
+        </div>
+      </div>
+      <div layout="column" ng-show="collection.modelSummary">
+        <md-content flex layout-padding>
+          <h3>Modeldetails</h3>
+          <pre>{{collection.modelSummary}}</pre>
+        </md-content>
+        <p>Sie können weitere Trainingsdaten klassifizieren um das Model zu aktualisieren.</p>
+      </div>
     </md-card-content>
   </md-card>
-  <md-card>
+  <div>
+    <md-switch ng-model="cb.classify" aria-label="Switch 1">
+      Trainingsdaten klassifizieren
+    </md-switch>
+  </div>
+  <md-card ng-show="cb.classify">
     <md-card-header>
       <md-card-header-text>
         <h2>Training</h2>
       </md-card-header-text>
     </md-card-header>
     <md-card-content layout="column" layout-align="space-between">
-      <div layout="column" layout-margin >
+      <div layout="column" layout-margin>
         <h3>1) Auswahl der Trainingsdaten</h3>
         <p>Wählen Sie zunächst aus, wieviele Trainingsdaten Sie klassifizieren möchten:</p>
         <md-slider-container>
@@ -37,7 +59,7 @@
       </div>
       <md-divider></md-divider>
 
-      <div  layout="column" layout-margin>
+      <div layout="column" layout-margin>
         <h3>2) Klassifizierung</h3>
         <p ng-show="!documents">Es wurden noch keine Trainingsdaten ausgewählt</p>
         <p ng-show="documents">Klassifizieren Sie die ausgewählten Nachrichten durch die Auswahl einer der vorgegebenen Labels:</p>
@@ -52,7 +74,7 @@
               <p>{{document.content}}</p>
             </div>
             <md-divider></md-divider>
-            <div layout="column" >
+            <div layout="column">
               <p>Labels zur Auswahl:</p>
               <md-radio-group ng-model="classifiedLabel">
                 <md-radio-button ng-repeat="label in collection.labels" value="{{label}}" ng-disabled=" d.isDisabled ">{{label}}</md-radio-button>
@@ -69,4 +91,4 @@
       </div>
     </md-card-content>
   </md-card>
-  </div>
+</div>

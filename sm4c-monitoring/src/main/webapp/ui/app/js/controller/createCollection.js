@@ -54,7 +54,7 @@ angular.module('sm4cMonitoring')
         var payload = {
           name: $scope.newCollection.name,
           description: $scope.newCollection.description,
-          collectionStatus: "gestoppt",
+          status: "gestoppt",
           labels: $scope.newCollection.labels,
           keywords: $scope.newCollection.tags,
           services: ["Facebook"],

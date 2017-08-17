@@ -1,22 +1,29 @@
 angular.module('sm4cMonitoring')
-  .controller('CollectionManagerCtrl', ['$scope',  '$http', '$location', '$routeParams', '$mdDialog', '$mdToast', 'collectionService', function($scope, $http, $location, $routeParams, $mdDialog, $mdToast, collectionService) {
+  .controller('CollectionManagerCtrl', ['$scope', '$http', '$location', '$routeParams', '$mdDialog', '$mdToast', 'collectionService', function($scope, $http, $location, $routeParams, $mdDialog, $mdToast, collectionService) {
 
 
-var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
+    var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
     $http.get(rootURL + '/collections/' + $routeParams.id).then(function(response) {
       collectionService.setCollection(response.data);
       $scope.collection = collectionService.getCollection();
+      $scope.currentNavItem = "templates/partials/collectionDetails.html";
+      if ($scope.collection.documentCount === 0) {
+        displayInitialCollectionDialog();
+      }
+
     }, function(err) {
       console.warn(err);
     });
 
 
 
-    $scope.onTrainerSelected = function(){
-      if ($scope.collection.documentCount === 0) {
-          displayInitialCollectionDialog();
-        }
-    };
+
+
+    // $scope.onTrainerSelected = function(){
+    //   if ($scope.collection.documentCount === 0) {
+    //       displayInitialCollectionDialog();
+    //     }
+    // };
 
     var displayInitialCollectionDialog = function() {
       $mdDialog.show({

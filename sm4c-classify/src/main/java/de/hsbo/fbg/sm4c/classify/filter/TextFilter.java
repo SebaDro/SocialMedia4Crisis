@@ -4,14 +4,16 @@
  * and open the template in the editor.
  */
 
-package de.hsbo.fbg.sm4c.classifier.geotag;
+package de.hsbo.fbg.sm4c.classify.filter;
 
-import de.hsbo.fbg.sm4c.common.model.Location;
+import java.util.List;
 
 /**
  *
  * @author Sebastian Drost
  */
-public interface GeoTagger {
-    public Location geocode(String address);
+public interface TextFilter {
+
+    public List<String> filter(List<String> tokens);
+    
 }

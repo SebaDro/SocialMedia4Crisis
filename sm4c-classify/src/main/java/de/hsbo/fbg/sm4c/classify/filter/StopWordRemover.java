@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.classifier.filter;
+package de.hsbo.fbg.sm4c.classify.filter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author Sebastian Drost
  */
-public class StopWordRemover {
+public class StopWordRemover implements TextFilter {
 
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(StopWordRemover.class);
 
@@ -60,19 +60,10 @@ public class StopWordRemover {
      * @param tokens List of tokens the stop words will be removed of
      * @return List of tokens without the default stop words
      */
-    public List<String> removeStopWords(List<String> tokens) {
+    @Override
+    public List<String> filter(List<String> tokens) {
         return tokens.stream().filter(t -> !stopWordList
                 .stream().anyMatch(sw -> sw.equalsIgnoreCase(t)))
                 .collect(Collectors.toList());
-
     }
-
-    public String removeStopWords(String text, String[] stopWords) {
-        throw new java.lang.UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String removeStopWords(String text, List<String> stopWords) {
-        throw new java.lang.UnsupportedOperationException("Not supported yet.");
-    }
-
 }

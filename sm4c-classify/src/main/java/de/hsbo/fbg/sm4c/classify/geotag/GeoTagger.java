@@ -3,12 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.classify;
+
+package de.hsbo.fbg.sm4c.classify.geotag;
+
+import de.hsbo.fbg.sm4c.common.model.Location;
 
 /**
  *
  * @author Sebastian Drost
  */
-public enum ClassifierTypes {
-    NAIVE_BAYES, MULTINOMIAL_NAIVE_BAYES, SVM, KNearest
+public interface GeoTagger {
+    public Location geocode(String address);
 }

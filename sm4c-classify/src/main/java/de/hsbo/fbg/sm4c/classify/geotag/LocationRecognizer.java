@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.classifier.geotag;
+package de.hsbo.fbg.sm4c.classify.geotag;
 
 import de.hsbo.fbg.common.config.Configuration;
 import edu.stanford.nlp.ling.CoreAnnotations;

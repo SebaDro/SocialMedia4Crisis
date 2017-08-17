@@ -43,7 +43,7 @@ public class MongoDaoIT {
         Collection col = new Collection();
         col.setName("Test Collection");
         MongoCollection mongoCol = documentDaoFactory.getContext(col);
-        documentDao = documentDaoFactory.createFacebookMessageDocumentDao(mongoCol);
+        documentDao = documentDaoFactory.createMessageDocumentDao(mongoCol);
         FacebookMessageDocument document = new FacebookMessageDocument();
         document.setContent("Test content");
         DateTime dt = DateTime.parse("May 28, 2013 11:21:54 PM",

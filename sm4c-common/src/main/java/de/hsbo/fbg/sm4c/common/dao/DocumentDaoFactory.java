@@ -16,6 +16,6 @@ public interface DocumentDaoFactory<T> {
 
     T getContext(Collection collection);
 
-    MessageDocumentDao createFacebookMessageDocumentDao(T daoContext);
+    MessageDocumentDao createMessageDocumentDao(T daoContext);
 
 }

@@ -9,13 +9,13 @@ package de.hsbo.fbg.sm4c.common.model;
  *
  * @author Sebastian Drost
  */
-public enum Services {
-    TWITTER("Twitter"),
-    FACEBOOK("Facebook");
+public enum Status {
+    ACTIVE("aktiv"),
+    STOPPED("gestoppt");
 
     private final String name;
 
-    private Services(final String name) {
+    private Status(final String name) {
         this.name = name;
     }
 

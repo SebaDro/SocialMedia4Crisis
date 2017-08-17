@@ -30,8 +30,8 @@
             <key column="collectionid" />
             <many-to-many column="sourceid" class="de.hsbo.fbg.sm4c.common.model.FacebookSource" foreign-key="fk_collection_facebooksources_cat_facebooksource"/>
         </set>
-        <one-to-one name="model" class="de.hsbo.fbg.sm4c.common.model.Model" cascade="all">
-        </one-to-one>
+        <many-to-one name="model" column="modelid" class="de.hsbo.fbg.sm4c.common.model.Model" cascade="all">
+        </many-to-one>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.CollectionStatus" table="collectionstatus">
         <meta attribute="class-description">
@@ -97,9 +97,11 @@
         <id name="id" type="long" column="id">
             <generator class="identity"/>
         </id>
-        <property name="path" column="path" type="string" unique="true" not-null="true"/>
-        <one-to-one name="evaluation" class="de.hsbo.fbg.sm4c.common.model.EvaluationResult" cascade="all">
-        </one-to-one>
+        <property name="classifierPath" column="classifierpath" type="string" unique="true" not-null="true"/>
+        <property name="inputDataPath" column="inputdatapath" type="string" unique="true" not-null="true"/>
+        <many-to-one name="evaluation" column="evaluationid" class="de.hsbo.fbg.sm4c.common.model.EvaluationResult" cascade="all" foreign-key="model_cat_evaluation">
+        </many-to-one>
+        <many-to-one name="classifier" column="classifierid" class="de.hsbo.fbg.sm4c.common.model.Classifier" foreign-key="fk_model_cat_classifier" cascade="save-update" />
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.EvaluationResult" table="evaluation">
         <meta attribute="class-description">
@@ -111,5 +113,14 @@
         <property name="summary" column="summary" type="string"/>
         <property name="classDetails" column="classdetails" type="string"/>
         <property name="confusionMatrix" column="confusionmatrix" type="string"/>
+    </class>
+        <class name="de.hsbo.fbg.sm4c.common.model.Classifier" table="classifier" >
+        <meta attribute="class-description">
+            This class contains a Facebook source for a collection.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="string" unique="true" not-null="true"/>
     </class>
 </hibernate-mapping>

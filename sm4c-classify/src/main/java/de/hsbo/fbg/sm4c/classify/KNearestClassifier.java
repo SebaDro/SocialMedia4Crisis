@@ -17,11 +17,14 @@ public class KNearestClassifier extends AbstractClassifier {
 
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(KNearestClassifier.class);
     private int k = 1;
-    
-    public KNearestClassifier(){
+
+    public KNearestClassifier() {
         super();
     }
 
+    public KNearestClassifier(Classifier classifier) {
+        super(classifier);
+    }
 
     public void setKNN(int k) {
         this.k = k;

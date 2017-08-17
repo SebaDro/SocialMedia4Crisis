@@ -21,6 +21,10 @@ public class SVMClassifier extends AbstractClassifier {
         super();
     }
 
+    public SVMClassifier(Classifier classifier) {
+        super(classifier);
+    }
+
     @Override
     protected Classifier instantiateClassifier() {
         return new SMO();

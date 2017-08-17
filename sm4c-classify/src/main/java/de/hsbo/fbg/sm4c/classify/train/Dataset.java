@@ -22,7 +22,7 @@ import weka.core.Instances;
 public class Dataset {
 
     public static final String MESSAGE_ATTRIBUTE = "message_content";
-    
+
     private Instances modelDataset;
 
     public Dataset(Collection col) {
@@ -38,7 +38,14 @@ public class Dataset {
                 .collect(Collectors.toList());
         attributes.add(new Attribute("class", classValues));
         modelDataset = new Instances(col.getName(), attributes, 10000);
-        modelDataset.setClassIndex(modelDataset.numAttributes()-1);
+        modelDataset.setClassIndex(modelDataset.numAttributes() - 1);
+    }
+
+    public Dataset(Instances instances) {
+        modelDataset = instances;
+        if (modelDataset.classIndex() == -1) {
+            modelDataset.setClassIndex(modelDataset.numAttributes() - 1);
+        }
     }
 
     public void add(List<MessageDocument> messages) {
@@ -58,7 +65,7 @@ public class Dataset {
         // Give instance access to attribute information from the dataset.
         instance.setDataset(modelDataset);
         instance.setClassValue(messageDoc.getLabel());
-        
+
         modelDataset.add(instance);
     }
 

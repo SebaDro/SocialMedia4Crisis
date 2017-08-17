@@ -50,15 +50,31 @@ public abstract class AbstractClassifier {
         transformer = createBasicTransformer();
     }
 
+    public AbstractClassifier(Classifier classifier) {
+        this.classifier = classifier;
+        transformer = createBasicTransformer();
+    }
+
+    public void setFormat(Dataset trainingData) {
+        this.trainingData = trainingData;
+        this.transformer.setInputFormat(trainingData);
+        this.matrix = this.transformer.createDocumentTermMatrix(trainingData);
+    }
+
+    public Dataset getTrainingData() {
+        return trainingData;
+    }
+
+    public Classifier getClassifier() {
+        return classifier;
+    }
+
     /**
      * Trains the classifier with a labeled training dataset
      *
      * @param trainingData the labeled training dataset
      */
-    public void trainClassifier(Dataset trainingData) {
-        this.trainingData = trainingData;
-        this.transformer.setInputFormat(trainingData);
-        this.matrix = this.transformer.createDocumentTermMatrix(trainingData);
+    public void trainClassifier() {
         try {
             classifier.buildClassifier(matrix.getDtm());
         } catch (Exception ex) {
@@ -134,9 +150,8 @@ public abstract class AbstractClassifier {
         filter.setOutputWordCounts(false);
 
         //Set german Snowball stemmer
-        SnowballStemmer stemmer = new SnowballStemmer("german");
-        filter.setStemmer((Stemmer) stemmer);
-
+//        SnowballStemmer stemmer = new SnowballStemmer("german");
+//        filter.setStemmer((Stemmer) stemmer);
         //Set tokenizer per word
         WordTokenizer tokenizer = new WordTokenizer();
         filter.setTokenizer(tokenizer);

@@ -26,7 +26,16 @@ public class CollectionView {
     private List<String> keywords;
     private List<String> services;
     private List<FacebookSourceView> facebookSources;
-    private ModelView model;
+//    private ModelView model;
+    private String modelSummary;
+
+    public String getModelSummary() {
+        return modelSummary;
+    }
+
+    public void setModelSummary(String modelSummary) {
+        this.modelSummary = modelSummary;
+    }
     private long documentCount;
 
     public CollectionView() {
@@ -104,15 +113,14 @@ public class CollectionView {
     public void setFacebookSources(List<FacebookSourceView> facebookSources) {
         this.facebookSources = facebookSources;
     }
-
-    public ModelView getModel() {
-        return model;
-    }
-
-    public void setModel(ModelView model) {
-        this.model = model;
-    }
-    
+//
+//    public ModelView getModel() {
+//        return model;
+//    }
+//
+//    public void setModel(ModelView model) {
+//        this.model = model;
+//    }
     
     
     public long getDocumentCount() {

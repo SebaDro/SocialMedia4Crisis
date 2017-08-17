@@ -6,13 +6,18 @@
 
 package de.hsbo.fbg.sm4c.rest.view;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+
 /**
  *
  * @author Sebastian Drost
  */
 public class ModelView {
+    @JsonRawValue
     private String summary;
+    @JsonRawValue
     private String classDetails;
+    @JsonRawValue
     private String confusionMatrix;
     
     public ModelView(){

@@ -8,8 +8,8 @@ package de.hsbo.fbg.sm4c.rest.control;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import de.hsbo.fbg.sm4c.collect.FacebookSimulationCollector;
 import de.hsbo.fbg.common.config.Configuration;
+import de.hsbo.fbg.sm4c.collect.FacebookTestCollector;
 import de.hsbo.fbg.sm4c.collect.dao.FacebookSimulationDao;
 import de.hsbo.fbg.sm4c.collect.dao.MongoDbFacebookSimulationDao;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
@@ -43,7 +43,7 @@ public class SimulationController implements InitializingBean {
     private static final Logger LOGGER = LogManager.getLogger(SimulationController.class);
 
     private FacebookSimulationDao fbDao;
-    private FacebookSimulationCollector fbCollector;
+    private FacebookTestCollector fbCollector;
     private ObjectMapper mapper;
     private FacebookSimulationEncoder fbEncoder;
 
@@ -126,7 +126,7 @@ public class SimulationController implements InitializingBean {
                 Integer.parseInt(conf.getPropertyValue("db_port")),
                 conf.getPropertyValue("db_sim_name"),
                 conf.getPropertyValue("db_sim_collection"));
-        fbCollector = new FacebookSimulationCollector();
+        fbCollector = new FacebookTestCollector();
         mapper = new ObjectMapper();
         fbEncoder = new FacebookSimulationEncoder();
     }

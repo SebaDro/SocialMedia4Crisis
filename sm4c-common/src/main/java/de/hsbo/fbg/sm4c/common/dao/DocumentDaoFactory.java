@@ -15,6 +15,8 @@ import de.hsbo.fbg.sm4c.common.model.Collection;
 public interface DocumentDaoFactory<T> {
 
     T getContext(Collection collection);
+    
+    T getContext(String collection);
 
     MessageDocumentDao createMessageDocumentDao(T daoContext);
 

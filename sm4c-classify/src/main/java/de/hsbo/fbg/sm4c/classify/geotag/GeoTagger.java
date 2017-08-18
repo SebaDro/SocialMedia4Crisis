@@ -7,6 +7,7 @@
 package de.hsbo.fbg.sm4c.classify.geotag;
 
 import de.hsbo.fbg.sm4c.common.model.Location;
+import java.util.List;
 
 /**
  *
@@ -14,4 +15,6 @@ import de.hsbo.fbg.sm4c.common.model.Location;
  */
 public interface GeoTagger {
     public Location geocode(String address);
+    
+    public List<Location> geocode(List<String> addresses);
 }

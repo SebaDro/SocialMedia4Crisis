@@ -21,6 +21,10 @@
             <artifactId>sm4c-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sm4c-classify</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.facebook4j</groupId>
             <artifactId>facebook4j-core</artifactId>
         </dependency>
@@ -66,7 +70,7 @@
             <version>4.3.9.RELEASE</version>
             <type>jar</type>
         </dependency>
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
         </dependency>

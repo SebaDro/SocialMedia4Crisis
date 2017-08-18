@@ -28,7 +28,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>sm4c-classify</artifactId>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sm4c-common</artifactId>
         </dependency>

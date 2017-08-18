@@ -7,6 +7,7 @@ package de.hsbo.fbg.sm4c.collect;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import de.hsbo.fbg.common.config.Configuration;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.mongo.MongoSimulationDatabaseConnection;
@@ -20,17 +21,16 @@ import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
  *
  * @author Seba
  */
-public class SimulationCollector extends Collector {
+public class SimulationCollector implements Collector {
 
     private MessageDocumentDao documentDao;
 
-    public SimulationCollector(Collection collection) {
-        super(collection);
+    public SimulationCollector() {
         MongoSimulationDatabaseConnection con = new MongoSimulationDatabaseConnection();
         con.afterPropertiesSet();
         DocumentDaoFactory documentDaoFactory = new MongoDocumentDaoFactory(con);
-        MongoCollection col = (MongoCollection) documentDaoFactory.getContext(collection);
-        documentDao = documentDaoFactory.createMessageDocumentDao(con);
+        MongoCollection col = (MongoCollection) documentDaoFactory.getContext(Configuration.getConfig().getPropertyValue("db_sim_collection"));
+        documentDao = documentDaoFactory.createMessageDocumentDao(col);
     }
 
     @Override

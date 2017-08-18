@@ -5,14 +5,6 @@
  */
 package de.hsbo.fbg.sm4c.collect;
 
-import de.hsbo.fbg.sm4c.common.model.FacebookSource;
-import de.hsbo.fbg.sm4c.common.model.MessageDocument;
-import facebook4j.Post;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.joda.time.DateTime;
-
 /**
  *
  * @author Sebastian Drost

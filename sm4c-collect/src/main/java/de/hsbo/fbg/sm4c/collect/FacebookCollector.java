@@ -12,18 +12,23 @@ import facebook4j.Post;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class FacebookCollector extends Collector {
+public class FacebookCollector implements Collector {
 
+    private static final Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
+    
+    private Collection collection;
     private FacebookAPI api;
     private FacebookDecoder decoder;
 
     public FacebookCollector(Collection collection) {
-        super(collection);
+        this.collection = collection;
         this.api = new FacebookAPI();
         this.decoder = new FacebookDecoder();
     }
@@ -33,7 +38,7 @@ public class FacebookCollector extends Collector {
         List<MessageDocument> result = new ArrayList();
         collection.getSources().forEach(s -> {
             List<Post> posts = api.getMessagesFromSingleSource(s, startTime, endTime);
-            posts.forEach(p ->{
+            posts.forEach(p -> {
                 result.add(decoder.createMessage(p, s));
             });
         });

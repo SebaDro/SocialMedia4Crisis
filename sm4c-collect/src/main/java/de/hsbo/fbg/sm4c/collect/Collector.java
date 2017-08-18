@@ -18,14 +18,7 @@ import java.util.List;
  *
  * @author Sebastian Drost
  */
-public abstract class Collector {
-    
-
-    protected Collection collection;
-    
-    public Collector(Collection collection){
-        this.collection = collection;
-    }
+public interface Collector {
     
     public abstract List<MessageDocument> collectMessages(Date startTime, Date endTime); 
 }

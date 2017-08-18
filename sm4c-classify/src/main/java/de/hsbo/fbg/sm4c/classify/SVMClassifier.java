@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.classify;
 
+import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import org.apache.logging.log4j.LogManager;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.SMO;
@@ -21,8 +22,8 @@ public class SVMClassifier extends AbstractClassifier {
         super();
     }
 
-    public SVMClassifier(Classifier classifier) {
-        super(classifier);
+    public SVMClassifier(Classifier classifier, Dataset trainingData) {
+        super(classifier, trainingData);
     }
 
     @Override

@@ -42,7 +42,7 @@ public abstract class AbstractClassifier {
 
     protected Classifier classifier;
     protected Dataset trainingData;
-    protected DocumentTermMatrix matrix;
+//    protected DocumentTermMatrix matrix;
     protected DtmTransformer transformer;
 
     public AbstractClassifier() {
@@ -50,15 +50,16 @@ public abstract class AbstractClassifier {
         transformer = createBasicTransformer();
     }
 
-    public AbstractClassifier(Classifier classifier) {
+    public AbstractClassifier(Classifier classifier, Dataset trainingData) {
         this.classifier = classifier;
-        transformer = createBasicTransformer();
+        this.transformer = createBasicTransformer();
+        setFormat(trainingData);
+        this.transformer.createDocumentTermMatrix(trainingData);
     }
 
     public void setFormat(Dataset trainingData) {
         this.trainingData = trainingData;
         this.transformer.setInputFormat(trainingData);
-        this.matrix = this.transformer.createDocumentTermMatrix(trainingData);
     }
 
     public Dataset getTrainingData() {
@@ -75,6 +76,7 @@ public abstract class AbstractClassifier {
      * @param trainingData the labeled training dataset
      */
     public void trainClassifier() {
+        DocumentTermMatrix matrix = this.transformer.createDocumentTermMatrix(trainingData);
         try {
             classifier.buildClassifier(matrix.getDtm());
         } catch (Exception ex) {
@@ -110,9 +112,9 @@ public abstract class AbstractClassifier {
      */
     public EvaluationResult evaluate(Dataset trainingData) {
         EvaluationResult result = new EvaluationResult();
-        this.transformer.setInputFormat(trainingData);
+        this.transformer.setInputFormat(this.trainingData);
         try {
-            DocumentTermMatrix matrix = transformer.createDocumentTermMatrix(trainingData);
+            DocumentTermMatrix matrix = this.transformer.createDocumentTermMatrix(trainingData);
             Evaluation evaluation = new Evaluation(matrix.getDtm());
             Classifier classifier = instantiateClassifier();
             evaluation.crossValidateModel(classifier, matrix.getDtm(), 10, new Random(42));
@@ -126,6 +128,16 @@ public abstract class AbstractClassifier {
         return result;
     }
 
+    public ArrayList<Attribute> getAttributes() {
+        ArrayList<Attribute> result = new ArrayList<>();
+        DocumentTermMatrix matrix = this.transformer.createDocumentTermMatrix(trainingData);
+        Enumeration<Attribute> ettributeEnmu = matrix.getDtm().enumerateAttributes();
+        while (ettributeEnmu.hasMoreElements()) {
+            result.add(ettributeEnmu.nextElement());
+        }
+        return result;
+    }
+
     protected Instance createInstance(MessageDocument document) {
         // Create instance of length two.
         Instance instance = new DenseInstance(2);
@@ -135,7 +147,7 @@ public abstract class AbstractClassifier {
         Attribute messageAtt = instances.attribute(Dataset.MESSAGE_ATTRIBUTE);
         instance.setValue(messageAtt, messageAtt.addStringValue(document.getContent()));
 
-        // Give instance access to attribute information from the dataset.
+        // Give instance access to attribute information from the training dataset.
         instance.setDataset(instances);
 
         return instance;
@@ -171,15 +183,6 @@ public abstract class AbstractClassifier {
             LOGGER.error("Could not load stop words", ex);
         }
         return new DtmTransformer(filter);
-    }
-
-    public ArrayList<Attribute> getAttributes() {
-        ArrayList<Attribute> result = new ArrayList<>();
-        Enumeration<Attribute> ettributeEnmu = this.matrix.getDtm().enumerateAttributes();
-        while (ettributeEnmu.hasMoreElements()) {
-            result.add(ettributeEnmu.nextElement());
-        }
-        return result;
     }
 
     protected abstract Classifier instantiateClassifier();

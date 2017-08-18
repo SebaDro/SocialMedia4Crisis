@@ -54,7 +54,7 @@ public class Dataset {
         });
     }
 
-    private void add(MessageDocument messageDoc) {
+    public void add(MessageDocument messageDoc) {
         // Create instance of length two.
         Instance instance = new DenseInstance(2);
 

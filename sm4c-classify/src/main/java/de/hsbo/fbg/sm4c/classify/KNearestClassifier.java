@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.classify;
 
+import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import org.apache.logging.log4j.LogManager;
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
@@ -22,8 +23,8 @@ public class KNearestClassifier extends AbstractClassifier {
         super();
     }
 
-    public KNearestClassifier(Classifier classifier) {
-        super(classifier);
+    public KNearestClassifier(Classifier classifier, Dataset trainingData) {
+        super(classifier, trainingData);
     }
 
     public void setKNN(int k) {

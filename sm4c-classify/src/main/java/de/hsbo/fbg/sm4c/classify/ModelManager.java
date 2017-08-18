@@ -46,13 +46,15 @@ public class ModelManager {
 
     public AbstractClassifier deserializeModel(Model model) throws Exception {
         Classifier cls = (Classifier) SerializationHelper.read(model.getClassifierPath());
-        ClassifierFactory factory = new ClassifierFactory();
-        AbstractClassifier result = factory.createClassifier(model.getClassifier().getName(), cls);
 
         DataSource source = new DataSource(model.getInputDataPath());
-        Instances data = source.getDataSet();
-        result.setFormat(new Dataset(source.getDataSet()));
-        return result;
+        Instances instances = source.getDataSet();
+        Dataset dataset = new Dataset(instances);
+
+        ClassifierFactory factory = new ClassifierFactory();
+        AbstractClassifier classifier = factory.createClassifier(model.getClassifier().getName(), cls, dataset);
+
+        return classifier;
     }
 
 }

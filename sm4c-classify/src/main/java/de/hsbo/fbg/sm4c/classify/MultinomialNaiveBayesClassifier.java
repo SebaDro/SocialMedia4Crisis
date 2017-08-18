@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.classify;
 
+import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import de.hsbo.fbg.sm4c.classify.train.DtmTransformer;
 import org.apache.logging.log4j.LogManager;
 import weka.classifiers.Classifier;
@@ -23,8 +24,8 @@ public class MultinomialNaiveBayesClassifier extends AbstractClassifier {
         transformer.getFilter().setIDFTransform(true);
     }
 
-    public MultinomialNaiveBayesClassifier(Classifier classifier) {
-        super(classifier);
+    public MultinomialNaiveBayesClassifier(Classifier classifier, Dataset trainigData) {
+        super(classifier, trainigData);
         transformer.getFilter().setIDFTransform(true);
     }
 

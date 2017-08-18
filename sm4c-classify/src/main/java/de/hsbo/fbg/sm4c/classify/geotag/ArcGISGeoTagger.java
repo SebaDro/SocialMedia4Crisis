@@ -51,7 +51,6 @@ public class ArcGISGeoTagger implements GeoTagger {
         try {
             List<GeocodeResult> geocodeResults = geocodeFuture.get();
             if (geocodeResults.size() > 0) {
-                // Use the first result - for example display in an existing Graphics Overlay
                 GeocodeResult topResult = geocodeResults.get(0);
                 double score = topResult.getScore();
                 Point p = topResult.getDisplayLocation();

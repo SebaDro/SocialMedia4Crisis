@@ -20,9 +20,9 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Seba
  */
-public class ArcGISGeoTagger implements GeoTagger {
-    
-   private static final Logger LOGGER = LogManager.getLogger(ArcGISGeoTagger.class);
+public class ArcGISGeoTagger {
+
+    private static final Logger LOGGER = LogManager.getLogger(ArcGISGeoTagger.class);
 
     private final String locatorURL = "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
     private final LocatorTask locator;
@@ -33,38 +33,40 @@ public class ArcGISGeoTagger implements GeoTagger {
 
     }
 
-    public void addDoneListener(Runnable doneListener) {
-        this.doneListener = doneListener;
-    }
-
-    @Override
-    public Location geocode(String address) {
+    public void geocode(String address) {
         Location resultLocation = null;
         GeocodeParameters params = new GeocodeParameters();
         params.setCountryCode("de");
-        params.setMaxResults(0);
+        params.setMaxResults(5);
         List<String> resultAttributeNames = params.getResultAttributeNames();
         resultAttributeNames.add("Place_addr");
         resultAttributeNames.add("Match_addr");
         resultAttributeNames.add("extent");
         final ListenableFuture<List<GeocodeResult>> geocodeFuture = this.locator.geocodeAsync(address, params);
-        try {
-            List<GeocodeResult> geocodeResults = geocodeFuture.get();
-            if (geocodeResults.size() > 0) {
-                GeocodeResult topResult = geocodeResults.get(0);
-                double score = topResult.getScore();
-                Point p = topResult.getDisplayLocation();
-                resultLocation = new Location(p.getX(), p.getY());
+        geocodeFuture.addDoneListener(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<GeocodeResult> geocodeResults = geocodeFuture.get();
+                    if (geocodeResults.size() > 0) {
+                        GeocodeResult topResult = geocodeResults.get(0);
+                        String place_addr = (String)topResult.getAttributes().get("Place_addr");
+                        String match_addr = (String)topResult.getAttributes().get("Match_addr");
+                        double score = topResult.getScore();
+                        Point p = topResult.getDisplayLocation();
+                        Location loc = new Location(p.getX(), p.getY());
+                        LOGGER.info("Found location x(" + loc.getLatitude() + ")"
+                                + " (" + loc.getLongitude() + ")");
+                    }
+                } catch (InterruptedException ex) {
+                    LOGGER.error("Geocoding was interrupted", ex);
+                } catch (ExecutionException ex) {
+                    LOGGER.error("There occured an error during geocoding", ex);
+                }
             }
-        } catch (InterruptedException ex) {
-            LOGGER.error("Geocoding was interrupted", ex);
-        } catch (ExecutionException ex) {
-            LOGGER.error("There occured an error during geocoding", ex);
-        }
-        return resultLocation;
+        });
     }
 
-    @Override
     public List<Location> geocode(List<String> addresses) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

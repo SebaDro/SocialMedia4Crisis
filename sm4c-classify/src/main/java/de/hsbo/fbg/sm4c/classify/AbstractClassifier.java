@@ -92,13 +92,14 @@ public abstract class AbstractClassifier {
      */
     public String classify(MessageDocument document) {
         String result = null;
-        Instance instance = createInstance(document);
-        Instance filteredInstance = transformer.createdWordVector(instance);
         try {
+            Instance instance = createInstance(document);
+            Instance filteredInstance = transformer.createdWordVector(instance);
+
             double predicted = classifier.classifyInstance(filteredInstance);
             result = trainingData.getModelDataset().classAttribute().value((int) predicted);
         } catch (Exception ex) {
-            LOGGER.error("Could not classify the referenced document", ex);
+            LOGGER.error("Could not classify the referenced document " + document.getId(), ex);
         }
         return result;
     }

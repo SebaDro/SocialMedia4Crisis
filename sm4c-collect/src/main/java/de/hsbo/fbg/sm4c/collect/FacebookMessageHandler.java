@@ -19,46 +19,46 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Sebastian Drost
  */
-public class MessageHandler {
-    
-    private static final Logger LOGGER = LogManager.getLogger(MessageHandler.class);
+public class FacebookMessageHandler implements MessageHandler{
+
+    private static final Logger LOGGER = LogManager.getLogger(FacebookMessageHandler.class);
 
     private MessageDocument document;
     private AbstractClassifier classifier;
     private LocationRecognizer recognizer;
-    private GeoTagger geoTagger;
+    private ArcGISGeoTagger geoTagger;
 
-    public MessageHandler(AbstractClassifier classifier) {
+    public FacebookMessageHandler(AbstractClassifier classifier) {
         this.classifier = classifier;
         this.recognizer = new LocationRecognizer();
         this.geoTagger = new ArcGISGeoTagger();
     }
 
-    public Runnable getHandlingRoutine(MessageDocument document) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                //do classyfying
-                String label = classifier.classify(document);
-                LOGGER.info("Document "+document.getId()+" was calssified as "+label);
-                document.setLabel(label);
-                
-                //find location entities in message content
-                List<String> locationEntities = recognizer.recognizeLocations(document.getContent());
-                //if no entities found and message document is from Facebook
-                //get location from source
-                if (locationEntities.isEmpty()) {
+    public void processMessages(List<MessageDocument> documents) {
+        documents.forEach(document -> {
+            //do classyfying
+            if (document.getContent()==null || document.getContent().isEmpty()){
+                return;
+            }
+            String label = classifier.classify(document);
+            LOGGER.info("Document " + document.getId() + " was classified as " + label);
+            document.setLabel(label);
+
+            //find location entities in message content
+            List<String> locationEntities = recognizer.recognizeLocations(document.getContent());
+            //if no entities found and message document is from Facebook
+            //get location from source
+            if (locationEntities.isEmpty()) {
 //                    if(document.getService().equals(Services.FACEBOOK.toString())){
 //                        
 //                    }
-                    return;
-                } else {
+            } else {
 //                    List<Location> locations = geoTagger.geocode(locationEntities);
-                    Location loc = geoTagger.geocode(locationEntities.get(0));
-                    LOGGER.info("Found location x("+loc.getLatitude()+")"
-                            + " ("+loc.getLongitude()+") for document "+document.getId());
-                }
+                geoTagger.geocode(locationEntities.get(0));
+
             }
-        };
+
+        });
     }
+
 }

@@ -5,6 +5,8 @@
  */
 package de.hsbo.fbg.sm4c.collect;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -18,16 +20,22 @@ public abstract class AbstractReceiver extends Thread {
 
     protected Collector collector;
     protected int interval; //in seconds
-    protected DateTime startTime;
-    protected DateTime endTime;
-    protected MessageHandler handler;
     protected ThreadPoolExecutor executor;
+    protected List<MessageHandler> handler;
 
-    public AbstractReceiver(Collector collector, MessageHandler handler, int interval) {
+    public AbstractReceiver(Collector collector, int interval) {
         this.collector = collector;
-        this.handler = handler;
         this.interval = interval;
         this.executor = new ThreadPoolExecutor(10, 50, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue());
+        this.handler = new ArrayList();
+    }
+
+    public void addMessageHandler(MessageHandler handler) {
+        this.handler.add(handler);
+    }
+
+    public void removeMessageHandler(MessageHandler handler) {
+        this.handler.remove(handler);
     }
 
     public abstract void run();

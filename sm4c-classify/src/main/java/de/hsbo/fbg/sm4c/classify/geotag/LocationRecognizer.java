@@ -33,9 +33,8 @@ public class LocationRecognizer {
 
     public LocationRecognizer() {
         Properties props = PropertiesUtils.asProperties(
-                "annotators", "tokenize, ssplit, pos, lemma, ner, entitymentions, parse",
+                "annotators", "tokenize, ssplit, pos, lemma, ner, entitymentions",
                 "ssplit.isOneSentence", "true",
-                "parse.model", "edu/stanford/nlp/models/lexparser/germanFactored.ser.gz",
                 "pos.model", "edu/stanford/nlp/models/pos-tagger/german/german-hgc.tagger",
                 "ner.model", "edu/stanford/nlp/models/ner/german.conll.hgc_175m_600.crf.ser.gz",
                 "tokenize.language", "de",
@@ -56,10 +55,8 @@ public class LocationRecognizer {
             }
             //otherwise check if the value is indexed in geonames.org
             //and add it to candidates if true
-            else{
-                if(isLocation(e.getValue())){
-                    result.add(e.getValue());
-                }
+            else if (isLocation(e.getValue())) {
+                result.add(e.getValue());
             }
         });
 

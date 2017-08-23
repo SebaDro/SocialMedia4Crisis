@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 
@@ -24,6 +26,7 @@ public class StopWordRemover implements TextFilter {
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(StopWordRemover.class);
 
     public static final String DEFAULT_STOP_WORD_LIST = "german_stopwords_plain.txt";
+    public static final String COMMENT_CHAR = "#";
 
     private ArrayList<String> stopWordList;
 
@@ -45,7 +48,7 @@ public class StopWordRemover implements TextFilter {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF8"));
             String stopWord;
             while ((stopWord = reader.readLine()) != null) {
-                if (!stopWord.startsWith(";")) {
+                if (!stopWord.startsWith(COMMENT_CHAR)) {
                     stopWordList.add(stopWord);
                 }
             }
@@ -65,5 +68,21 @@ public class StopWordRemover implements TextFilter {
         return tokens.stream().filter(t -> !stopWordList
                 .stream().anyMatch(sw -> sw.equalsIgnoreCase(t)))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String filter(String text){
+        if(stopWordList.isEmpty()){
+            try {
+                throw new Exception("No stopwords available");
+            } catch (Exception ex) {
+                LOGGER.error("Could not filter stopwords");
+            }
+        }
+        for (String st : stopWordList) {
+            text = text.replaceAll("\\b" + st + "\\b", "");
+            text.toString();
+        }
+        return text;
     }
 }

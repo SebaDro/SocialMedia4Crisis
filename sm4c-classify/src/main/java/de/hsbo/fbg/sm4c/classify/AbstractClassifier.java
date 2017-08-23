@@ -5,6 +5,12 @@
  */
 package de.hsbo.fbg.sm4c.classify;
 
+import de.hsbo.fbg.sm4c.classify.filter.LowerCaseFilter;
+import de.hsbo.fbg.sm4c.classify.filter.NonAlphabeticFilter;
+import de.hsbo.fbg.sm4c.classify.filter.StopWordRemover;
+import de.hsbo.fbg.sm4c.classify.filter.TextPreprocessor;
+import de.hsbo.fbg.sm4c.classify.filter.URLFilter;
+import de.hsbo.fbg.sm4c.classify.filter.WhitespaceFilter;
 import de.hsbo.fbg.sm4c.common.model.EvaluationResult;
 import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import de.hsbo.fbg.sm4c.classify.train.DocumentTermMatrix;
@@ -27,6 +33,7 @@ import weka.core.Instances;
 import weka.core.stemmers.SnowballStemmer;
 import weka.core.stemmers.Stemmer;
 import weka.core.stopwords.WordsFromFile;
+import weka.core.tokenizers.NGramTokenizer;
 import weka.core.tokenizers.WordTokenizer;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 
@@ -44,14 +51,17 @@ public abstract class AbstractClassifier {
     protected Dataset trainingData;
 //    protected DocumentTermMatrix matrix;
     protected DtmTransformer transformer;
+    protected TextPreprocessor preProcessor;
 
     public AbstractClassifier() {
-        this.classifier = instantiateClassifier();
+        classifier = instantiateClassifier();
+        preProcessor = createTextPreProcessor();
         transformer = createBasicTransformer();
     }
 
     public AbstractClassifier(Classifier classifier, Dataset trainingData) {
         this.classifier = classifier;
+        preProcessor = createTextPreProcessor();
         this.transformer = createBasicTransformer();
         setFormat(trainingData);
         this.transformer.createDocumentTermMatrix(trainingData);
@@ -146,7 +156,8 @@ public abstract class AbstractClassifier {
         // Set value for message attribute
         Instances instances = this.trainingData.getModelDataset().stringFreeStructure();
         Attribute messageAtt = instances.attribute(Dataset.MESSAGE_ATTRIBUTE);
-        instance.setValue(messageAtt, messageAtt.addStringValue(document.getContent()));
+        String filteredContent = preProcessor.preprocessText(document.getContent());
+        instance.setValue(messageAtt, messageAtt.addStringValue(filteredContent));
 
         // Give instance access to attribute information from the training dataset.
         instance.setDataset(instances);
@@ -157,7 +168,7 @@ public abstract class AbstractClassifier {
     protected DtmTransformer createBasicTransformer() {
         StringToWordVector filter = new StringToWordVector();
         //downcase tokens
-        filter.setLowerCaseTokens(true);
+//        filter.setLowerCaseTokens(true);
 
         //binary weighting of word occurence
         filter.setOutputWordCounts(false);
@@ -166,25 +177,46 @@ public abstract class AbstractClassifier {
 //        SnowballStemmer stemmer = new SnowballStemmer("german");
 //        filter.setStemmer((Stemmer) stemmer);
         //Set tokenizer per word
+//        NGramTokenizer tokenizer = new NGramTokenizer();
+//        tokenizer.setNGramMinSize(2);
+//        tokenizer.setNGramMaxSize(2);
         WordTokenizer tokenizer = new WordTokenizer();
         filter.setTokenizer(tokenizer);
 
-        filter.setWordsToKeep(10000);
+        filter.setWordsToKeep(20000);
 
         //Set stopwords from a file
-        WordsFromFile stopwordHandler = new WordsFromFile();
-        URL url = this.getClass().getClassLoader().getResource(DEFAULT_STOP_WORD_LIST);
-        File stopWordFile;
-        try {
-            stopWordFile = new File(url.toURI());
-            stopwordHandler.setStopwords(stopWordFile);
-            filter.setStopwordsHandler(stopwordHandler);
-
-        } catch (URISyntaxException ex) {
-            LOGGER.error("Could not load stop words", ex);
-        }
+//        WordsFromFile stopwordHandler = new WordsFromFile();
+//        URL url = this.getClass().getClassLoader().getResource(DEFAULT_STOP_WORD_LIST);
+//        File stopWordFile;
+//        try {
+//            stopWordFile = new File(url.toURI());
+//            stopwordHandler.setStopwords(stopWordFile);
+//            filter.setStopwordsHandler(stopwordHandler);
+//
+//        } catch (URISyntaxException ex) {
+//            LOGGER.error("Could not load stop words", ex);
+//        }
         return new DtmTransformer(filter);
     }
 
+    private TextPreprocessor createTextPreProcessor() {
+        StopWordRemover stopWordRemover = new StopWordRemover();
+        LowerCaseFilter lowerCaseFilter = new LowerCaseFilter();
+        NonAlphabeticFilter nonAlphaFilter = new NonAlphabeticFilter();
+        TextPreprocessor preProcessor = new TextPreprocessor();
+        WhitespaceFilter whitepaceFilter = new WhitespaceFilter();
+        URLFilter urlFilter = new URLFilter();
+
+        preProcessor = new TextPreprocessor();
+        preProcessor.addFilter(lowerCaseFilter);
+        preProcessor.addFilter(urlFilter);
+        preProcessor.addFilter(nonAlphaFilter);
+        preProcessor.addFilter(stopWordRemover);
+        preProcessor.addFilter(whitepaceFilter);
+        return preProcessor;
+    }
+
     protected abstract Classifier instantiateClassifier();
+
 }

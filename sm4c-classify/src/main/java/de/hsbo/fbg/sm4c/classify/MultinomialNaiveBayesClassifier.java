@@ -21,6 +21,9 @@ public class MultinomialNaiveBayesClassifier extends AbstractClassifier {
 
     public MultinomialNaiveBayesClassifier() {
         super();
+//        transformer.getFilter().setOutputWordCounts(true);
+
+        transformer.getFilter().setIDFTransform(true);
         transformer.getFilter().setIDFTransform(true);
     }
 

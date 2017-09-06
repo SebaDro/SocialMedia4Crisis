@@ -3,20 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.hsbo.fbg.sm4c.common.model;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class Location {
+public class Location extends AbstractEntity {
+
     private double longitude;
     private double latitude;
-    
-    public Location(double lat, double lon){
-        this.latitude = lat;
-        this.longitude = lon;
+
+    public Location() {
+
     }
 
     public double getLongitude() {
@@ -34,6 +33,5 @@ public class Location {
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
-    
-    
+
 }

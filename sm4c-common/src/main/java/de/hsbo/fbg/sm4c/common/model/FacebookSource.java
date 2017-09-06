@@ -6,6 +6,7 @@
 package de.hsbo.fbg.sm4c.common.model;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  *
@@ -17,6 +18,7 @@ public class FacebookSource extends AbstractEntity implements Serializable {
     private String name;
     private String description;
     private SourceType type;
+    private Set<Location> locations;
 
     public FacebookSource() {
 
@@ -60,4 +62,14 @@ public class FacebookSource extends AbstractEntity implements Serializable {
     public void setType(SourceType type) {
         this.type = type;
     }
+
+    public Set<Location> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Set<Location> locations) {
+        this.locations = locations;
+    }
+    
+    
 }

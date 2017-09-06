@@ -31,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
+import de.hsbo.fbg.sm4c.common.model.Location;
 
 /**
  *
@@ -75,19 +76,35 @@ public class HibernateDaoIT {
         Set<Label> labels = new HashSet();
         Collections.addAll(labels, label1, label2);
 
-        SourceType category1 = sourceCategoryDao.retrieveByName("group").get();
-        SourceType category2 = sourceCategoryDao.retrieveByName("page").get();
+        SourceType category1 = sourceCategoryDao.retrieveByName("Group").get();
+        SourceType category2 = sourceCategoryDao.retrieveByName("Page").get();
+
+        Location location1 = new Location();
+        location1.setLatitude(52.00);
+        location1.setLongitude(7.00);
+
+        Location location2 = new Location();
+        location2.setLatitude(52.00);
+        location2.setLongitude(7.00);
+
+        Set<Location> locations1 = new HashSet();
+        Collections.addAll(locations1, location1, location2);
+        
+        Set<Location> locations2 = new HashSet();
+        Collections.addAll(locations1, location1);
 
         FacebookSource source1 = new FacebookSource();
         source1.setFacebookId("Source ID Test 1");
         source1.setName("Source Name Test 1");
         source1.setDescription("Source Description Test 1");
         source1.setType(category1);
+        source1.setLocations(locations1);
         FacebookSource source2 = new FacebookSource();
         source2.setFacebookId("Source ID Test 2");
         source2.setName("Source Name Test 2");
         source2.setDescription("Source Description Test 2");
         source2.setType(category2);
+        source2.setLocations(locations2);
         Set<FacebookSource> sources = new HashSet();
         Collections.addAll(sources, source1, source2);
 

@@ -2,7 +2,9 @@
 var sm4cMonitoring = angular.module('sm4cMonitoring', [
   'ngRoute',
   'ngMaterial',
-  'ngMessages'
+  'ngMessages',
+  'esri.map',
+  "rzModule"
 ]);
 
 sm4cMonitoring.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
@@ -21,6 +23,8 @@ sm4cMonitoring.config(['$locationProvider', '$routeProvider', function($location
       templateUrl: 'templates/partials/collectionTrainer.html',
     }).when('/collection/:id/map', {
       templateUrl: 'templates/partials/collectionMap.html',
+    }).when('/map', {
+      templateUrl: 'templates/view/map.html',
     }).otherwise({
       redirectTo: '/overview'
     });

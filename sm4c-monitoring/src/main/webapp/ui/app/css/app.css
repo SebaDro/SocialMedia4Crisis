@@ -116,3 +116,31 @@ div.collection-details{
   width: 400px;
   overflow-y: scroll;
 }
+
+#map {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.custom-slider.rzslider .rz-bar {
+  background: #f3e0e0;
+  height: 4px;
+}
+.custom-slider.rzslider .rz-selection {
+  background: #990000;
+}
+
+.custom-slider.rzslider .rz-pointer {
+  background-color: #990000;
+}
+
+.custom-slider.rzslider .rz-tick {
+  background: #f3e0e0;
+}
+
+.custom-slider.rzslider .rz-tick.rz-selected {
+  background: #990000;
+}

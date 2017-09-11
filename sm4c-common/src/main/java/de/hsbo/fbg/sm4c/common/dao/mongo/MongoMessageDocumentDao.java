@@ -8,13 +8,11 @@ package de.hsbo.fbg.sm4c.common.dao.mongo;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.bson.Document;
 import java.util.Date;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
-import java.util.function.Consumer;
 import de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder;
 import de.hsbo.fbg.sm4c.common.coding.MessageDocumentEncoder;
 import org.apache.logging.log4j.LogManager;
@@ -22,11 +20,8 @@ import org.apache.logging.log4j.Logger;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.nor;
-import de.hsbo.fbg.sm4c.common.dao.RessourceNotFoundException;
-import java.util.Collections;
-import java.util.Random;
-import java.util.logging.Level;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 
 /**
  *
@@ -79,21 +74,21 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     }
 
     @Override
-    public List<MessageDocument> retrieveUnlabeledData(int size) {
+    public List<MessageDocument> retrieveUnlabeledData() {
         FindIterable<Document> documents = dbCollection.find(
                 Filters.and(
                         Filters.eq("training", false),
                         Filters.eq("label", "")));
-//        if(documents.first()==null){
-//            try {
-//                throw new RessourceNotFoundException("There are no unlabled messages");
-//            } catch (RessourceNotFoundException ex) {
-//                java.util.logging.Logger.getLogger(MongoMessageDocumentDao.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        }
         List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
- 
 
+        return messages;
+    }
+
+    @Override
+    public List<MessageDocument> retrieveLabeledData() {
+        FindIterable<Document> documents = dbCollection.find(
+                Filters.not(Filters.eq("label", "")));
+        List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
         return messages;
     }
 
@@ -137,6 +132,12 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     @Override
     public long count() {
         return dbCollection.count();
+    }
+
+    @Override
+    public void createIndex() {
+        IndexOptions indexOptions = new IndexOptions().unique(true);
+        dbCollection.createIndex(Indexes.hashed("messageId"), indexOptions);
     }
 
 }

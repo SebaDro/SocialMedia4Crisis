@@ -6,6 +6,8 @@
 package de.hsbo.fbg.sm4c.common.model;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 import org.joda.time.DateTime;
 
 /**
@@ -21,6 +23,7 @@ public abstract class MessageDocument implements Serializable {
     protected boolean training;
     protected DateTime creationTime;
     protected DateTime updateTime;
+    protected List<Location> locations;
 
     public String getId() {
         return id;
@@ -78,8 +81,12 @@ public abstract class MessageDocument implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public void setType(String type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<Location> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<Location> locations) {
+        this.locations = locations;
     }
 
 }

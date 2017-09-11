@@ -21,13 +21,15 @@ public interface MessageDocumentDao {
     MessageDocument retrieveById(String id);
 
     List<MessageDocument> retrieve();
-    
+
     List<MessageDocument> retrieveTrainingData();
+
+    List<MessageDocument> retrieveUnlabeledData();
     
-    List<MessageDocument> retrieveUnlabeledData(int size);
+    List<MessageDocument> retrieveLabeledData();
 
     List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
-    
+
     long count();
 
     boolean exists(MessageDocument doc);
@@ -35,11 +37,13 @@ public interface MessageDocumentDao {
     void store(MessageDocument doc);
 
     void store(List<MessageDocument> docs);
-    
+
     void update(MessageDocument doc, String field);
 
     void remove(MessageDocument doc);
-    
+
     void removeAll();
+
+    void createIndex();
 
 }

@@ -13,6 +13,7 @@ import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
+import de.hsbo.fbg.sm4c.common.model.Location;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.model.Services;
 import java.util.ArrayList;
@@ -32,11 +33,11 @@ import org.joda.time.DateTime;
  * @author Sebastian Drost
  */
 public class MessageDocumentDecoder {
-
+    
     private static final Logger LOGGER = LogManager.getLogger(MessageDocumentDecoder.class);
-
+    
     private DaoFactory<Session> daoFactory;
-
+    
     public MessageDocumentDecoder() {
         HibernateDatabaseConnection dbc = new HibernateDatabaseConnection();
         try {
@@ -54,11 +55,11 @@ public class MessageDocumentDecoder {
      * @return decoded FacebookMessage
      */
     public List<MessageDocument> decodeFacebookMessages(FindIterable<Document> documents) {
-
+        
         List<MessageDocument> result = new ArrayList();
-
+        
         try (Session session = (Session) daoFactory.initializeContext()) {
-
+            
             FacebookSourceDao sourceDao = daoFactory.createFacebookSourceDao(session);
             documents.forEach(new Consumer<Document>() {
                 @Override
@@ -82,13 +83,25 @@ public class MessageDocumentDecoder {
                     message.setTraining(doc.getBoolean("training"));
                     message.setCreationTime(new DateTime(doc.getDate("creationTime")));
                     message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
+                    List<Document> locDocs = (List<Document>) doc.get("locations");
+                    if (locDocs != null && !locDocs.isEmpty()) {
+                        List<Location> locations = new ArrayList();
+                        locDocs.forEach(l -> {
+                            Location loc = new Location();
+                            loc.setLatitude(l.getDouble("latitude"));
+                            loc.setLongitude(l.getDouble("longitude"));
+                            locations.add(loc);
+                        });
+                        message.setLocations(locations);
+                        
+                    }
                     result.add(message);
                 }
             });
         }
         return result;
     }
-
+    
     private FacebookSource retrieveFacebookSource(String facebookId, FacebookSourceDao sourceDao) throws RessourceNotFoundException {
         FacebookSource result;
         Optional<FacebookSource> source = sourceDao.retrieveByFacebookId(facebookId);
@@ -96,8 +109,8 @@ public class MessageDocumentDecoder {
             throw new RessourceNotFoundException("The referenced source is not available");
         }
         result = source.get();
-
+        
         return result;
     }
-
+    
 }

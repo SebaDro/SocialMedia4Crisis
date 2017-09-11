@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.model.Services;
-import java.math.BigDecimal;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -84,6 +83,16 @@ public class MessageDocumentEncoder {
         sourceNode.put("name", message.getSource().getName());
         sourceNode.put("type", message.getSource().getType().getName());
         root.set("source", sourceNode);
+
+        ArrayNode locationsArray = mapper.createArrayNode();
+        message.getLocations().forEach(l -> {
+            ObjectNode locationNode = mapper.createObjectNode();
+            locationNode.put("latitude", l.getLatitude());
+            locationNode.put("longitude", l.getLongitude());
+            locationsArray.add(locationNode);
+        });
+        root.set("locations", locationsArray);
+
         return root;
     }
 

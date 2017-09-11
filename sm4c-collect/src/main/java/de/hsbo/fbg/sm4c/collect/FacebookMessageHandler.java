@@ -6,12 +6,11 @@
 package de.hsbo.fbg.sm4c.collect;
 
 import de.hsbo.fbg.sm4c.classify.AbstractClassifier;
-import de.hsbo.fbg.sm4c.classify.geotag.ArcGISGeoTagger;
-import de.hsbo.fbg.sm4c.classify.geotag.GeoTagger;
-import de.hsbo.fbg.sm4c.classify.geotag.LocationRecognizer;
-import de.hsbo.fbg.sm4c.common.model.Location;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.geotag.ArcGISGeoCoder;
+import de.hsbo.fbg.sm4c.geotag.LocationRecognizer;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,25 +18,25 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Sebastian Drost
  */
-public class FacebookMessageHandler implements MessageHandler{
-
+public class FacebookMessageHandler implements MessageHandler {
+    
     private static final Logger LOGGER = LogManager.getLogger(FacebookMessageHandler.class);
-
+    
     private MessageDocument document;
     private AbstractClassifier classifier;
     private LocationRecognizer recognizer;
-    private ArcGISGeoTagger geoTagger;
-
+    private ArcGISGeoCoder geoCoder;
+    
     public FacebookMessageHandler(AbstractClassifier classifier) {
         this.classifier = classifier;
         this.recognizer = new LocationRecognizer();
-        this.geoTagger = new ArcGISGeoTagger();
+        this.geoCoder = new ArcGISGeoCoder();
     }
-
+    
     public void processMessages(List<MessageDocument> documents) {
         documents.forEach(document -> {
             //do classyfying
-            if (document.getContent()==null || document.getContent().isEmpty()){
+            if (document.getContent() == null || document.getContent().isEmpty()) {
                 return;
             }
             String label = classifier.classify(document);
@@ -53,12 +52,16 @@ public class FacebookMessageHandler implements MessageHandler{
 //                        
 //                    }
             } else {
-//                    List<Location> locations = geoTagger.geocode(locationEntities);
-                geoTagger.geocode(locationEntities.get(0));
-
+                try {
+                    //                    List<Location> locations = geoTagger.geocode(locationEntities);
+                    geoCoder.findLocation(locationEntities.get(0));
+                } catch (Exception ex) {
+                    LOGGER.error("Error during geocoding", ex);
+                }
+                
             }
-
+            
         });
     }
-
+    
 }

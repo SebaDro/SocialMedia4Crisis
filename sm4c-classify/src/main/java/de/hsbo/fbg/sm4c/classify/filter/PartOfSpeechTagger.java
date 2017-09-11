@@ -5,51 +5,56 @@
  */
 package de.hsbo.fbg.sm4c.classify.filter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.PropertiesUtils;
+import java.util.ArrayList;
 import java.util.List;
-import opennlp.tools.postag.POSModel;
-import opennlp.tools.postag.POSTagger;
-import opennlp.tools.postag.POSTaggerME;
-import org.apache.logging.log4j.LogManager;
+import java.util.Properties;
 
 /**
- * Class for identifying the part of speech of a text
  *
  * @author Sebastian Drost
  */
 public class PartOfSpeechTagger {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(PartOfSpeechTagger.class);
+    private StanfordCoreNLP pipeline;
 
-    public static final String DEFAULT_POS_MODEL = "de-pos-maxent.bin";
-
-    private POSModel posModel;
-    private POSTagger posTagger;
-
-    /**
-     * Trains the part of speech tagger with a given POS Model.
-     *
-     * @param modelPath path starting from the classpath to the model
-     */
-    public void trainPOSModel(String modelPath) {
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(modelPath)) {
-            posModel = new POSModel(in);
-            posTagger = new POSTaggerME(posModel);
-        } catch (IOException ex) {
-            LOGGER.error("Could not load tokenizer model", ex);
-        }
+    public PartOfSpeechTagger() {
+        Properties props = PropertiesUtils.asProperties(
+                "annotators", "tokenize, ssplit, pos",
+                "ssplit.isOneSentence", "true",
+                "pos.model", "edu/stanford/nlp/models/pos-tagger/german/german-hgc.tagger",
+                "ner.model", "edu/stanford/nlp/models/ner/german.conll.hgc_175m_600.crf.ser.gz",
+                "tokenize.language", "de",
+                "ner.useSUTime", "false");
+        this.pipeline = new StanfordCoreNLP(props);
     }
 
-    /**
-     * Tags the part of speech for given tokens.
-     *
-     * @param tokens Tokens to tag
-     * @return List of tags for the tokens
-     */
-    public List<String> tagTokens(List<String> tokens) {
-        return Arrays.asList(posTagger.tag(tokens.toArray(new String[0])));
+    public List<String> tagPOS(String text) {
+        Annotation document = new Annotation(text);
+        pipeline.annotate(document);
+        List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
+        List<String> result = new ArrayList();
+
+        sentences.forEach(s -> {
+            s.get(CoreAnnotations.TokensAnnotation.class).forEach(t -> {
+                String value = t.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+                result.add(value);
+            });
+
+        });
+
+//        sentences.forEach(s -> {
+//            s.get(CoreAnnotations.MentionsAnnotation.class).forEach(em -> {
+//                String value = em.get(CoreAnnotations.TextAnnotation.class);
+//                String tag = em.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+//                result.add(new NamedEntity(value, tag));
+//            });
+//        });
+        return result;
     }
 
 }

@@ -65,7 +65,9 @@ import de.hsbo.fbg.sm4c.rest.coding.ModelEncoder;
 import de.hsbo.fbg.sm4c.rest.view.MessageDocumentView;
 import de.hsbo.fbg.sm4c.rest.view.ModelView;
 import de.hsbo.fbg.sm4c.rest.view.TimeDefinitionView;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -194,7 +196,7 @@ public class CollectionController implements InitializingBean {
                 DatasetBuilder builder = new DatasetBuilder();
                 Dataset trainingData = builder.createDataset(collection);
                 builder.add(trainingData, documents);
-                
+
                 classifier.setFormat(trainingData);
                 classifier.trainClassifier();
 
@@ -270,6 +272,16 @@ public class CollectionController implements InitializingBean {
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
                 MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
                 List<MessageDocument> documents = documentDao.retrieveUnlabeledData(Integer.parseInt(limit));
+                
+                if (documents.isEmpty()){
+                    throw new RessourceNotFoundException("There are no unlabeled documents");
+                }
+
+                Random random = new Random();
+                random.setSeed(42);
+                Collections.shuffle(documents, random);
+
+                documents = documents.subList(0, Integer.parseInt(limit));
                 result = documents.stream()
                         .map(d -> messageDocumentEncoder.encode(d))
                         .collect(Collectors.toList());

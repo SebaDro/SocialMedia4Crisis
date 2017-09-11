@@ -23,8 +23,10 @@ import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.nor;
+import de.hsbo.fbg.sm4c.common.dao.RessourceNotFoundException;
 import java.util.Collections;
 import java.util.Random;
+import java.util.logging.Level;
 
 /**
  *
@@ -82,12 +84,17 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
                 Filters.and(
                         Filters.eq("training", false),
                         Filters.eq("label", "")));
+//        if(documents.first()==null){
+//            try {
+//                throw new RessourceNotFoundException("There are no unlabled messages");
+//            } catch (RessourceNotFoundException ex) {
+//                java.util.logging.Logger.getLogger(MongoMessageDocumentDao.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
         List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
-        Random random = new Random();
-        random.setSeed(42);
-        Collections.shuffle(messages, random);
+ 
 
-        return messages.subList(0, size);
+        return messages;
     }
 
     @Override

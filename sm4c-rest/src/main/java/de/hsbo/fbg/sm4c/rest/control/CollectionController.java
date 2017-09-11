@@ -134,96 +134,7 @@ public class CollectionController implements InitializingBean {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/collections/{id}/documents", method = RequestMethod.POST)
-    public ResponseEntity initiateCollectionDocuments(@PathVariable("id") String id, @RequestBody TimeDefinitionView req) throws Exception {
-        try (Session session = daoFactory.initializeContext()) {
-            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
-            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
-            if (collection.isPresent()) {
-                FacebookCollector collector = new FacebookCollector(collection.get());
-                List<MessageDocument> documents = collector.collectMessages(req.getStartTime(), req.getEndTime());
-
-                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
-                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
-//                List<MessageDocument> documents = documentDao.retrieve();
-                documentDao.store(documents);
-                return new ResponseEntity(documents.size(), HttpStatus.OK);
-            }
-            throw new RessourceNotFoundException("The referenced collection is not available");
-        }
-    }
-
-    @RequestMapping(value = "/collections/{id}/model/evaluate", method = RequestMethod.POST, produces = {"text/plain"})
-    public String evaluateCollectionModel(@PathVariable("id") String id, @RequestBody String req) throws Exception {
-        try (Session session = daoFactory.initializeContext()) {
-            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
-            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
-            if (collection.isPresent()) {
-                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
-                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
-                List<MessageDocument> documents = documentDao.retrieveTrainingData();
-
-                ClassifierFactory factory = new ClassifierFactory();
-                AbstractClassifier classifier = factory.createClassifier(ClassifierFactory.NAIVE_BAYES_MULTINOMIAL);
-                DatasetBuilder builder = new DatasetBuilder();
-                Dataset trainingData = builder.createDataset(collection.get());
-                builder.add(trainingData, documents);
-                EvaluationResult evalResult = classifier.evaluate(trainingData);
-
-//                ModelView modelView = new ModelView();
-//                modelView.setClassDetails(evalResult.getClassDetails());
-//                modelView.setConfusionMatrix(evalResult.getConfusionMatrix());
-//                modelView.setSummary(evalResult.getSummary());
-                return evalResult.getClassDetails();
-            }
-            throw new RessourceNotFoundException("The referenced collection is not available");
-        }
-    }
-
-    @RequestMapping(value = "/collections/{id}/model", method = RequestMethod.POST, produces = {"text/plain"})
-    public String initiateCollectionModel(@PathVariable("id") String id, @RequestBody String req) throws Exception {
-        try (Session session = daoFactory.initializeContext()) {
-            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
-            Optional<Collection> col = collectionDao.retrieveById(Long.parseLong(id));
-            if (col.isPresent()) {
-                Collection collection = col.get();
-                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection);
-                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
-                List<MessageDocument> documents = documentDao.retrieveTrainingData();
-
-                ClassifierFactory factory = new ClassifierFactory();
-                AbstractClassifier classifier = factory.createClassifier(ClassifierFactory.NAIVE_BAYES_MULTINOMIAL);
-                DatasetBuilder builder = new DatasetBuilder();
-                Dataset trainingData = builder.createDataset(collection);
-                builder.add(trainingData, documents);
-
-                classifier.setFormat(trainingData);
-                classifier.trainClassifier();
-
-                EvaluationResult result = classifier.evaluate(trainingData);
-//                EvaluationResultDao evalResultDao = daoFactory.createEvaluationResultDao(session);
-//                result = evalResultDao.store(result);
-
-                ModelManager manager = new ModelManager();
-                String[] paths = manager.serializeModel(classifier, collection);
-
-                Model model = new Model();
-                Classifier cls = retrieveClassifier(ClassifierFactory.NAIVE_BAYES_MULTINOMIAL, session);
-                model.setClassifier(cls);
-                model.setClassifierPath(paths[0]);
-                model.setInputDataPath(paths[1]);
-                model.setEvaluation(result);
-
-                collection.setModel(model);
-                collectionDao.update(collection);
-
-//                ModelEncoder modelEncoder = new ModelEncoder();
-//                ModelView modelView = modelEncoder.encode(model);
-                return result.getClassDetails();
-            }
-            throw new RessourceNotFoundException("The referenced collection is not available");
-        }
-    }
+   
 
     @RequestMapping(value = "/collections", method = RequestMethod.GET)
     public List<CollectionView> getCollections() {
@@ -255,74 +166,6 @@ public class CollectionController implements InitializingBean {
 //                }
                 cv.setDocumentCount(documentDao.count());
                 return cv;
-            }
-            throw new RessourceNotFoundException("The referenced collection is not available");
-        }
-    }
-
-    @RequestMapping(value = "/collections/{id}/documents/limit/{limit}", method = RequestMethod.GET)
-    public List<MessageDocumentView> getCollectionDocuments(@PathVariable("id") String id, @PathVariable("limit") String limit) throws RessourceNotFoundException {
-        List<MessageDocumentView> result = new ArrayList();
-
-        try (Session session = daoFactory.initializeContext()) {
-            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
-            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
-            if (collection.isPresent()) {
-
-                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
-                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
-                List<MessageDocument> documents = documentDao.retrieveUnlabeledData(Integer.parseInt(limit));
-                
-                if (documents.isEmpty()){
-                    throw new RessourceNotFoundException("There are no unlabeled documents");
-                }
-
-                Random random = new Random();
-                random.setSeed(42);
-                Collections.shuffle(documents, random);
-
-                documents = documents.subList(0, Integer.parseInt(limit));
-                result = documents.stream()
-                        .map(d -> messageDocumentEncoder.encode(d))
-                        .collect(Collectors.toList());
-                return result;
-            }
-            throw new RessourceNotFoundException("The referenced collection is not available");
-        }
-    }
-
-    @RequestMapping(value = "/collections/{id}/documents/training", method = RequestMethod.GET)
-    public List<MessageDocumentView> getTrainingCollectionDocuments(@PathVariable("id") String id) throws RessourceNotFoundException {
-        List<MessageDocumentView> result = new ArrayList();
-
-        try (Session session = daoFactory.initializeContext()) {
-            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
-            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
-            if (collection.isPresent()) {
-
-                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
-                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
-                List<MessageDocument> documents = documentDao.retrieveTrainingData();
-                result = documents.stream()
-                        .map(d -> messageDocumentEncoder.encode(d))
-                        .collect(Collectors.toList());
-                return result;
-            }
-            throw new RessourceNotFoundException("The referenced collection is not available");
-        }
-    }
-
-    @RequestMapping(value = "/collections/{id}/model", method = RequestMethod.GET, produces = {"plain/text"})
-    public String getModelStatistics(@PathVariable("id") String id) throws RessourceNotFoundException {
-        List<MessageDocumentView> result = new ArrayList();
-
-        try (Session session = daoFactory.initializeContext()) {
-            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
-            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
-            if (collection.isPresent()) {
-                if (collection.get().getModel() != null) {
-                    return collection.get().getModel().getEvaluation().getClassDetails();
-                }
             }
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
@@ -414,15 +257,6 @@ public class CollectionController implements InitializingBean {
             }
         });
         return result;
-    }
-
-    private Classifier retrieveClassifier(String type, Session session) throws RessourceNotFoundException {
-        ClassifierDao classifierDao = daoFactory.createClassifierDao(session);
-        Optional<Classifier> classifier = classifierDao.retrieveByName(type);
-        if (!classifier.isPresent()) {
-            throw new RessourceNotFoundException("The specified classifier is not available");
-        }
-        return classifier.get();
     }
 
 }

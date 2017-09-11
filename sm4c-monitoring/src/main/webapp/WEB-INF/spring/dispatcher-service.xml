@@ -21,5 +21,6 @@
     <bean class="de.hsbo.fbg.sm4c.rest.control.FacebookController" />
     <bean class="de.hsbo.fbg.sm4c.rest.control.SimulationController" />
     <bean class="de.hsbo.fbg.sm4c.rest.control.CollectionController" />
+    <bean class="de.hsbo.fbg.sm4c.rest.control.DocumentController" />
   
 </beans>

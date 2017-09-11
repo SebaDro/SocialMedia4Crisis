@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package de.hsbo.fbg.sm4c.classify.geotag;
+package de.hsbo.fbg.sm4c.geotag;
 
 import de.hsbo.fbg.sm4c.common.model.Location;
 import java.util.List;

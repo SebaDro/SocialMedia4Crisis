@@ -12,6 +12,7 @@
         <module>sm4c-classify</module>
         <module>sm4c-common</module>
         <module>sm4c-collect</module>
+        <module>sm4c-geotag</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,6 +49,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sm4c-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sm4c-geotag</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

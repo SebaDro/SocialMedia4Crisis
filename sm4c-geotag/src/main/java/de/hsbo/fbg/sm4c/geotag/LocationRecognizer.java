@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.classify.geotag;
+package de.hsbo.fbg.sm4c.geotag;
 
 import de.hsbo.fbg.common.config.Configuration;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -43,23 +43,35 @@ public class LocationRecognizer {
         WebService.setUserName(Configuration.getConfig().getPropertyValue("geonames_user"));
     }
 
-    public List<String> recognizeLocations(String text) {
+    public List<String> recognizeLocationsExtended(String text) {
         List<String> result = new ArrayList();
-        
+
         List<NamedEntity> entities = tagNamedEntities(text);
         entities.forEach(e -> {
             //if named entity annotation has tagged value as location,
             //add the value to the candidate list of locations
-            if (e.getTag().equals("LOC")){
+            if (e.getTag().equals("LOC")) {
                 result.add(e.getValue());
-            }
-            //otherwise check if the value is indexed in geonames.org
+            } //otherwise check if the value is indexed in geonames.org
             //and add it to candidates if true
             else if (isLocation(e.getValue())) {
                 result.add(e.getValue());
             }
         });
+        return result;
+    }
 
+    public List<String> recognizeLocations(String text) {
+        List<String> result = new ArrayList();
+
+        List<NamedEntity> entities = tagNamedEntities(text);
+        entities.forEach(e -> {
+            //if named entity annotation has tagged value as location,
+            //add the value to the candidate list of locations
+            if (e.getTag().equals("LOC")) {
+                result.add(e.getValue());
+            }
+        });
         return result;
     }
 
@@ -81,7 +93,7 @@ public class LocationRecognizer {
         return result;
     }
 
-    private List<NamedEntity> tagNamedEntities(String text) {
+    public List<NamedEntity> tagNamedEntities(String text) {
         Annotation document = new Annotation(text);
         pipeline.annotate(document);
         List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);

@@ -5,6 +5,8 @@
  */
 package de.hsbo.fbg.sm4c.rest.view;
 
+import java.util.List;
+
 /**
  *
  * @author Sebastian Drost
@@ -19,6 +21,7 @@ public class FacebookSourceView {
     private String name;
     private String description;
     private SourceTypeView sourceType;
+    private List<LocationView> location;
 
     public String getFacebookId() {
         return facebookId;
@@ -50,6 +53,14 @@ public class FacebookSourceView {
 
     public void setSourceCategory(SourceTypeView sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public List<LocationView> getLocation() {
+        return location;
+    }
+
+    public void setLocation(List<LocationView> location) {
+        this.location = location;
     }
 
 }

@@ -30,6 +30,7 @@
     <bean class="de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder"/>
     <bean class="de.hsbo.fbg.sm4c.rest.coding.FacebookSourceEncoder"/>
     <bean class="de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder"/>
+    <bean class="de.hsbo.fbg.sm4c.collect.encode.FacebookDecoder"/>
     
     
     <!-- hibernate -->    

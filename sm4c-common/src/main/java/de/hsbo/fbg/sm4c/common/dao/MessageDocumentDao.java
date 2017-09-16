@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.common.dao;
 
+import static com.mongodb.client.model.Filters.eq;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
@@ -22,10 +23,12 @@ public interface MessageDocumentDao {
 
     List<MessageDocument> retrieve();
 
+    List<MessageDocument> retrieveSimulationData();
+
     List<MessageDocument> retrieveTrainingData();
 
     List<MessageDocument> retrieveUnlabeledData();
-    
+
     List<MessageDocument> retrieveLabeledData();
 
     List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
@@ -33,6 +36,8 @@ public interface MessageDocumentDao {
     long count();
 
     boolean exists(MessageDocument doc);
+
+    public boolean containsSource(String sourceId);
 
     void store(MessageDocument doc);
 

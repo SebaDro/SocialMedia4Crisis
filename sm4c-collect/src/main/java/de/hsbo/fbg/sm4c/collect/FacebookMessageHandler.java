@@ -8,9 +8,8 @@ package de.hsbo.fbg.sm4c.collect;
 import de.hsbo.fbg.sm4c.classify.AbstractClassifier;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.geotag.ArcGISGeoCoder;
-import de.hsbo.fbg.sm4c.geotag.LocationRecognizer;
+import de.hsbo.fbg.sm4c.geoparsing.Geoparser;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,20 +18,19 @@ import org.apache.logging.log4j.Logger;
  * @author Sebastian Drost
  */
 public class FacebookMessageHandler implements MessageHandler {
-    
+
     private static final Logger LOGGER = LogManager.getLogger(FacebookMessageHandler.class);
-    
-    private MessageDocument document;
+
     private AbstractClassifier classifier;
-    private LocationRecognizer recognizer;
+    private Geoparser recognizer;
     private ArcGISGeoCoder geoCoder;
-    
+
     public FacebookMessageHandler(AbstractClassifier classifier) {
         this.classifier = classifier;
-        this.recognizer = new LocationRecognizer();
+        this.recognizer = new Geoparser();
         this.geoCoder = new ArcGISGeoCoder();
     }
-    
+
     public void processMessages(List<MessageDocument> documents) {
         documents.forEach(document -> {
             //do classyfying
@@ -58,10 +56,10 @@ public class FacebookMessageHandler implements MessageHandler {
                 } catch (Exception ex) {
                     LOGGER.error("Error during geocoding", ex);
                 }
-                
+
             }
-            
+
         });
     }
-    
+
 }

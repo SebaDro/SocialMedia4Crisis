@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Sebastian Drost
  */
-public class TrainingDataView {
+public class SimulationDataParameterView {
 
     private String id;
     private List<String> keywords;

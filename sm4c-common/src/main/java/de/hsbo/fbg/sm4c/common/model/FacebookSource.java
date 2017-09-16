@@ -70,6 +70,5 @@ public class FacebookSource extends AbstractEntity implements Serializable {
     public void setLocations(Set<Location> locations) {
         this.locations = locations;
     }
-    
-    
+
 }

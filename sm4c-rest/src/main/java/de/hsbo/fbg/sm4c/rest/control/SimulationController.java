@@ -5,26 +5,30 @@
  */
 package de.hsbo.fbg.sm4c.rest.control;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import de.hsbo.fbg.common.config.Configuration;
-import de.hsbo.fbg.sm4c.collect.FacebookTestCollector;
-import de.hsbo.fbg.sm4c.collect.dao.FacebookSimulationDao;
-import de.hsbo.fbg.sm4c.collect.dao.MongoDbFacebookSimulationDao;
-import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
-import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
-import de.hsbo.fbg.sm4c.rest.view.TrainingDataView;
+import de.hsbo.fbg.sm4c.collect.FacebookApi;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookDecoder;
+import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
+import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
+import de.hsbo.fbg.sm4c.common.dao.mongo.MongoMessageDocumentDao;
+import de.hsbo.fbg.sm4c.common.model.FacebookSource;
+import de.hsbo.fbg.sm4c.common.model.Location;
+import de.hsbo.fbg.sm4c.common.model.MessageDocument;
+import de.hsbo.fbg.sm4c.common.model.SourceType;
+import de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder;
+import de.hsbo.fbg.sm4c.rest.view.MessageDocumentView;
+import de.hsbo.fbg.sm4c.rest.view.SimulationDataParameterView;
 import facebook4j.Group;
 import facebook4j.Page;
 import facebook4j.Post;
-import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,41 +46,33 @@ public class SimulationController implements InitializingBean {
 
     private static final Logger LOGGER = LogManager.getLogger(SimulationController.class);
 
-    private FacebookSimulationDao fbDao;
-    private FacebookTestCollector fbCollector;
-    private ObjectMapper mapper;
-    private FacebookSimulationEncoder fbEncoder;
+    @Autowired
+    MessageDocumentEncoder messageDocumentEncoder;
+
+    @Autowired
+    private FacebookDecoder fbDecoder;
+
+    private FacebookApi fbApi;
+    private MessageDocumentDao messageDocumentDao;
+
+    DocumentDaoFactory documentDaoFactory;
 
     @RequestMapping(produces = {"application/json"}, value = "/posts", method = RequestMethod.GET)
-    public String getPosts() {
-        ArrayNode jsonArray = mapper.createArrayNode();
-        fbDao.getValues().forEach(new Consumer<String>() {
-            @Override
-            public void accept(String d) {
-                try {
-                    jsonArray.add(mapper.readTree(d));
-                } catch (IOException ex) {
-                    LOGGER.error("Could not parse document", ex);
-                }
-            }
-        });
-        String result = "";
-        try {
-            result = mapper.writeValueAsString(jsonArray);
-        } catch (JsonProcessingException ex) {
-            LOGGER.error("Could not write json array", ex);
-        }
+    public List<MessageDocumentView> getPosts() {
+        List<MessageDocumentView> result = messageDocumentDao.retrieveSimulationData().stream()
+                .map(md -> messageDocumentEncoder.encode(md))
+                .collect(Collectors.toList());
         return result;
     }
 
     @RequestMapping(value = "/posts/all", method = RequestMethod.DELETE)
-    public ResponseEntity getFacebookSimulationPosts() {
-        fbDao.deleteAllValues();
+    public ResponseEntity deleteFacebookSimulationPosts() {
+        messageDocumentDao.removeAll();
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/posts", method = RequestMethod.POST)
-    public ResponseEntity getFacebookSimulationPosts(@RequestBody TrainingDataView req) {
+    public ResponseEntity collectFacebookSimulationPosts(@RequestBody SimulationDataParameterView req) {
 
         List<String> keywords = req.getKeywords();
         new Thread(new Runnable() {
@@ -84,29 +80,34 @@ public class SimulationController implements InitializingBean {
             public void run() {
                 LOGGER.info("Started collecting posts for simulation");
                 keywords.forEach(k -> {
-                    List<Group> groups = fbCollector.getGroups(k);
+                    List<Group> groups = fbApi.getGroups(k);
                     groups.forEach(g -> {
-                        if (!fbDao.containsGroup(g)) {
-                            List<Post> posts = fbCollector.getMessagesFromSingleGroup(g,
+                        if (!messageDocumentDao.containsSource(g.getId())) {
+                            FacebookSource source = fbDecoder.createFacebookSource(g);
+
+                            List<Post> posts = fbApi.getPostsFromSingleGroup(g,
                                     req.getStartDate(), req.getEndDate());
-                            List<FacebookSimulationMessageDocument> messages = posts.stream()
-                                    .map(p -> fbEncoder.createMessage(p, g))
+
+                            List<MessageDocument> messages = posts.stream()
+                                    .map(p -> fbDecoder.createMessage(p, source))
                                     .collect(Collectors.toList());
                             if (posts != null && !posts.isEmpty()) {
-                                fbDao.storeFacebookMessages(messages);
+                                messageDocumentDao.store(messages);
                             }
                         }
                     });
-                    List<Page> pages = fbCollector.getPages(k);
+                    List<Page> pages = fbApi.getPages(k);
                     pages.forEach(fP -> {
-                        if (!fbDao.containsPage(fP)) {
-                            List<Post> posts = fbCollector.getPostsFromSinglePage(fP,
+
+                        if (!messageDocumentDao.containsSource(fP.getId())) {
+                            FacebookSource source = fbDecoder.createFacebookSource(fP);
+                            List<Post> posts = fbApi.getPostsFromSinglePage(fP,
                                     req.getStartDate(), req.getEndDate());
-                            List<FacebookSimulationMessageDocument> messages = posts.stream()
-                                    .map(p -> fbEncoder.createMessage(p, fP))
+                            List<MessageDocument> messages = posts.stream()
+                                    .map(p -> fbDecoder.createMessage(p, source))
                                     .collect(Collectors.toList());
                             if (posts != null && !posts.isEmpty()) {
-                                fbDao.storeFacebookMessages(messages);
+                                messageDocumentDao.store(messages);
                             }
                         }
                     });
@@ -121,13 +122,12 @@ public class SimulationController implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         Configuration conf = Configuration.getConfig();
-        fbDao = new MongoDbFacebookSimulationDao(
-                conf.getPropertyValue("db_host"), 
+        messageDocumentDao = new MongoMessageDocumentDao(
+                conf.getPropertyValue("db_host"),
                 Integer.parseInt(conf.getPropertyValue("db_port")),
                 conf.getPropertyValue("db_sim_name"),
                 conf.getPropertyValue("db_sim_collection"));
-        fbCollector = new FacebookTestCollector();
-        mapper = new ObjectMapper();
-        fbEncoder = new FacebookSimulationEncoder();
+        fbApi = new FacebookApi();
+
     }
 }

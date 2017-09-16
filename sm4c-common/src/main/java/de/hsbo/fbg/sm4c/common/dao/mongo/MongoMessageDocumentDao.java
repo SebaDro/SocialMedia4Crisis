@@ -5,8 +5,10 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.mongo;
 
+import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,6 +43,14 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
         messageDocDecoder = new MessageDocumentDecoder();
     }
 
+    public MongoMessageDocumentDao(String dbHost, int dbPort, String dbName, String dbCollection) {
+        MongoClient mongoClient = new MongoClient(dbHost, dbPort);
+        MongoDatabase database = mongoClient.getDatabase(dbName);
+        this.dbCollection = database.getCollection(dbCollection);
+        messageDocEncoder = new MessageDocumentEncoder();
+        messageDocDecoder = new MessageDocumentDecoder();
+    }
+
     @Override
     public MessageDocument retrieveById(String id) {
         FindIterable<Document> document = dbCollection.find(eq("messageId", id));
@@ -60,6 +70,13 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     public List<MessageDocument> retrieve() {
         FindIterable<Document> documents = dbCollection.find();
         List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
+        return messages;
+    }
+
+    @Override
+    public List<MessageDocument> retrieveSimulationData() {
+        FindIterable<Document> documents = dbCollection.find();
+        List<MessageDocument> messages = messageDocDecoder.decodeFacebookSimulationMessages(documents);
         return messages;
     }
 
@@ -95,6 +112,11 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     @Override
     public boolean exists(MessageDocument doc) {
         return dbCollection.find(eq("messageId", doc.getId())).first() != null;
+    }
+
+    @Override
+    public boolean containsSource(String sourceId) {
+        return dbCollection.find(eq("source.id", sourceId)).first() != null;
     }
 
     @Override

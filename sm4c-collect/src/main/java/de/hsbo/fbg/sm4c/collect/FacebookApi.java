@@ -5,13 +5,10 @@
  */
 package de.hsbo.fbg.sm4c.collect;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.Gson;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookCSVEncoder;
-import de.hsbo.fbg.sm4c.collect.encode.FacebookSimulationEncoder;
-import de.hsbo.fbg.sm4c.collect.model.FacebookSimulationMessageDocument;
+import de.hsbo.fbg.sm4c.collect.encode.FacebookDecoder;
+import de.hsbo.fbg.sm4c.common.model.FacebookSource;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -24,50 +21,52 @@ import facebook4j.ResponseList;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Collector class for fetching different content from the Facebook Graph API
  *
  * @author Sebastian Drost
  */
-public class FacebookTestCollector {
+public class FacebookApi {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(FacebookTestCollector.class);
+    private static final Logger LOGGER = LogManager.getLogger(FacebookApi.class);
 
     private final int GROUP_LIMIT = 10000;
     private final int PAGE_LIMIT = 1000;
     private final int GROUP_POST_LIMIT = 1000;
     private final int PAGE_POST_LIMIT = 100;
+    private final String GROUP_FIELDS[] = {"id", "description", "email", "name", "privacy", "updated_time", "city"};
+    private final String PAGE_FIELDS[] = {"id", "description", "emails", "about", "category", "location", "name"};
+    private final String POST_FIELDS[] = {"id", "created_time", "description", "link", "type", "updated_time", "caption", "from", "likes", "message", "parent_id", "picture", "place", "reactions"};
 
     private final Facebook facebook;
     private final Gson gson;
     private final FacebookCSVEncoder fbCsvEncoder;
-    private final FacebookSimulationEncoder fbEncoder;
+    private FacebookDecoder fbDecoder;
     private final int groupLimit;
     private final int pageLimit;
     private final int groupPostLimit;
     private final int pagePostLimit;
 
-    public FacebookTestCollector() {
+    public FacebookApi() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
-        fbEncoder = new FacebookSimulationEncoder();
+        fbDecoder = new FacebookDecoder();
         groupLimit = GROUP_LIMIT;
         pageLimit = PAGE_LIMIT;
         groupPostLimit = GROUP_POST_LIMIT;
         pagePostLimit = PAGE_POST_LIMIT;
     }
 
-    public FacebookTestCollector(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
+    public FacebookApi(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
-        fbEncoder = new FacebookSimulationEncoder();
+        fbDecoder = new FacebookDecoder();
         this.groupLimit = groupLimit;
         this.pageLimit = pageLimit;
         this.groupPostLimit = groupPostLimit;
@@ -85,7 +84,7 @@ public class FacebookTestCollector {
         try {
             ResponseList<Group> groups = facebook.searchGroups(keywords, new Reading()
                     .limit(groupLimit)
-                    .fields("id", "description", "email", "name", "privacy", "updated_time", "city"));
+                    .fields(GROUP_FIELDS));
             groups.removeIf(g -> g.getPrivacy() == GroupPrivacyType.CLOSED);
             result = groups.stream().collect(Collectors.toList());
             LOGGER.info("Retrieved groups for keywords [" + keywords + "]: " + groups.size());
@@ -132,7 +131,7 @@ public class FacebookTestCollector {
         try {
             ResponseList<Page> pages = facebook.searchPages(keywords, new Reading()
                     .limit(pageLimit)
-                    .fields("id", "description", "emails", "about", "category", "location", "name"));
+                    .fields(PAGE_FIELDS));
             result = pages.stream().collect(Collectors.toList());
             LOGGER.info("Retrieved pages for keywords [" + keywords + "]: " + pages.size());
         } catch (FacebookException ex) {
@@ -162,12 +161,52 @@ public class FacebookTestCollector {
      * @param endDate end date of the time period
      * @return
      */
-    public List<Post> getMessagesFromSingleGroup(Group group, Date startDate, Date endDate) {
+    public List<Post> getPostsFromSingleSource(FacebookSource source, Date startTime, Date endTime) {
         List<Post> result = new ArrayList();
         try {
+            ResponseList<Post> feeds;
+            if (source.getType().getName().equals("group")) {
+                feeds = facebook.getGroupFeed(source.getFacebookId(), new Reading()
+                        .limit(groupPostLimit)
+                        .fields(POST_FIELDS)
+                        .since(startTime).until(endTime));
+            } else {
+                feeds = facebook.getFeed(source.getFacebookId(), new Reading()
+                        .limit(pagePostLimit)
+                        .fields(POST_FIELDS)
+                        .since(startTime).until(endTime));
+            }
+            if (feeds != null && !feeds.isEmpty()) {
+                result = feeds.stream().collect(Collectors.toList());
+                ResponseList<Post> f = facebook.fetchNext(feeds.getPaging());
+                while (f != null && !f.isEmpty()) {
+                    LOGGER.info("Retrieved partial posts from group [" + source.getFacebookId() + "]");
+                    result.addAll(f.stream().collect(Collectors.toList()));
+                    f = facebook.fetchNext(f.getPaging());
+                }
+            }
+            LOGGER.info("Retrieved posts from source [" + source.getFacebookId() + "]: " + result.size());
+        } catch (FacebookException ex) {
+            LOGGER.error("Could not retrieve posts from source", ex);
+        }
+        return result;
+    }
+
+    /**
+     * Fetches posts from the specified group for a specified time period.
+     *
+     * @param group Facebook group
+     * @param startDate start date of the time period
+     * @param endDate end date of the time period
+     * @return
+     */
+    public List<Post> getPostsFromSingleGroup(Group group, Date startDate, Date endDate) {
+        List<Post> result = new ArrayList();
+        try {
+
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
                     .limit(groupPostLimit)
-                    .fields("id", "created_time", "description", "link", "type", "updated_time", "caption", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .fields(POST_FIELDS)
                     .since(startDate).until(endDate));
             if (feeds != null && !feeds.isEmpty()) {
                 result = feeds.stream().collect(Collectors.toList());
@@ -199,7 +238,7 @@ public class FacebookTestCollector {
         try {
             ResponseList<Post> feeds = facebook.getGroupFeed(group.getId(), new Reading()
                     .limit(groupPostLimit)
-                    .fields("id", "created_time", "link", "caption", "type", "updated_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .fields(POST_FIELDS)
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());
             LOGGER.info("Retrieved posts from group [" + group.getId() + "]: " + feeds.size());
@@ -221,7 +260,7 @@ public class FacebookTestCollector {
     public List<Post> getPostsFromGroups(List<Group> groups, Date startDate, Date endDate) {
         List<Post> resultList = new ArrayList();
         groups.forEach(g -> {
-            List<Post> posts = getMessagesFromSingleGroup(g, startDate, endDate);
+            List<Post> posts = getPostsFromSingleGroup(g, startDate, endDate);
             resultList.addAll(posts);
         });
         return resultList;
@@ -236,25 +275,25 @@ public class FacebookTestCollector {
      * @param endDate end date of the time period
      * @return posts from facebook groups as JSON
      */
-    public String getPostsFromGroupsAsJSON(List<Group> groups, Date startDate, Date endDate) {
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode postArray = mapper.createArrayNode();
-        groups.forEach(g -> {
-            List<Post> posts = getMessagesFromSingleGroup(g, startDate, endDate);
-            List<FacebookSimulationMessageDocument> messages = posts.stream()
-                    .map(p -> fbEncoder.createMessage(p, g))
-                    .collect(Collectors.toList());
-            postArray.addAll(fbEncoder.createPostArrayNode(messages));
-        });
-        String result = "";
-        try {
-            result = mapper.writeValueAsString(postArray);
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(FacebookTestCollector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return result;
-    }
-
+//    public String getPostsFromGroupsAsJSON(List<Group> groups, Date startDate, Date endDate) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ArrayNode postArray = mapper.createArrayNode();
+//        groups.forEach(g -> {
+//            FacebookSource source = fbDecoder.createFacebookSource(g);
+//            List<Post> posts = getPostsFromSingleGroup(g, startDate, endDate);
+//            List<FacebookMessageDocument> messages = posts.stream()
+//                    .map(p -> fbDecoder.createMessage(p, source))
+//                    .collect(Collectors.toList());
+//            postArray.addAll(fbEncoder.createPostArrayNode(messages));
+//        });
+//        String result = "";
+//        try {
+//            result = mapper.writeValueAsString(postArray);
+//        } catch (JsonProcessingException ex) {
+//            LOGGER.error("Could not encode referenced array", ex);
+//        }
+//        return result;
+//    }
     /**
      * Fetches posts from the specified page for a specified time period.
      *
@@ -268,7 +307,7 @@ public class FacebookTestCollector {
         try {
             ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
                     .limit(pagePostLimit)
-                    .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .fields(POST_FIELDS)
                     .since(startDate).until(endDate));
             if (feeds != null && !feeds.isEmpty()) {
                 result = feeds.stream().collect(Collectors.toList());
@@ -300,7 +339,7 @@ public class FacebookTestCollector {
         try {
             ResponseList<Post> feeds = facebook.getFeed(page.getId(), new Reading()
                     .limit(pagePostLimit)
-                    .fields("id", "created_time", "description", "from", "likes", "message", "parent_id", "picture", "place", "reactions")
+                    .fields(POST_FIELDS)
                     .since(startDate).until(endDate));
             result = feeds.stream().collect(Collectors.toList());
             LOGGER.info("Retrieved posts from page [" + page.getId() + "]: " + result.size());
@@ -338,23 +377,22 @@ public class FacebookTestCollector {
      * @param endDate end date of the time period
      * @return posts from facebook pages as JSON
      */
-    public String getPostsFromPagesAsJSON(List<Page> pages, Date startDate, Date endDate) {
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode postArray = mapper.createArrayNode();
-        pages.forEach(p -> {
-            List<Post> posts = getPostsFromSinglePage(p, startDate, endDate);
-            List<FacebookSimulationMessageDocument> messages = posts.stream()
-                    .map(fP -> fbEncoder.createMessage(fP, p))
-                    .collect(Collectors.toList());
-            postArray.addAll(fbEncoder.createPostArrayNode(messages));
-        });
-        String result = "";
-        try {
-            result = mapper.writeValueAsString(postArray);
-        } catch (JsonProcessingException ex) {
-            Logger.getLogger(FacebookTestCollector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return result;
-    }
-
+//    public String getPostsFromPagesAsJSON(List<Page> pages, Date startDate, Date endDate) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ArrayNode postArray = mapper.createArrayNode();
+//        pages.forEach(p -> {
+//            List<Post> posts = getPostsFromSinglePage(p, startDate, endDate);
+//            List<FacebookSimulationMessageDocument> messages = posts.stream()
+//                    .map(fP -> fbEncoder.createMessage(fP, p))
+//                    .collect(Collectors.toList());
+//            postArray.addAll(fbEncoder.createPostArrayNode(messages));
+//        });
+//        String result = "";
+//        try {
+//            result = mapper.writeValueAsString(postArray);
+//        } catch (JsonProcessingException ex) {
+//            LOGGER.error("Could not encode referenced array", ex);
+//        }
+//        return result;
+//    }
 }

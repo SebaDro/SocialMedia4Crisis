@@ -7,6 +7,7 @@ package de.hsbo.fbg.sm4c.rest.view;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
+import java.util.List;
 import org.joda.time.DateTime;
 
 /**
@@ -19,17 +20,18 @@ public class MessageDocumentView {
     private String content;
     private String label;
     private String service;
+    private List<LocationView> locations;
     private boolean training;
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Date creationTime;
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Date updateTime;
-    
+
     private String type;
     private FacebookSourceView facebookSource;
-    
-    public MessageDocumentView(){
-        
+
+    public MessageDocumentView() {
+
     }
 
     public String getId() {
@@ -71,7 +73,7 @@ public class MessageDocumentView {
     public void setTraining(boolean training) {
         this.training = training;
     }
-    
+
     public Date getCreationTime() {
         return creationTime;
     }
@@ -103,8 +105,13 @@ public class MessageDocumentView {
     public void setFacebookSource(FacebookSourceView facebookSource) {
         this.facebookSource = facebookSource;
     }
-    
-    
-    
+
+    public List<LocationView> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<LocationView> locations) {
+        this.locations = locations;
+    }
 
 }

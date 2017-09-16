@@ -24,12 +24,12 @@ public class FacebookCollector implements Collector {
     private static final Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
     
     private Collection collection;
-    private FacebookAPI api;
+    private FacebookApi api;
     private FacebookDecoder decoder;
 
     public FacebookCollector(Collection collection) {
         this.collection = collection;
-        this.api = new FacebookAPI();
+        this.api = new FacebookApi();
         this.decoder = new FacebookDecoder();
     }
 
@@ -37,7 +37,7 @@ public class FacebookCollector implements Collector {
     public List<MessageDocument> collectMessages(Date startTime, Date endTime) {
         List<MessageDocument> result = new ArrayList();
         collection.getSources().forEach(s -> {
-            List<Post> posts = api.getMessagesFromSingleSource(s, startTime, endTime);
+            List<Post> posts = api.getPostsFromSingleSource(s, startTime, endTime);
             posts.forEach(p -> {
                 result.add(decoder.createMessage(p, s));
             });

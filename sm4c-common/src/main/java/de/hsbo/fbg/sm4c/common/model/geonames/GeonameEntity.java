@@ -3,26 +3,31 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.common.model;
+package de.hsbo.fbg.sm4c.common.model.geonames;
+
+import de.hsbo.fbg.sm4c.common.model.AbstractEntity;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class GeoName extends AbstractEntity {
+public abstract class GeonameEntity extends AbstractEntity {
 
+    private String geonameid;
     private String name;
     private double latitude;
     private double longitude;
     private String featureClass;
     private String featureCode;
-    private String admin01;
-    private String admin02;
-    private String admin03;
-    private String admin04;
-    
-    public GeoName(){
-        
+
+    public abstract GeonameEntity getParent();
+
+    public String getGeonameid() {
+        return geonameid;
+    }
+
+    public void setGeonameid(String geonameid) {
+        this.geonameid = geonameid;
     }
 
     public String getName() {
@@ -64,39 +69,5 @@ public class GeoName extends AbstractEntity {
     public void setFeatureCode(String featureCode) {
         this.featureCode = featureCode;
     }
-
-    public String getAdmin01() {
-        return admin01;
-    }
-
-    public void setAdmin01(String admin01) {
-        this.admin01 = admin01;
-    }
-
-    public String getAdmin02() {
-        return admin02;
-    }
-
-    public void setAdmin02(String admin02) {
-        this.admin02 = admin02;
-    }
-
-    public String getAdmin03() {
-        return admin03;
-    }
-
-    public void setAdmin03(String admin03) {
-        this.admin03 = admin03;
-    }
-
-    public String getAdmin04() {
-        return admin04;
-    }
-
-    public void setAdmin04(String admin04) {
-        this.admin04 = admin04;
-    }
-    
-    
 
 }

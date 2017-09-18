@@ -18,6 +18,16 @@ import de.hsbo.fbg.sm4c.common.dao.SocialMediaServiceDao;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
+import de.hsbo.fbg.sm4c.common.dao.geonames.Admin01Dao;
+import de.hsbo.fbg.sm4c.common.dao.geonames.Admin02Dao;
+import de.hsbo.fbg.sm4c.common.dao.geonames.Admin03Dao;
+import de.hsbo.fbg.sm4c.common.dao.geonames.Admin04Dao;
+import de.hsbo.fbg.sm4c.common.dao.geonames.GeonameDao;
+import de.hsbo.fbg.sm4c.common.dao.hibernate.geonames.HibernateAdmin01Dao;
+import de.hsbo.fbg.sm4c.common.dao.hibernate.geonames.HibernateAdmin02Dao;
+import de.hsbo.fbg.sm4c.common.dao.hibernate.geonames.HibernateAdmin03Dao;
+import de.hsbo.fbg.sm4c.common.dao.hibernate.geonames.HibernateAdmin04Dao;
+import de.hsbo.fbg.sm4c.common.dao.hibernate.geonames.HibernateGeonameDao;
 
 /**
  *
@@ -88,6 +98,31 @@ public class HibernateDaoFactory implements DaoFactory<Session> {
     @Override
     public EvaluationResultDao createEvaluationResultDao(Session daoContext) {
         return new HibernateEvaluationResultDao(daoContext);
+    }
+
+    @Override
+    public Admin01Dao createAdmin01Dao(Session daoContext) {
+        return new HibernateAdmin01Dao(daoContext);
+    }
+
+    @Override
+    public Admin02Dao createAdmin02Dao(Session daoContext) {
+        return new HibernateAdmin02Dao(daoContext);
+    }
+
+    @Override
+    public Admin03Dao createAdmin03Dao(Session daoContext) {
+        return new HibernateAdmin03Dao(daoContext);
+    }
+
+    @Override
+    public Admin04Dao createAdmin04Dao(Session daoContext) {
+        return new HibernateAdmin04Dao(daoContext);
+    }
+
+    @Override
+    public GeonameDao createGeonameDao(Session daoContext) {
+        return new HibernateGeonameDao(daoContext);
     }
 
 }

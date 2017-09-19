@@ -15,6 +15,7 @@ public class Admin3 extends GeonameEntity {
 
     private String admin3_id;
     private Admin2 admin2;
+    private Admin1 admin1;
 
     public Admin3() {
 
@@ -36,9 +37,21 @@ public class Admin3 extends GeonameEntity {
         this.admin2 = admin2;
     }
 
+    public Admin1 getAdmin1() {
+        return admin1;
+    }
+
+    public void setAdmin1(Admin1 admin1) {
+        this.admin1 = admin1;
+    }
+
     @Override
     public GeonameEntity getParent() {
-        return this.getAdmin2();
+        if (this.getAdmin2().getName().equals("Unknown")) {
+            return this.getAdmin1();
+        } else {
+            return this.getAdmin2();
+        }
     }
 
 }

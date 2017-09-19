@@ -48,6 +48,15 @@ public class HibernateBaseDao<T extends AbstractEntity> {
         return Optional.ofNullable(result.isEmpty() ? null : result.get(0));
     }
 
+    public List<T> retrieveAllByKey(String key, String value) {
+        Query<T> query = session.createQuery("select o "
+                + "from " + this.genericType.getSimpleName() + " o "
+                + "where o." + key + " = :value")
+                .setParameter("value", value);
+        List<T> result = query.getResultList();
+        return result;
+    }
+
     public List<T> retrieve() {
         List<T> results = session.createQuery("from " + this.genericType.getSimpleName()).getResultList();
         return results;
@@ -68,7 +77,7 @@ public class HibernateBaseDao<T extends AbstractEntity> {
 
     }
 
-    public T update(T o){
+    public T update(T o) {
         Transaction t = session.beginTransaction();
         session.update(o);
         t.commit();

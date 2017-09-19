@@ -213,6 +213,9 @@
         <many-to-one name="admin2" column="admin2_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin2"
                      foreign-key="fk_admin2" lazy="false" fetch="join" cascade="save-update">
         </many-to-one>
+        <many-to-one name="admin1" column="admin1_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin1"
+                             foreign-key="fk_admin1" lazy="false" fetch="join" cascade="save-update">
+        </many-to-one>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.geonames.Admin4" table="admin4" >
         <meta attribute="class-description">

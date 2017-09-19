@@ -7,11 +7,14 @@ package de.hsbo.fbg.sm4c.common.dao.geonames;
 
 import de.hsbo.fbg.sm4c.common.model.geonames.Admin1;
 import de.hsbo.fbg.sm4c.common.dao.BaseDao;
+import java.util.Optional;
 
 /**
  *
  * @author Seba
  */
 public interface Admin01Dao extends BaseDao<Admin1>{
+    
+    
     
 }

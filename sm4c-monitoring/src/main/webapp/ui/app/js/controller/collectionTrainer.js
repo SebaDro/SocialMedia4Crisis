@@ -55,7 +55,7 @@ angular.module('sm4cMonitoring')
 
     $scope.loadTrainingData = function() {
       displayLoadingDialog();
-      $http.get(rootURL + '/collections/' + $routeParams.id + '/documents/limit/' + $scope.trainingSize).then(function(response) {
+      $http.get(rootURL + '/collections/' + $routeParams.id + '/documents/unlabeled/limit/' + $scope.trainingSize).then(function(response) {
         $mdDialog.hide(true);
         $scope.documents = response.data;
         $scope.maxIndex = $scope.documents.length - 1;

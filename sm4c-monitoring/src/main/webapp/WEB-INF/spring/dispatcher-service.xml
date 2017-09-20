@@ -22,5 +22,6 @@
     <bean class="de.hsbo.fbg.sm4c.rest.control.SimulationController" />
     <bean class="de.hsbo.fbg.sm4c.rest.control.CollectionController" />
     <bean class="de.hsbo.fbg.sm4c.rest.control.DocumentController" />
+    <bean class="de.hsbo.fbg.sm4c.rest.control.ModelController" />
   
 </beans>

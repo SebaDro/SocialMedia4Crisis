@@ -2,7 +2,7 @@ angular.module('sm4cMonitoring')
   .controller('MapCtrl', ['$scope', '$http', '$location', '$routeParams', '$mdDialog', '$mdToast', '$filter', 'collectionService', 'esriRegistry', 'esriLoader', function($scope, $http, $location, $routeParams, $mdDialog, $mdToast, $filter, collectionService, esriRegistry, esriLoader) {
     var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
     var featureLayer = {};
-	var featureLayerURL='your-feature-service-url';
+	var featureLayerURL='https://services6.arcgis.com/RF3oqOe1dChQus9k/arcgis/rest/services/sm4c/FeatureServer/0';
 
     var dates = [];
     var startDate = new Date();

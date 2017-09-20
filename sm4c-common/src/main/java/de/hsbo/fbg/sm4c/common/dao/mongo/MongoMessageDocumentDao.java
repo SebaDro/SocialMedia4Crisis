@@ -158,8 +158,8 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
 
     @Override
     public void createIndex() {
-        IndexOptions indexOptions = new IndexOptions().unique(true);
-        dbCollection.createIndex(Indexes.hashed("messageId"), indexOptions);
+//        IndexOptions indexOptions = new IndexOptions().unique(true);
+        dbCollection.createIndex(Indexes.hashed("messageId"));
     }
 
 }

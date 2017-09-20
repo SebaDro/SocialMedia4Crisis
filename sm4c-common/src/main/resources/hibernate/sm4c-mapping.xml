@@ -80,7 +80,7 @@
         <property name="name" column="name" type="string" />
         <property name="description" column="description" type="string" />
         <many-to-one name="type" column="typeid" class="de.hsbo.fbg.sm4c.common.model.SourceType" foreign-key="fk_facebooksource_cat_sourcetype" cascade="save-update" lazy="false" fetch="join"/>
-        <set name="locations" table="facebooksource_location" cascade="all" >
+        <set name="locations" table="facebooksource_location" cascade="all" lazy="false" fetch="join">
             <key column="facebooksourceid" />
             <many-to-many column="locationid" class="de.hsbo.fbg.sm4c.common.model.Location" foreign-key="fk_facebooksource_location_cat_location"/>
         </set>

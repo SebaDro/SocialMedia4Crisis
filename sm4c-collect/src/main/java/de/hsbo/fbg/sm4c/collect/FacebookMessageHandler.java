@@ -7,7 +7,6 @@ package de.hsbo.fbg.sm4c.collect;
 
 import de.hsbo.fbg.sm4c.classify.AbstractClassifier;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
-import de.hsbo.fbg.sm4c.geotag.ArcGISGeoCoder;
 import de.hsbo.fbg.sm4c.geoparsing.Geoparser;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
@@ -23,12 +22,10 @@ public class FacebookMessageHandler implements MessageHandler {
 
     private AbstractClassifier classifier;
     private Geoparser recognizer;
-    private ArcGISGeoCoder geoCoder;
 
     public FacebookMessageHandler(AbstractClassifier classifier) {
         this.classifier = classifier;
         this.recognizer = new Geoparser();
-        this.geoCoder = new ArcGISGeoCoder();
     }
 
     public void processMessages(List<MessageDocument> documents) {
@@ -52,7 +49,7 @@ public class FacebookMessageHandler implements MessageHandler {
             } else {
                 try {
                     //                    List<Location> locations = geoTagger.geocode(locationEntities);
-                    geoCoder.findLocation(locationEntities.get(0));
+//                    geoCoder.findLocation(locationEntities.get(0));
                 } catch (Exception ex) {
                     LOGGER.error("Error during geocoding", ex);
                 }

@@ -60,7 +60,7 @@ public class FacebookSourceEncoder {
         s.setDescription(page.getAbout());
         s.setFacebookId(page.getId());
         List<LocationView> locations = new ArrayList();
-        if (page.getLocation() != null) {
+        if (page.getLocation() != null&&page.getLocation().getLatitude()!=null&&page.getLocation().getLongitude()!=null) {
             LocationView location = new LocationView();
             location.setLatitude(page.getLocation().getLatitude());
             location.setLongitude(page.getLocation().getLongitude());

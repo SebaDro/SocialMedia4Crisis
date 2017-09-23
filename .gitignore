@@ -1,0 +1,21 @@
+/webapp/target/
+*/target/*
+/core/target/
+/rest/target/
+/webapp/logs/
+/core/jobs/
+/core/logs/
+
+/http/target/
+/webapp/src/main/resources/config.json
+/core/src/test/resources/test-config.json
+*.jar
+
+*.properties
+nb-configuration.xml
+hibernate.cfg.xml
+
+# Eclipse
+.classpath
+.project
+.settings/

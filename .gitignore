@@ -19,3 +19,5 @@ hibernate.cfg.xml
 .classpath
 .project
 .settings/
+
+.Rhistory

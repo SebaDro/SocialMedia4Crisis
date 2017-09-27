@@ -19,6 +19,7 @@ public abstract class GeonameEntity extends AbstractEntity {
     private double longitude;
     private String featureClass;
     private String featureCode;
+    private long population;
 
     public abstract GeonameEntity getParent();
 
@@ -68,6 +69,14 @@ public abstract class GeonameEntity extends AbstractEntity {
 
     public void setFeatureCode(String featureCode) {
         this.featureCode = featureCode;
+    }
+
+    public long getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(long population) {
+        this.population = population;
     }
 
 }

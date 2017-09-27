@@ -6,6 +6,8 @@
 
 package de.hsbo.fbg.sm4c.common.model;
 
+import de.hsbo.fbg.sm4c.common.model.geonames.Geoname;
+
 /**
  *
  * @author Sebastian Drost
@@ -13,7 +15,7 @@ package de.hsbo.fbg.sm4c.common.model;
 public class AlternateGeoName {
     
     String name;
-    GeoName geoName;
+    Geoname geoName;
     
     public AlternateGeoName(){
         
@@ -27,11 +29,11 @@ public class AlternateGeoName {
         this.name = name;
     }
 
-    public GeoName getGeoName() {
+    public Geoname getGeoName() {
         return geoName;
     }
 
-    public void setGeoName(GeoName geoName) {
+    public void setGeoName(Geoname geoName) {
         this.geoName = geoName;
     }
 

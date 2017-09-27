@@ -12,6 +12,7 @@ import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.model.geonames.Geoname;
 import de.hsbo.fbg.sm4c.common.model.geonames.GeonameEntity;
 import de.hsbo.fbg.sm4c.geoparsing.AmbiguityToponym;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -38,10 +39,25 @@ public class ToponymDisambiguator {
         dbc.afterPropertiesSet();
 
         daoFactory = new HibernateDaoFactory(dbc);
-
     }
 
-    public void disambiguateToponyms(List<AmbiguityToponym> toponyms) {
+    public GeonameEntity disambiguateSingleToponym(AmbiguityToponym toponym) {
+        try (Session session = (Session) daoFactory.initializeContext()) {
+            GeonameDao geonameDao = daoFactory.createGeonameDao(session);
+            List<Geoname> geonameCandidates = geonameDao.retrieveCandidatesByName(toponym.getToponym());
+            List<GeonameEntity> candidates = geonameCandidates.stream().map(g -> (GeonameEntity) g).collect(Collectors.toList());
+            if (candidates.isEmpty()) {
+                return null;
+            } else {
+                GeonameEntity result = null;
+                result = calculateHighestPopulationEntity(candidates);
+                return result;
+            }
+        }
+    }
+
+    public List<GeonameEntity> disambiguateToponyms(List<AmbiguityToponym> toponyms) {
+        List<GeonameEntity> disambiguatedToponyms = new ArrayList();
 
         try (Session session = (Session) daoFactory.initializeContext()) {
 //            GeonameNode root = new GeonameNode();
@@ -49,17 +65,22 @@ public class ToponymDisambiguator {
             GeonameNode root = buildTree(toponyms, geonameDao);
 
             for (AmbiguityToponym t : toponyms) {
-                HashMap<GeonameNode, ConceptualDensityParameters> resultMap = new HashMap();
+                if (t.getCandidates().size() == 1) {
+                    disambiguatedToponyms.add(t.getCandidates().get(0).getEntity());
+                    continue;
+                }
+                HashMap<GeonameNode, ConceptualDensityParameters> candidateParameters = new HashMap();
                 for (GeonameNode candidate : t.getCandidates()) {
                     GeonameNode synsetHierarchy = getSynsetHierarchy(candidate);
                     ConceptualDensityParameters parameters = calculateCDParameters(synsetHierarchy);
-                    resultMap.put(candidate, parameters);
+                    candidateParameters.put(candidate, parameters);
                 }
-                LinkedHashMap sortedResultMap = sortResultMap(resultMap);
-                sortedResultMap.values().size();
+//                LinkedHashMap<GeonameNode, ConceptualDensityParameters> sortedParameterMap = sortParameterMap(candidateParameters);
+                GeonameEntity disambiguatedToponym = calculateHighestCDEntity(candidateParameters);
+                disambiguatedToponyms.add(disambiguatedToponym);
             }
         }
-
+        return disambiguatedToponyms;
     }
 
     public GeonameNode addToTree(GeonameNode subtree, GeonameNode treeBranch) {
@@ -177,12 +198,47 @@ public class ToponymDisambiguator {
         return found;
     }
 
-    public LinkedHashMap<GeonameNode, ConceptualDensityParameters> sortResultMap(HashMap<GeonameNode, ConceptualDensityParameters> resultMap) {
+    public LinkedHashMap<GeonameNode, ConceptualDensityParameters> sortParameterMap(HashMap<GeonameNode, ConceptualDensityParameters> resultMap) {
         LinkedHashMap<GeonameNode, ConceptualDensityParameters> sortedResultMap = resultMap.entrySet().stream()
                 .sorted(Collections.reverseOrder((e1, e2) -> Double.compare(e1.getValue().getTotalSynsets(),
                         e2.getValue().getTotalSynsets())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         return sortedResultMap;
+    }
+
+    public GeonameEntity calculateHighestCDEntity(Map<GeonameNode, ConceptualDensityParameters> candidateParameterMap) {
+        double alpha = 0.1;
+        double maxCD = 0;
+        GeonameEntity resultEntity = null;
+        int frequencyRank = 1;
+//        double lastSubHierarchyFrequency = 0;
+        for (Map.Entry<GeonameNode, ConceptualDensityParameters> entry : candidateParameterMap.entrySet()) {
+            double baseCD = (double) entry.getValue().getRelevantSynsets() / (double) entry.getValue().getTotalSynsets();
+
+            if (baseCD > maxCD) {
+                maxCD = baseCD;
+                resultEntity = entry.getKey().getEntity();
+            } else if (baseCD == maxCD) {
+                if (entry.getKey().getEntity().getParent().getPopulation() > resultEntity.getParent().getPopulation()) {
+                    resultEntity = entry.getKey().getEntity();
+                }
+            } else {
+                ;
+            }
+        }
+        return resultEntity;
+    }
+
+    public GeonameEntity calculateHighestPopulationEntity(List<GeonameEntity> candidates) {
+        GeonameEntity result = null;
+        for (GeonameEntity candidate : candidates) {
+            if (result == null) {
+                result = candidate;
+            } else if (candidate.getParent().getPopulation() > result.getParent().getPopulation()) {
+                result = candidate;
+            }
+        }
+        return result;
     }
 
 }

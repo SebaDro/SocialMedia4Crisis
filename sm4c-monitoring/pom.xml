@@ -33,6 +33,10 @@
             <artifactId>sm4c-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sm4c-geotag</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.thetransactioncompany</groupId>
             <artifactId>cors-filter</artifactId>
         </dependency>
@@ -230,7 +234,7 @@
                             <webAppSourceDirectory>${jetty.docroot}</webAppSourceDirectory>
                             <webAppConfig>
                                 <contextPath>/${project.build.finalName}</contextPath>
-                                <extraClasspath>target/classes;../sm4c-rest/target/classes;../sm4c-collect/target/classes;../sm4c-classify/target/classes;../sm4c-common/target/classes</extraClasspath>
+                                <extraClasspath>target/classes;../sm4c-rest/target/classes;../sm4c-collect/target/classes;../sm4c-classify/target/classes;../sm4c-common/target/classes;../sm4c-geotag/target/classes</extraClasspath>
                             </webAppConfig>
                             <scanTargets>
                                 <scanTarget>target/classes</scanTarget>
@@ -238,6 +242,7 @@
                                 <scanTarget>../sm4c-collect/target/classes</scanTarget>
                                 <scanTarget>../sm4c-classify/target/classes</scanTarget>
                                 <scanTarget>../sm4c-common/target/classes</scanTarget>
+                                <scanTarget>../sm4c-geotag/target/classes</scanTarget>
                             </scanTargets>
                             <httpConnector>
                                 <port>8080</port>

@@ -1,6 +1,7 @@
-#R-Script for some preparation functions
-#that process text corpora
-
+# R-Script for corpora processing, to preprocess large text corpora
+# and reduce the number of text features.
+# 
+# sebastian.drost@hs-bochum.de
 if (!require("openNLP")) {
   install.packages("openNLP")
 }
@@ -10,26 +11,19 @@ if (!require("NLP")) {
 if (!require("tm")) {
   install.packages("tm")
 }
-if (!require("koRpus")) {
-  install.packages("koRpus")
-}
-if (!require("SnowballC")) {
-  install.packages("SnowballC")
-}
+
 
 library("openNLP")
 library("NLP")
 library("tm")
-library("koRpus")
-library("SnowballC")
 
-# install openNLP model for german
-# Tiger Corpus and STTS Tag Set
+# You have to install the openNLP model for the german language first.
+# So please uncomment the following lines and install the german langugae packages.
 # install.packages("openNLPmodels.de",
 #                  repos = "http://datacube.wu.ac.at/",
 #                  type = "source")
 
-#create annotators
+#create token annotators
 sent_token_annotator <- Maxent_Sent_Token_Annotator(language = "de")
 word_token_annotator <- Maxent_Word_Token_Annotator(language = "de")
 pos_token_annotator <- Maxent_POS_Tag_Annotator(language = "de")
@@ -37,20 +31,13 @@ pos_token_annotator <- Maxent_POS_Tag_Annotator(language = "de")
 #read stopwords from file
 stopwords <-
   read.table(
-    "./scripts/german_stopwords_plain.txt",
+    "./data/german_stopwords_plain.txt",
     header = FALSE,
     encoding = "UTF-8",
     skip = 9,
     stringsAsFactors = FALSE
   )
 stopwords <- as.character(stopwords[, 1])
-
-#system parameters for koRpus
-# set.kRp.env(
-#   TT.cmd = "manual",
-#   lang = "de",
-#   TT.options = list(path = "C:\\TreeTagger\\", preset = "de")
-# )
 
 #use regex to remove urls that can occur
 #in several different forms
@@ -63,118 +50,72 @@ removeURLs <- function(corpora) {
   return(corpora)
 }
 
-#remove non alpha numeric characters
-#but keep dashes and umlauts
+# remove non alpha numeric characters
+# but keep dashes and umlauts
 removeNonAlphanumericCharacters <- function(corpora) {
   corpora <-
     tm_map(corpora,
            content_transformer(gsub),
-           pattern = "[^a-zA-Z0-9 Ã¤Ã„Ã¶Ã–Ã¼ÃœÃŸ-]",
+           pattern = "[^a-zA-Z0-9 äÄöÖüÜß-]",
            replacement = " ")
   return(corpora)
 }
 
-#transforms a character term into lemmas
-# toLemmas <- function(value) {
-#   valueChars <- as.character(value)
-#   tags <- treetag(valueChars, encoding = "UTF-8", format = "obj")
-#   lemma <- tags@TT.res$lemma
-#   lemma[which(tags@TT.res$lemma == "<unknown>")] <-
-#     tags@TT.res$token[which(tags@TT.res$lemma == "<unknown>")]
-#   value <- paste(lemma, collapse = " ")
-# }
-
-#change the content from the text corpora with
-#pos tagged words
-# createLemmaCorpora <- function(corpora) {
-#   corpora <- tm_map(corpora, content_transformer(toLemmas))
-#   return(corpora)
-# }
-
-#transforms a character into pos tagged words
-toPosTaggedWords <- function(value) {
-  valueString <- as.String(value)
-  
-  # first do sentence annotation
-  sentAnn <- annotate(valueString, sent_token_annotator)
-  
-  # second do word annotation given the
-  # sentence annotation object to start with
-  wordAnn <- annotate(valueString, word_token_annotator, sentAnn)
-  
-  #third do POS annotation given the
-  #word annotation object to start with
-  posTags <- annotate(valueString, pos_token_annotator, wordAnn)
-  
-  #get the word subset and the POS tags,
-  #combine both and concatenate the single
-  #tagged words
-  wordSub <- subset(posTags, type == "word")
-  tags  <- sapply(wordSub$features , "[[", "POS")
-  taggedWords <- sprintf("%s/%s", valueString[wordSub], tags)
-  taggedContent <- paste(taggedWords, collapse = " ")
-  
-  #overwrite  the content from the text corpus
-  value <- taggedContent
-}
-
-#transforms a character into pos tags
-toPosTags <- function(value) {
-  valueString <- as.String(value)
-  
-  # first do sentence annotation
-  sentAnn <- annotate(valueString, sent_token_annotator)
-  
-  # second do word annotation given the
-  # sentence annotation object to start with
-  wordAnn <- annotate(valueString, word_token_annotator, sentAnn)
-  
-  #third do POS annotation given the
-  #word annotation object to start with
-  posTags <- annotate(valueString, pos_token_annotator, wordAnn)
-  
-  #concatenate the POS tags
-  wordSub <- subset(posTags, type == "word")
-  tags  <- sapply(wordSub$features , "[[", "POS")
-  taggedContent <- paste(tags, collapse = " ")
-  
-  #overwrite  the content from the text corpus
-  value <- taggedContent
-}
-
-#change the content from the text corpora with
-#pos tagged words
-createPosTaggedWordCorpora <- function(corpora) {
-  #create annotators
-  sent_token_annotator <-
-    Maxent_Sent_Token_Annotator(language = "de")
-  word_token_annotator <-
-    Maxent_Word_Token_Annotator(language = "de")
-  pos_token_annotator <- Maxent_POS_Tag_Annotator(language = "de")
-  
-  corpora <- tm_map(corpora, content_transformer(toPosTaggedWords))
-  
+# remove non alpha numeric characters
+# but keep dashes and umlauts and punctuation
+removeNonAlphanumericCharactersButPunctuation <- function(corpora) {
+  corpora <-
+    tm_map(corpora,
+           content_transformer(gsub),
+           pattern = "[^a-zA-Z0-9 äÄöÖüÜß[:punct:]]",
+           replacement = " ")
   return(corpora)
 }
 
-#change the content from the text corpora with
-#pos tags
-createPosTagCorpora <- function(corpora) {
-  #create annotators
-  sent_token_annotator <-
-    Maxent_Sent_Token_Annotator(language = "de")
-  word_token_annotator <-
-    Maxent_Word_Token_Annotator(language = "de")
-  pos_token_annotator <- Maxent_POS_Tag_Annotator(language = "de")
-  
-  corpora <- tm_map(corpora, content_transformer(toPosTags))
-  
-  return(corpora)
+# apply several filter steps on the raw text corpora
+# to reduce the number of features for the bag-of-words approach
+filterPipeBOWCorpora <- function(corpora) {
+  #convert to lower case
+  corpora <- tm_map(corpora, content_transformer(tolower))
+  #remove URLS
+  corpora <- removeURLs(corpora)
+  #remove non alphanumeric characters
+  corpora <- removeNonAlphanumericCharacters(corpora)
+  #remove punctuation
+  corpora <-
+    tm_map(corpora, removePunctuation, preserve_intra_word_dashes = T)
+  #remove numbers
+  corpora <- tm_map(corpora, removeNumbers)
+  #remove additional whitespaces
+  corpora <-  tm_map(corpora, stripWhitespace)
+  return (corpora)
 }
 
-#apply several filter steps on the raw text corpora
-#to reduce the number of features
-filterPipeStemCorpora <- function(corpora) {
+# apply several filter steps on the raw text corpora
+# and remove stopwords to reduce the number of features
+filterPipeStopwordsCorpora <- function(corpora) {
+  #convert to lower case
+  corpora <- tm_map(corpora, content_transformer(tolower))
+  #remove URLS
+  corpora <- removeURLs(corpora)
+  #remove non alphanumeric characters
+  corpora <- removeNonAlphanumericCharacters(corpora)
+  #remove punctuation
+  corpora <-
+    tm_map(corpora, removePunctuation, preserve_intra_word_dashes = T)
+  #remove numbers
+  corpora <- tm_map(corpora, removeNumbers)
+  #remove stopwords
+  corpora <- tm_map(corpora, removeWords, stopwords)
+  
+  #remove additional whitespaces
+  corpora <-  tm_map(corpora, stripWhitespace)
+  return (corpora)
+}
+
+# apply several filter steps on the raw text corpora
+# and remove stopwords and stem the text to reduce the number of features
+filterPipeStopwordsStemCorpora <- function(corpora) {
   #convert to lower case
   corpora <- tm_map(corpora, content_transformer(tolower))
   #remove URLS
@@ -189,50 +130,11 @@ filterPipeStemCorpora <- function(corpora) {
   #remove stopwords
   corpora <- tm_map(corpora, removeWords, stopwords)
   #stem the words
-  corpora <- tm_map(corpora, stemDocument, language = "de")
+  corpora <- tm_map(corpora,
+                    content_transformer(stemDocument),
+                    language = "german")
   #remove additional whitespaces
   corpora <-  tm_map(corpora, stripWhitespace)
   return (corpora)
 }
 
-#apply several filter steps on the raw text corpora
-#to reduce the number of features
-# filterPipeLemmaCorpora <- function(corpora) {
-#   #convert to lower case
-#   corpora <- tm_map(corpora, content_transformer(tolower))
-#   #remove URLS
-#   corpora <- removeURLs(corpora)
-#   #remove non alphanumeric characters
-#   corpora <- removeNonAlphanumericCharacters(corpora)
-#   #remove punctuation
-#   corpora <-
-#     tm_map(corpora, removePunctuation, preserve_intra_word_dashes = T)
-#   #remove numbers
-#   corpora <- tm_map(corpora, removeNumbers)
-#   #remove stopwords
-#   corpora <- tm_map(corpora, removeWords, stopwords)
-#   #lemmatize the words
-#   corpora <- createLemmaCorpora(corpora)
-#   #remove additional whitespaces
-#   corpora <-  tm_map(corpora, stripWhitespace)
-#   return (corpora)
-# }
-
-#apply several filter steps on the raw text corpora
-#to reduce the number of features for pos tagging
-filterPipePosCorpora <- function(corpora) {
-  #remove URLS
-  corpora <- removeURLs(corpora)
-  #remove non alphanumeric characters
-  corpora <- removeNonAlphanumericCharacters(corpora)
-  #remove punctuation
-  corpora <-
-    tm_map(corpora, removePunctuation, preserve_intra_word_dashes = T)
-  #remove numbers
-  corpora <- tm_map(corpora, removeNumbers)
-  #remove stopwords
-  corpora <- tm_map(corpora, removeWords, stopwords)
-  #remove additional whitespaces
-  corpora <-  tm_map(corpora, stripWhitespace)
-  return (corpora)
-}

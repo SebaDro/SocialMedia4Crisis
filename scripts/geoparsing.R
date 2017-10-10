@@ -41,7 +41,7 @@ geonameTable = "geonameTable"
 # path to the CoreNLP library 
 coreNlpLibLoc = "coreNlpPath"
 # path to the german parameter file
-coreNlpGermanParamFile = "germanParamFilerPath"
+coreNlpGermanParamFile = "germanParamFilePath"
 
 
 #set working directory

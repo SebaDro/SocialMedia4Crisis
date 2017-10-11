@@ -1,5 +1,11 @@
-# R-Script for the evaluation of the text classification for Facebook posts.
+# R-Script for the evaluation of text classification for Facebook posts.
 # The classification task is done by the use of the machine learning library WEKA.
+# 
+# Note that you have to install WEKA from this website first: 
+# https://www.cs.waikato.ac.nz/~ml/weka/
+#
+# For further instructions, please look at the documentation for the RWeka package:
+# https://cran.r-project.org/web/packages/RWeka/index.html
 # 
 # sebastian.drost@hs-bochum.de
 

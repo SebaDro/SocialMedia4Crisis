@@ -1,11 +1,11 @@
 <div layout="column" ng-controller="MapCtrl">
   <rzslider class="custom-slider" rz-slider-model="slider.minValue" rz-slider-high="slider.maxValue" rz-slider-options="slider.options"></rzslider>
     <div layout="row">
-      <div flex="20">
+      <!-- <div flex="20">
         <md-card>
           <md-card-content>
             <md-list style="width:300px">
-              <!-- <md-subheader class="md-no-sticky {{mapStatusToColor(activityStatus)}}" >{{activityStatusMissions[0].missionStatus.description}}</md-subheader> -->
+              <md-subheader class="md-no-sticky {{mapStatusToColor(activityStatus)}}" >{{activityStatusMissions[0].missionStatus.description}}</md-subheader>
               <md-list-item class="md-2-line" ng-repeat="document in documents">
                 <div class="md-list-item-text" style="max-height:50px">
                   <p>{{document.content}}</p>
@@ -15,10 +15,10 @@
             </md-list>
           </md-card-content>
         </md-card>
-      </div>
+      </div> -->
       <div layout="column" flex="80">
         <div flex>
-          <div id="overviewMap" element-ready="onMapContainerReady()" style="padding:10px; position:absolute; width:77%; height:90%;"></div>
+          <div id="overviewMap" element-ready="onMapContainerReady()" style="padding:10px; position:absolute; width:95%; height:90%;"></div>
         </div>
       </div>
     </div>

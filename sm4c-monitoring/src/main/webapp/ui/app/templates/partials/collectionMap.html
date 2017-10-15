@@ -1,10 +1,10 @@
-<div layout="row" ng-controller="CollectionMapCtrl">
-  <div>
+<div layout="column" ng-controller="CollectionMapCtrl">
+  <!-- <div>
     <md-card>
       <md-card-content>
-        <md-list style="width:300px">
+        <md-list style="width:300px"> -->
           <!-- <md-subheader class="md-no-sticky {{mapStatusToColor(activityStatus)}}" >{{activityStatusMissions[0].missionStatus.description}}</md-subheader> -->
-          <md-list-item class="md-2-line" ng-repeat="document in documents">
+          <!-- <md-list-item class="md-2-line" ng-repeat="document in documents">
             <div class="md-list-item-text" style="max-height:50px">
               <p>{{document.content}}</p>
             </div>
@@ -16,9 +16,9 @@
 
   </div>
   <div layout="column" flex>
-    <div>
+    <div> -->
       <!-- <md-button flex class="md-raised" ng-disabled="checkTrainingDataSize()" ng-click="test()">Test</md-button> -->
-      <md-slider-container>
+      <!-- <md-slider-container>
         <rzslider rz-slider-model="priceSlider"></rzslider>
       </md-slider-container>
     </div>
@@ -26,7 +26,30 @@
     <div>
       <div id="overviewMap" span element-ready="onMapContainerReady()" style="padding:10px; position:absolute; width:97%; height:90%;"></div>
     </div>
-  </div>
+  </div> -->
+  <rzslider class="custom-slider" rz-slider-model="slider.minValue" rz-slider-high="slider.maxValue" rz-slider-options="slider.options"></rzslider>
+    <div layout="row">
+      <!-- <div flex="20">
+        <md-card>
+          <md-card-content>
+            <md-list style="width:300px">
+              <md-subheader class="md-no-sticky {{mapStatusToColor(activityStatus)}}" >{{activityStatusMissions[0].missionStatus.description}}</md-subheader>
+              <md-list-item class="md-2-line" ng-repeat="document in documents">
+                <div class="md-list-item-text" style="max-height:50px">
+                  <p>{{document.content}}</p>
+                </div>
+                <md-divider ng-if="!$last"></md-divider>
+              </md-list-item>
+            </md-list>
+          </md-card-content>
+        </md-card>
+      </div> -->
+      <div layout="column" flex="80">
+        <div flex>
+          <div id="overviewMap" element-ready="onMapContainerReady()" style="padding:10px; position:absolute; width:95%; height:80%;"></div>
+        </div>
+      </div>
+    </div>
 
 
 </div>

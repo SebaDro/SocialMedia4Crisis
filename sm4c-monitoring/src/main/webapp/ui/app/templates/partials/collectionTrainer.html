@@ -29,7 +29,7 @@
           <h3>Modeldetails</h3>
           <pre>{{collection.modelSummary}}</pre>
         </md-content>
-        <p>Sie können weitere Trainingsdaten klassifizieren um das Model zu aktualisieren.</p>
+        <p class="md-subhead">Sie können weitere Trainingsdaten kategorisieren um das Model zu aktualisieren.</p>
       </div>
     </md-card-content>
   </md-card>
@@ -47,7 +47,7 @@
     <md-card-content layout="column" layout-align="space-between">
       <div layout="column" layout-margin>
         <h3>1) Auswahl der Trainingsdaten</h3>
-        <p>Wählen Sie zunächst aus, wieviele Trainingsdaten Sie klassifizieren möchten:</p>
+        <p class="md-subhead">Wählen Sie zunächst aus, wieviele Trainingsdaten Sie kategorisieren möchten:</p>
         <md-slider-container>
           <md-slider flex md-discrete step="100" min="0" max="{{collection.documentCount}}" ng-model="trainingSize" aria-label="trainingSize" id="sizeSlider" ng-change="sliderChanged()" ng-disabled="documents">
           </md-slider>
@@ -62,7 +62,7 @@
       <div layout="column" layout-margin>
         <h3>2) Klassifizierung</h3>
         <p ng-show="!documents">Es wurden noch keine Trainingsdaten ausgewählt</p>
-        <p ng-show="documents">Klassifizieren Sie die ausgewählten Nachrichten durch die Auswahl einer der vorgegebenen Labels:</p>
+        <p ng-show="documents" class="md-subhead">Kategorisieren Sie die ausgewählten Nachrichten durch die Auswahl einer der vorgegebenen Kategorien:</p>
         <div layout="row" layout-align="center center" layout-margin ng-show="documents">
           <div>
             <md-button class="md-raised" ng-click="previous()" ng-disabled="currentIndex == 0">
@@ -70,8 +70,10 @@
             </md-button>
           </div>
           <md-whiteframe class="md-whiteframe-1dp" layout-padding layout="column" style="height:400px">
-            <div class="document-div" layout-align="center start" layout="row" ng-repeat="document in documents | limitTo: 1 : currentIndex" flex>
-              <p>{{document.content}}</p>
+            <div class="document-div" layout-align="center start" layout="column" ng-repeat="document in documents | limitTo: 1 : currentIndex" flex>
+              <h3>{{document.facebookSource.name}}</h3>
+              <p class="md-body-1">{{document.content}}</p>
+              <p class="md-caption">Veröffentlichung: {{document.creationTime  | date : 'dd.MM.yyyy, HH:mm:ss' : '+0200'}} Uhr</p>
             </div>
             <md-divider></md-divider>
             <div layout="column">

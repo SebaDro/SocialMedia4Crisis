@@ -89,29 +89,36 @@ table.collection-content ul {
 table.collection-content li {
   display: inline;
 }
+
 table.collection-content li:not(:first-child):before {
-    content: " | ";
+  content: " | ";
 }
+
 md-toolbar {
   font-weight: 300;
   height: 45px;
   min-height: 45px;
   margin-bottom: 10px;
 }
+
 md-toolbar.overview {
   font-weight: 300;
   height: 45px;
   min-height: 45px;
 }
-div.collection-details{
+
+div.collection-details {
   margin-left: 20px;
 }
+
 .md-icon-button[disabled] svg {
   fill: rgba(0, 0, 0, 0.26);
 }
+
 .md-button[disabled] svg {
   fill: rgba(0, 0, 0, 0.26);
 }
+
 .document-div {
   width: 400px;
   overflow-y: scroll;
@@ -129,6 +136,7 @@ div.collection-details{
   background: #f3e0e0;
   height: 4px;
 }
+
 .custom-slider.rzslider .rz-selection {
   background: #990000;
 }
@@ -143,4 +151,20 @@ div.collection-details{
 
 .custom-slider.rzslider .rz-tick.rz-selected {
   background: #990000;
+}
+
+.esriViewPopup .header {
+  background-color: #f3e0e0;
+}
+
+.esriPopup h3 {
+  margin: 0;
+}
+
+.esriPopup .title {
+  margin: 0;
+}
+
+.esriPopup .timeInfo {
+  color: grey
 }

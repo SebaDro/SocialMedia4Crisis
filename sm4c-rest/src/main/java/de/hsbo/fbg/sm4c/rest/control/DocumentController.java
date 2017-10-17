@@ -54,13 +54,14 @@ public class DocumentController implements InitializingBean {
     @Autowired
     private MessageDocumentEncoder messageDocumentEncoder;
 
+    @Autowired
     DocumentDaoFactory documentDaoFactory;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        MongoDatabaseConnection con = new MongoDatabaseConnection();
-        con.afterPropertiesSet();
-        documentDaoFactory = new MongoDocumentDaoFactory(con);
+//        MongoDatabaseConnection con = new MongoDatabaseConnection();
+//        con.afterPropertiesSet();
+//        documentDaoFactory = new MongoDocumentDaoFactory(con);
     }
 
     @RequestMapping(value = "/collections/{id}/documents", method = RequestMethod.POST)
@@ -114,8 +115,8 @@ public class DocumentController implements InitializingBean {
         }
     }
 
-    @RequestMapping(value = "/collections/{id}/documents/labeled/limit/{limit}", method = RequestMethod.GET)
-    public List<MessageDocumentView> getLabeledCollectionDocuments(@PathVariable("id") String id, @PathVariable("limit") String limit) throws RessourceNotFoundException {
+    @RequestMapping(value = "/collections/{id}/documents/labeled", method = RequestMethod.GET)
+    public List<MessageDocumentView> getLabeledCollectionDocuments(@PathVariable("id") String id) throws RessourceNotFoundException {
         List<MessageDocumentView> result = new ArrayList();
 
         try (Session session = daoFactory.initializeContext()) {
@@ -131,11 +132,6 @@ public class DocumentController implements InitializingBean {
                     throw new RessourceNotFoundException("There are no labeled documents");
                 }
 
-                Random random = new Random();
-                random.setSeed(42);
-                Collections.shuffle(documents, random);
-
-                documents = documents.subList(0, Integer.parseInt(limit));
                 result = documents.stream()
                         .map(d -> messageDocumentEncoder.encode(d))
                         .collect(Collectors.toList());

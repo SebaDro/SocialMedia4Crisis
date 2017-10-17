@@ -38,6 +38,6 @@
     <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory" />
     <!-- Mongo-->
     <bean class="de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection"/>
-    <bean class="de.hsbo.fbg.sm4c.common.dao.mongo.MongoSimulationDatabaseConnection"/>
+    <bean class="de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory" />
        
 </beans>

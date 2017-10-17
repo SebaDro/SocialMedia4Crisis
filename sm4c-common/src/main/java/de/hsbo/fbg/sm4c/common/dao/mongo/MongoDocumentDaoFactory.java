@@ -5,26 +5,35 @@
  */
 package de.hsbo.fbg.sm4c.common.dao.mongo;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder;
+import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
+import org.hibernate.Session;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author Sebastian Drost
  */
-public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollection> {
-//    @Autowired
+public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollection>, InitializingBean {
+
+    @Autowired
     private MongoDatabaseConnection mongoConnection;
+//    @Autowired
+//    private DaoFactory<Session> daoFactory;
+    @Autowired
+    private MessageDocumentDecoder messageDocumentDecoder;
 
     private MongoDatabase database;
 
-    public MongoDocumentDaoFactory() {
-        database = mongoConnection.getDatabase();
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.database = mongoConnection.getDatabase();
     }
 
     public MongoDocumentDaoFactory(MongoDatabaseConnection connection) {
@@ -34,7 +43,7 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
 
     @Override
     public MessageDocumentDao createMessageDocumentDao(MongoCollection daoContext) {
-        return new MongoMessageDocumentDao(daoContext);
+        return new MongoMessageDocumentDao(daoContext, messageDocumentDecoder);
     }
 
     public MongoCollection getContext(Collection collection) {
@@ -44,5 +53,7 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
     public MongoCollection getContext(String collection) {
         return database.getCollection(collection);
     }
+
+
 
 }

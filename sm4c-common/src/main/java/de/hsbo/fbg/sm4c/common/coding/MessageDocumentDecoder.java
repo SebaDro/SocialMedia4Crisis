@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.bson.Document;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class for decoding Faceook messages
@@ -37,17 +38,22 @@ public class MessageDocumentDecoder {
 
     private static final Logger LOGGER = LogManager.getLogger(MessageDocumentDecoder.class);
 
+    @Autowired
     private DaoFactory<Session> daoFactory;
 
     public MessageDocumentDecoder() {
-        HibernateDatabaseConnection dbc = new HibernateDatabaseConnection();
-        try {
-            dbc.afterPropertiesSet();
-        } catch (Exception ex) {
-            LOGGER.error("Could not instantiate DB connection", ex);
-        }
-        daoFactory = new HibernateDaoFactory(dbc);
+
     }
+
+//    public MessageDocumentDecoder() {
+//        HibernateDatabaseConnection dbc = new HibernateDatabaseConnection();
+//        try {
+//            dbc.afterPropertiesSet();
+//        } catch (Exception ex) {
+//            LOGGER.error("Could not instantiate DB connection", ex);
+//        }
+//        daoFactory = new HibernateDaoFactory(dbc);
+//    }
 
     /**
      * Decodes a MongoDB document to a FacebookMessage

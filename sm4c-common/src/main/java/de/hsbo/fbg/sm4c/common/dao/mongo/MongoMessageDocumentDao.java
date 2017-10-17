@@ -37,10 +37,10 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     private final MessageDocumentEncoder messageDocEncoder;
     private final MessageDocumentDecoder messageDocDecoder;
 
-    public MongoMessageDocumentDao(MongoCollection dbCollection) {
+    public MongoMessageDocumentDao(MongoCollection dbCollection, MessageDocumentDecoder messageDocDecoder) {
         this.dbCollection = dbCollection;
-        messageDocEncoder = new MessageDocumentEncoder();
-        messageDocDecoder = new MessageDocumentDecoder();
+        this.messageDocEncoder = new MessageDocumentEncoder();
+        this.messageDocDecoder = messageDocDecoder;
     }
 
     public MongoMessageDocumentDao(String dbHost, int dbPort, String dbName, String dbCollection) {
@@ -104,7 +104,10 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     @Override
     public List<MessageDocument> retrieveLabeledData() {
         FindIterable<Document> documents = dbCollection.find(
-                Filters.not(Filters.eq("label", "")));
+                Filters.and(
+                        Filters.eq("training", false),
+                        Filters.not(Filters.eq("label", ""))
+                ));
         List<MessageDocument> messages = messageDocDecoder.decodeFacebookMessages(documents);
         return messages;
     }

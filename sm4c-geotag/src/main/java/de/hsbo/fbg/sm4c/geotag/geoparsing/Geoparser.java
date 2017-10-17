@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.geotag;
+package de.hsbo.fbg.sm4c.geotag.geoparsing;
 
 import de.hsbo.fbg.common.config.Configuration;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geonames.InvalidParameterException;
 import org.geonames.Toponym;
 import org.geonames.ToponymSearchCriteria;
@@ -25,13 +26,13 @@ import org.geonames.WebService;
  *
  * @author Sebastian Drost
  */
-public class LocationRecognizer {
+public class Geoparser {
 
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(LocationRecognizer.class);
+    private static final Logger LOGGER = LogManager.getLogger(Geoparser.class);
 
     private StanfordCoreNLP pipeline;
 
-    public LocationRecognizer() {
+    public Geoparser() {
         Properties props = PropertiesUtils.asProperties(
                 "annotators", "tokenize, ssplit, pos, lemma, ner, entitymentions",
                 "ssplit.isOneSentence", "true",
@@ -40,7 +41,6 @@ public class LocationRecognizer {
                 "tokenize.language", "de",
                 "ner.useSUTime", "false");
         this.pipeline = new StanfordCoreNLP(props);
-        WebService.setUserName(Configuration.getConfig().getPropertyValue("geonames_user"));
     }
 
     public List<String> recognizeLocationsExtended(String text) {

@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.geoparsing;
+package de.hsbo.fbg.sm4c.geotag.geoparsing;
 
 import de.hsbo.fbg.sm4c.common.model.geonames.Geoname;
-import de.hsbo.fbg.sm4c.geotag.GeonameNode;
+import de.hsbo.fbg.sm4c.geotag.geocoding.GeonameNode;
 import java.util.ArrayList;
 import java.util.List;
 

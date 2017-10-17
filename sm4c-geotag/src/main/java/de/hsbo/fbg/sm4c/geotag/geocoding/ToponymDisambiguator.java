@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.hsbo.fbg.sm4c.geotag;
+package de.hsbo.fbg.sm4c.geotag.geocoding;
 
 import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.geonames.GeonameDao;
@@ -11,7 +11,7 @@ import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.model.geonames.Geoname;
 import de.hsbo.fbg.sm4c.common.model.geonames.GeonameEntity;
-import de.hsbo.fbg.sm4c.geoparsing.AmbiguityToponym;
+import de.hsbo.fbg.sm4c.geotag.geoparsing.AmbiguityToponym;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

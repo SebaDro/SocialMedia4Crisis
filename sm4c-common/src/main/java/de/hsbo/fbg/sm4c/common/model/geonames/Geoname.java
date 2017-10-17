@@ -56,7 +56,15 @@ public class Geoname extends GeonameEntity {
 
     @Override
     public GeonameEntity getParent() {
-        if (this.getAdmin4() != null) {
+        if (this.getFeatureCode().equals("ADM4") || this.getFeatureCode().equals("ADM4H")) {
+            return this.getAdmin4().getParent();
+        } else if (this.getFeatureCode().equals("ADM3") || this.getFeatureCode().equals("ADM3H")) {
+            return this.getAdmin3().getParent();
+        } else if (this.getFeatureCode().equals("ADM2") || this.getFeatureCode().equals("ADM2H")) {
+            return this.getAdmin2().getParent();
+        } else if (this.getFeatureCode().equals("ADM1") || this.getFeatureCode().equals("ADM1H")) {
+            return this.getAdmin2().getParent();
+        } else if (this.getAdmin4() != null) {
             return this.getAdmin4();
         } else if (this.getAdmin3() != null) {
             return this.getAdmin3();

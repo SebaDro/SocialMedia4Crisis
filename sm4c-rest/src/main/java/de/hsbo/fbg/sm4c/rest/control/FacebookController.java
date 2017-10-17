@@ -5,7 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.rest.control;
 
-import de.hsbo.fbg.sm4c.collect.FacebookApi;
+import de.hsbo.fbg.sm4c.collect.FacebookWrapper;
 import de.hsbo.fbg.sm4c.rest.coding.FacebookSourceEncoder;
 import de.hsbo.fbg.sm4c.rest.view.FacebookSourceView;
 import de.hsbo.fbg.sm4c.rest.view.KeywordView;
@@ -35,11 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class FacebookController implements InitializingBean {
 
     private static final Logger LOGGER = LogManager.getLogger(FacebookController.class);
-    
+
     @Autowired
     FacebookSourceEncoder fbSourceEncoder;
 
-    private FacebookApi fbApi;
+    private FacebookWrapper fbApi;
 
     @RequestMapping(value = "/groups/{keywords}/json", method = RequestMethod.GET)
     public String getGroupsAsJSON(@PathVariable("keywords") String keywords) {
@@ -81,6 +81,12 @@ public class FacebookController implements InitializingBean {
         return groups;
     }
 
+    @RequestMapping(produces = {"text/csv"}, value = "/pages/{keywords}/csv", method = RequestMethod.GET)
+    public String getPagesAsCSV(@PathVariable("keywords") String keywords) {
+        String pages = fbApi.getPagesAsCSV(keywords);
+        return pages;
+    }
+
     @RequestMapping(value = "/pages/{keywords}", method = RequestMethod.GET)
     public String getPages(@PathVariable("keywords") String keywords) {
         String pages = fbApi.getPagesAsJSON(keywords);
@@ -98,7 +104,6 @@ public class FacebookController implements InitializingBean {
 //                new DateTime(endTime).toDate());
 //        return posts;
 //    }
-
 //    @RequestMapping(value = "/pages/{keywords}/posts/startTime/{startTime}/endTime/{endTime}",
 //            method = RequestMethod.GET)
 //    public String getPostsFromPages(@PathVariable("keywords") String keywords,
@@ -110,10 +115,9 @@ public class FacebookController implements InitializingBean {
 //                new DateTime(endTime).toDate());
 //        return posts;
 //    }
-
     @Override
     public void afterPropertiesSet() throws Exception {
-        fbApi = new FacebookApi();
+        fbApi = new FacebookWrapper();
     }
 
 }

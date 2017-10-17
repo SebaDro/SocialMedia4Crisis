@@ -30,16 +30,16 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Sebastian Drost
  */
-public class FacebookApi {
+public class FacebookWrapper {
 
-    private static final Logger LOGGER = LogManager.getLogger(FacebookApi.class);
+    private static final Logger LOGGER = LogManager.getLogger(FacebookWrapper.class);
 
     private final int GROUP_LIMIT = 10000;
     private final int PAGE_LIMIT = 1000;
     private final int GROUP_POST_LIMIT = 1000;
     private final int PAGE_POST_LIMIT = 100;
     private final String GROUP_FIELDS[] = {"id", "description", "email", "name", "privacy", "updated_time", "city"};
-    private final String PAGE_FIELDS[] = {"id", "description", "emails", "about", "category", "location", "name"};
+    private final String PAGE_FIELDS[] = {"id", "created_time", "description", "emails", "about", "category", "location", "name"};
     private final String POST_FIELDS[] = {"id", "created_time", "description", "link", "type", "updated_time", "caption", "from", "likes", "message", "parent_id", "picture", "place", "reactions"};
 
     private final Facebook facebook;
@@ -51,7 +51,7 @@ public class FacebookApi {
     private final int groupPostLimit;
     private final int pagePostLimit;
 
-    public FacebookApi() {
+    public FacebookWrapper() {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
@@ -62,7 +62,7 @@ public class FacebookApi {
         pagePostLimit = PAGE_POST_LIMIT;
     }
 
-    public FacebookApi(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
+    public FacebookWrapper(int groupLimit, int pageLimit, int groupPostLimit, int pagePostLimit) {
         this.facebook = new FacebookFactory().getInstance();
         gson = new Gson();
         fbCsvEncoder = new FacebookCSVEncoder();
@@ -86,6 +86,20 @@ public class FacebookApi {
                     .limit(groupLimit)
                     .fields(GROUP_FIELDS));
             groups.removeIf(g -> g.getPrivacy() == GroupPrivacyType.CLOSED);
+            result = groups.stream().collect(Collectors.toList());
+            LOGGER.info("Retrieved groups for keywords [" + keywords + "]: " + groups.size());
+        } catch (FacebookException ex) {
+            LOGGER.error("Could not search for groups", ex);
+        }
+        return result;
+    }
+    
+        public List<Group> getAllGroups(String keywords) {
+        List result = new ArrayList();
+        try {
+            ResponseList<Group> groups = facebook.searchGroups(keywords, new Reading()
+                    .limit(groupLimit)
+                    .fields(GROUP_FIELDS));
             result = groups.stream().collect(Collectors.toList());
             LOGGER.info("Retrieved groups for keywords [" + keywords + "]: " + groups.size());
         } catch (FacebookException ex) {
@@ -118,6 +132,19 @@ public class FacebookApi {
         List<Group> groups = getGroups(keywords);
         String groupsCsv = fbCsvEncoder.createGroupCSV(groups);
         return groupsCsv;
+    }
+
+    /**
+     * Search for facebook pages whose names contain the specified keyords and
+     * encodes the result to CSV.
+     *
+     * @param keywords keywords to search for
+     * @return List of facebook groups as JSON
+     */
+    public String getPagesAsCSV(String keywords) {
+        List<Page> pages = getPages(keywords);
+        String pagesCsv = fbCsvEncoder.createPageCSV(pages);
+        return pagesCsv;
     }
 
     /**

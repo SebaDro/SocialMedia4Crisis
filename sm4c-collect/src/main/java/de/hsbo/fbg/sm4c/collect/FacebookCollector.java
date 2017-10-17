@@ -24,12 +24,12 @@ public class FacebookCollector implements Collector {
     private static final Logger LOGGER = LogManager.getLogger(FacebookCollector.class);
     
     private Collection collection;
-    private FacebookApi api;
+    private FacebookWrapper api;
     private FacebookDecoder decoder;
 
     public FacebookCollector(Collection collection) {
         this.collection = collection;
-        this.api = new FacebookApi();
+        this.api = new FacebookWrapper();
         this.decoder = new FacebookDecoder();
     }
 

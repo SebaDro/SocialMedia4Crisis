@@ -6,6 +6,7 @@
 package de.hsbo.fbg.sm4c.collect.encode;
 
 import facebook4j.Group;
+import facebook4j.Page;
 import java.util.List;
 
 /**
@@ -25,7 +26,23 @@ public class FacebookCSVEncoder {
             builder.append(g.getUpdatedTime());
             builder.append(System.getProperty("line.separator"));
         });
-        builder.setLength(builder.length()-1);
+        builder.setLength(builder.length() - 1);
+        String result = builder.toString();
+        return result;
+    }
+
+    public String createPageCSV(List<Page> facebookGroups) {
+        StringBuilder builder = new StringBuilder("id;name;created_time");
+        builder.append(System.getProperty("line.separator"));
+        facebookGroups.forEach(p -> {
+            builder.append(p.getId());
+            builder.append(";");
+            builder.append(p.getName());
+            builder.append(";");
+            builder.append(p.getCreatedTime());
+            builder.append(System.getProperty("line.separator"));
+        });
+        builder.setLength(builder.length() - 1);
         String result = builder.toString();
         return result;
     }

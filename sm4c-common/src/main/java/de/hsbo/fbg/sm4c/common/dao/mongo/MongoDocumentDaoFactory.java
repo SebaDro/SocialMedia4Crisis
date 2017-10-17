@@ -24,8 +24,7 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
 
     @Autowired
     private MongoDatabaseConnection mongoConnection;
-//    @Autowired
-//    private DaoFactory<Session> daoFactory;
+
     @Autowired
     private MessageDocumentDecoder messageDocumentDecoder;
 
@@ -53,7 +52,5 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
     public MongoCollection getContext(String collection) {
         return database.getCollection(collection);
     }
-
-
 
 }

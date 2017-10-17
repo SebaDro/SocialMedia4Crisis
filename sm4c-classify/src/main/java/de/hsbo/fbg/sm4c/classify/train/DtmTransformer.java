@@ -5,20 +5,9 @@
  */
 package de.hsbo.fbg.sm4c.classify.train;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.logging.log4j.LogManager;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.stemmers.SnowballStemmer;
-import weka.core.stemmers.Stemmer;
-import weka.core.stopwords.StopwordsHandler;
-import weka.core.stopwords.WordsFromFile;
-import weka.core.tokenizers.Tokenizer;
-import weka.core.tokenizers.WordTokenizer;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 

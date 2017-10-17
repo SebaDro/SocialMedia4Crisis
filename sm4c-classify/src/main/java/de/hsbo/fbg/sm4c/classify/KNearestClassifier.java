@@ -9,6 +9,8 @@ import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import org.apache.logging.log4j.LogManager;
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
+import weka.core.SelectedTag;
+import weka.core.neighboursearch.KDTree;
 
 /**
  *
@@ -17,10 +19,15 @@ import weka.classifiers.lazy.IBk;
 public class KNearestClassifier extends AbstractClassifier {
 
     private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(KNearestClassifier.class);
-    private int k = 1;
+    private static final int K = 7;
+
+    private int k;
 
     public KNearestClassifier() {
         super();
+        this.k = K;
+        transformer.getFilter().setOutputWordCounts(true);
+        transformer.getFilter().setIDFTransform(true);
     }
 
     public KNearestClassifier(Classifier classifier, Dataset trainingData) {
@@ -32,9 +39,17 @@ public class KNearestClassifier extends AbstractClassifier {
         ((IBk) classifier).setKNN(k);
     }
 
+    public void useKDTree() throws Exception {
+        KDTree tree = new KDTree();
+        tree.setInstances(this.getTrainingData().getModelDataset());
+        ((IBk) classifier).setNearestNeighbourSearchAlgorithm(tree);
+    }
+
     @Override
     protected Classifier instantiateClassifier() {
-        return new IBk(k);
+        IBk ibk = new IBk(k);
+        ibk.setDistanceWeighting(new SelectedTag(IBk.WEIGHT_INVERSE, IBk.TAGS_WEIGHTING));
+        return ibk;
     }
 
 }

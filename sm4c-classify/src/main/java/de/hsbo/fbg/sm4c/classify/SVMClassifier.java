@@ -9,6 +9,7 @@ import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import org.apache.logging.log4j.LogManager;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.SMO;
+import weka.classifiers.functions.supportVector.PolyKernel;
 
 /**
  *
@@ -28,7 +29,13 @@ public class SVMClassifier extends AbstractClassifier {
 
     @Override
     protected Classifier instantiateClassifier() {
-        return new SMO();
+        SMO smo = new SMO();
+        PolyKernel kernel = new PolyKernel();
+        kernel.setExponent(1);
+        smo.setC(1);
+        smo.setKernel(kernel);
+
+        return smo;
     }
 
 }

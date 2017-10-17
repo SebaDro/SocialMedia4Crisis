@@ -7,8 +7,6 @@ package de.hsbo.fbg.sm4c.classify;
 
 import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.SMO;
-import weka.classifiers.lazy.IBk;
 
 /**
  *

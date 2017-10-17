@@ -16,13 +16,9 @@ import de.hsbo.fbg.sm4c.classify.train.Dataset;
 import de.hsbo.fbg.sm4c.classify.train.DocumentTermMatrix;
 import de.hsbo.fbg.sm4c.classify.train.DtmTransformer;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Random;
-import java.util.jar.Attributes;
 import org.apache.logging.log4j.LogManager;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -32,8 +28,6 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.stemmers.SnowballStemmer;
 import weka.core.stemmers.Stemmer;
-import weka.core.stopwords.WordsFromFile;
-import weka.core.tokenizers.NGramTokenizer;
 import weka.core.tokenizers.WordTokenizer;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 
@@ -167,36 +161,20 @@ public abstract class AbstractClassifier {
 
     protected DtmTransformer createBasicTransformer() {
         StringToWordVector filter = new StringToWordVector();
-        //downcase tokens
-//        filter.setLowerCaseTokens(true);
 
         //binary weighting of word occurence
         filter.setOutputWordCounts(false);
 
         //Set german Snowball stemmer
-//        SnowballStemmer stemmer = new SnowballStemmer("german");
-//        filter.setStemmer((Stemmer) stemmer);
+        SnowballStemmer stemmer = new SnowballStemmer("german");
+        filter.setStemmer((Stemmer) stemmer);
+
         //Set tokenizer per word
-//        NGramTokenizer tokenizer = new NGramTokenizer();
-//        tokenizer.setNGramMinSize(2);
-//        tokenizer.setNGramMaxSize(2);
         WordTokenizer tokenizer = new WordTokenizer();
         filter.setTokenizer(tokenizer);
 
         filter.setWordsToKeep(20000);
 
-        //Set stopwords from a file
-//        WordsFromFile stopwordHandler = new WordsFromFile();
-//        URL url = this.getClass().getClassLoader().getResource(DEFAULT_STOP_WORD_LIST);
-//        File stopWordFile;
-//        try {
-//            stopWordFile = new File(url.toURI());
-//            stopwordHandler.setStopwords(stopWordFile);
-//            filter.setStopwordsHandler(stopwordHandler);
-//
-//        } catch (URISyntaxException ex) {
-//            LOGGER.error("Could not load stop words", ex);
-//        }
         return new DtmTransformer(filter);
     }
 

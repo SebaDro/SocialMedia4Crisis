@@ -6,7 +6,9 @@
 package de.hsbo.fbg.sm4c.common.dao.mongo;
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import de.hsbo.fbg.sm4c.common.coding.MessageDocumentEncoder;
+import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
+import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.FacebookSource;
@@ -20,30 +22,36 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
+import de.hsbo.fbg.sm4c.common.model.Location;
+import java.util.ArrayList;
+import java.util.List;
+import org.hibernate.Session;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Sebastian Drost
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"file:src/test/resources/application-context-test.xml"})
 public class MongoDaoIT {
-    
-    private MongoDocumentDaoFactory documentDaoFactory;
+
+    @Autowired
+    DocumentDaoFactory documentDaoFactory;
+
     private MessageDocumentDao documentDao;
-    
-    @Before
-    public void setup() {
-        MongoDatabaseConnection con = new MongoDatabaseConnection();
-        con.afterPropertiesSet();
-//        MongoDatabase db = con.getDatabase();
-        documentDaoFactory = new MongoDocumentDaoFactory(con);
-    }
-    
+
     @Test
     public void roundTrip() {
         Collection col = new Collection();
         col.setName("Test Collection");
-        MongoCollection mongoCol = documentDaoFactory.getContext(col);
-        documentDao = documentDaoFactory.createMessageDocumentDao(mongoCol);
+        MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(col);
+
+        documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
+
         FacebookMessageDocument document = new FacebookMessageDocument();
         document.setContent("Test content");
         DateTime dt = DateTime.parse("May 28, 2013 11:21:54 PM",
@@ -65,9 +73,11 @@ public class MongoDaoIT {
         document.setType("Link");
         document.setUpdateTime(dt);
         document.setService("Facebook");
-        
+        List<Location> locations = new ArrayList();
+        document.setLocations(locations);
+
         documentDao.store(document);
-        
+
         Assert.assertThat(documentDao.retrieve().isEmpty(), CoreMatchers.equalTo(false));
         Assert.assertThat(documentDao.retrieve().size(), CoreMatchers.equalTo(1));
         Assert.assertThat(documentDao.exists(document), CoreMatchers.equalTo(true));
@@ -75,15 +85,14 @@ public class MongoDaoIT {
                 CoreMatchers.equalTo(document.getId()));
 //        Assert.assertThat(fbDao.getValuesForTimeSpan(startDate.toDate(), endDate.toDate()).size(), CoreMatchers.equalTo(messages.size()));
         document.setLabel("non relief");
-        documentDao.update(document,"label");
-        
+        documentDao.update(document, "label");
+
         Assert.assertThat(documentDao.retrieveById(document.getId()).getLabel(),
                 CoreMatchers.equalTo(document.getLabel()));
     }
-    
+
     @After
     public void shutDown() {
         documentDao.removeAll();
     }
-    
 }

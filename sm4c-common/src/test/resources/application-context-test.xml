@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:ctx="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+    
+    <mvc:annotation-driven />
+    <ctx:annotation-config />
+    
+    <!-- static resources -->
+    <mvc:resources mapping="/ui/**" location="/ui/"/>
+    
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver" />
+        <property name="url" value="jdbc:postgresql://localhost:5432/sm4c" />
+        <property name="username" value="postgres" />
+        <property name="password" value="postgres" />
+    </bean>
+    
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.CollectionDecoder" />
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.CollectionEncoder"/>
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.ModelEncoder"/>
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder"/>
+    <bean class="de.hsbo.fbg.sm4c.rest.coding.FacebookSourceEncoder"/>
+    <bean class="de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder"/>
+    <bean class="de.hsbo.fbg.sm4c.collect.encode.FacebookDecoder"/>
+    
+    
+    <!-- hibernate -->    
+    <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection" />
+    <bean class="de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory" />
+    <!-- Mongo-->
+    <bean class="de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection"/>
+    <bean class="de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory" />
+       
+</beans>

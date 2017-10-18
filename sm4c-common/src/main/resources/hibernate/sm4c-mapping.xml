@@ -151,16 +151,16 @@
         <property name="featureCode" column="fcode" type="string"/>
         <property name="population" column="population" type="long"/>
         <many-to-one name="admin1" column="admin1_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin1"
-                     foreign-key="fk_admin1" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin1" fetch="select"  cascade="save-update">
         </many-to-one>
         <many-to-one name="admin2" column="admin2_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin2"
-                     foreign-key="fk_admin2" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin2" fetch="select"  cascade="save-update">
         </many-to-one>
         <many-to-one name="admin3" column="admin3_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin3"
-                     foreign-key="fk_admin3" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin3" fetch="select"  cascade="save-update">
         </many-to-one>
         <many-to-one name="admin4" column="admin4_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin4"
-                     foreign-key="fk_admin4" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin4" fetch="select"  cascade="save-update">
         </many-to-one>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.geonames.Admin1" table="admin1" >
@@ -194,7 +194,7 @@
         <property name="featureCode" column="fcode" type="string"/>
         <property name="population" column="population" type="long"/>
         <many-to-one name="admin1" column="admin1_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin1"
-                     foreign-key="fk_admin1" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin1" fetch="select"  cascade="save-update">
         </many-to-one>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.geonames.Admin3" table="admin3" >
@@ -215,10 +215,10 @@
         <property name="featureCode" column="fcode" type="string"/>
         <property name="population" column="population" type="long"/>
         <many-to-one name="admin2" column="admin2_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin2"
-                     foreign-key="fk_admin2" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin2"  fetch="select" cascade="save-update">
         </many-to-one>
         <many-to-one name="admin1" column="admin1_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin1"
-                     foreign-key="fk_admin1" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin1"  fetch="select"  cascade="save-update">
         </many-to-one>
     </class>
     <class name="de.hsbo.fbg.sm4c.common.model.geonames.Admin4" table="admin4" >
@@ -237,7 +237,7 @@
         <property name="population" column="population" type="long"/>
         <!--<property name="admin4" column="admin4" type="string"/>-->   
         <many-to-one name="admin3" column="admin3_id" class="de.hsbo.fbg.sm4c.common.model.geonames.Admin3"
-                     foreign-key="fk_admin3" lazy="false" fetch="join" cascade="save-update">
+                     foreign-key="fk_admin3" fetch="select"  cascade="save-update">
         </many-to-one>
     </class>
     <!--

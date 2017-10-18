@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.geotag.geocoding;
 
+import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,8 @@ public class FeatureServicePersister {
         featureCreator = new FeatureCreator();
     }
 
-    public ResponseEntity<String> addDocumentAsFeature(MessageDocument document) {
-        String featureValue = featureCreator.createFeature(document);
+    public void addDocumentAsFeature(MessageDocument document, Collection collection) {
+        String featureValue = featureCreator.createFeature(document, collection);
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
         map.add(F_PARAM, F_VALUE);
@@ -56,8 +57,8 @@ public class FeatureServicePersister {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.postForEntity(featureServiceUrl, request, String.class);
-
-        return response;
+        LOG.info("Document " + document.getId() + " has been added to FeatureService wirh response code: " + response.getStatusCodeValue());
+//        return response;
     }
 
 }

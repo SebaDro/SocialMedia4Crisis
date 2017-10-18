@@ -9,6 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.hsbo.fbg.sm4c.common.model.Collection;
+import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,12 +29,13 @@ class FeatureCreator {
         mapper = new ObjectMapper();
     }
 
-    public String createFeature(MessageDocument document) {
+    public String createFeature(MessageDocument document, Collection collection) {
         String result = null;
         ArrayNode featuresNode = mapper.createArrayNode();
         ObjectNode attributeNode = mapper.createObjectNode();
         attributeNode.put("messageid", document.getId());
-//            attributeNode.put("collection", "test");
+        attributeNode.put("collection", collection.getName());
+        attributeNode.put("collectionId", collection.getId());
         attributeNode.put("creation", document.getCreationTime().toString());
         document.getLocations().forEach(l -> {
             ObjectNode featureNode = mapper.createObjectNode();

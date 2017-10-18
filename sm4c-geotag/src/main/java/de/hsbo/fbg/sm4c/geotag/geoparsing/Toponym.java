@@ -14,12 +14,12 @@ import java.util.List;
  *
  * @author Sebastian Drost
  */
-public class AmbiguityToponym {
+public class Toponym {
 
     private String toponym;
     private List<GeonameNode> candidates;
 
-    public AmbiguityToponym(String toponym) {
+    public Toponym(String toponym) {
         this.toponym = toponym;
         candidates = new ArrayList();
     }

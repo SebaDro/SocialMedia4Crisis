@@ -5,7 +5,8 @@
  */
 package de.hsbo.fbg.sm4c.geotag.geoparsing;
 
-import de.hsbo.fbg.common.config.Configuration;
+import de.hsbo.fbg.sm4c.geotag.nlp.NlpTagger;
+import de.hsbo.fbg.sm4c.geotag.nlp.NlpTags;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -16,11 +17,6 @@ import java.util.List;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geonames.InvalidParameterException;
-import org.geonames.Toponym;
-import org.geonames.ToponymSearchCriteria;
-import org.geonames.ToponymSearchResult;
-import org.geonames.WebService;
 
 /**
  *
@@ -31,6 +27,7 @@ public class Geoparser {
     private static final Logger LOGGER = LogManager.getLogger(Geoparser.class);
 
     private StanfordCoreNLP pipeline;
+    private NlpTagger nlpTagger;
 
     public Geoparser() {
         Properties props = PropertiesUtils.asProperties(
@@ -41,71 +38,49 @@ public class Geoparser {
                 "tokenize.language", "de",
                 "ner.useSUTime", "false");
         this.pipeline = new StanfordCoreNLP(props);
+        this.nlpTagger = new NlpTagger();
     }
 
-    public List<String> recognizeLocationsExtended(String text) {
-        List<String> result = new ArrayList();
+    public List<Toponym> recognizeLocationsExtended(String text) {
+        List<Toponym> result = new ArrayList();
 
-        List<NamedEntity> entities = tagNamedEntities(text);
-        entities.forEach(e -> {
-            //if named entity annotation has tagged value as location,
+        List<NlpTags> tags = nlpTagger.annotateText(text);
+        tags.forEach(t -> {
+            //if named entity annotation is a location,
             //add the value to the candidate list of locations
-            if (e.getTag().equals("LOC")) {
-                result.add(e.getValue());
+            if (t.getNe().equals("I-LOC")) {
+
+                result.add(new Toponym(t.getWord()));
             } //otherwise check if the value is indexed in geonames.org
             //and add it to candidates if true
-            else if (isLocation(e.getValue())) {
-                result.add(e.getValue());
+            else if (t.getPos().equals("NN") || t.getPos().equals("NE")) {
+                if (isLocation(t.getWord())) {
+                    result.add(new Toponym(t.getWord()));
+                }
             }
         });
+
         return result;
     }
 
-    public List<String> recognizeLocations(String text) {
-        List<String> result = new ArrayList();
+    public List<Toponym> recognizeLocations(String text) {
+        List<Toponym> result = new ArrayList();
 
-        List<NamedEntity> entities = tagNamedEntities(text);
-        entities.forEach(e -> {
-            //if named entity annotation has tagged value as location,
+        List<NlpTags> tags = nlpTagger.annotateText(text);
+        tags.forEach(t -> {
+            //if named entity annotation is a location,
             //add the value to the candidate list of locations
-            if (e.getTag().equals("LOC")) {
-                result.add(e.getValue());
+            if (t.getNe().equals("I-LOC")) {
+
+                result.add(new Toponym(t.getWord()));
             }
         });
+
         return result;
     }
 
     private boolean isLocation(String entity) {
         boolean result = false;
-        try {
-            ToponymSearchCriteria searchCriteria = new ToponymSearchCriteria();
-            searchCriteria.setNameEquals(entity);
-            searchCriteria.setCountryCode("DE");
-            searchCriteria.setMaxRows(1);
-            ToponymSearchResult searchResult = WebService.search(searchCriteria);
-            List<Toponym> topos = searchResult.getToponyms();
-            result = !topos.isEmpty();
-        } catch (InvalidParameterException ex) {
-            LOGGER.error("Country code is not supported", ex);
-        } catch (Exception ex) {
-            LOGGER.error("Search for geoname failed", ex);
-        }
-        return result;
-    }
-
-    public List<NamedEntity> tagNamedEntities(String text) {
-        Annotation document = new Annotation(text);
-        pipeline.annotate(document);
-        List<CoreMap> sentences = document.get(CoreAnnotations.SentencesAnnotation.class);
-        List<NamedEntity> result = new ArrayList();
-
-        sentences.forEach(s -> {
-            s.get(CoreAnnotations.MentionsAnnotation.class).forEach(em -> {
-                String value = em.get(CoreAnnotations.TextAnnotation.class);
-                String tag = em.get(CoreAnnotations.NamedEntityTagAnnotation.class);
-                result.add(new NamedEntity(value, tag));
-            });
-        });
         return result;
     }
 

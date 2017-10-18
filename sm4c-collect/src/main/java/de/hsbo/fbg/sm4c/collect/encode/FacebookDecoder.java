@@ -16,6 +16,7 @@ import facebook4j.Page;
 import facebook4j.Post;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.joda.time.DateTime;
 
@@ -42,7 +43,7 @@ public class FacebookDecoder {
         message.setUpdateTime(updateTime);
         message.setService(Services.FACEBOOK.toString());
         message.setTraining(false);
-        ArrayList<Location> locations = new ArrayList<Location>();
+        List<Location> locations = new ArrayList<Location>();
         if (post.getPlace() != null) {
             if (post.getPlace().getLocation().getLatitude() != null
                     && post.getPlace().getLocation().getLongitude() != null) {

@@ -5,6 +5,7 @@
  */
 package de.hsbo.fbg.sm4c.collect;
 
+import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import java.util.List;
 
@@ -14,5 +15,5 @@ import java.util.List;
  */
 public interface MessageHandler {
 
-    public void processMessages(List<MessageDocument> documents);
+    public void processMessages(List<MessageDocument> documents, Collection collection);
 }

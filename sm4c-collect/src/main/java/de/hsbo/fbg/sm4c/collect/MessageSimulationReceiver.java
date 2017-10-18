@@ -5,10 +5,9 @@
  */
 package de.hsbo.fbg.sm4c.collect;
 
+import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
@@ -27,12 +26,12 @@ public class MessageSimulationReceiver extends AbstractReceiver {
     private DateTime endTime;
 
     //simulation intervall in minutes
-    public MessageSimulationReceiver(Collector collector, int minutes) {
-        super(collector, minutes);
+    public MessageSimulationReceiver(Collector collector, int minutes, Collection collection) {
+        super(collector, minutes, collection);
     }
 
-    public MessageSimulationReceiver(Collector collector, int minutes, DateTime startTime, DateTime endTime) {
-        super(collector, minutes);
+    public MessageSimulationReceiver(Collector collector, int minutes, DateTime startTime, DateTime endTime, Collection collection) {
+        super(collector, minutes, collection);
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -45,7 +44,7 @@ public class MessageSimulationReceiver extends AbstractReceiver {
         while (!isInterrupted() && currentTime.isBefore(endTime)) {
             try {
                 List<MessageDocument> documents = collector.collectMessages(lastRetrieve.toDate(), currentTime.toDate());
-                fireMessagesReceived(documents);
+                fireMessagesReceived(documents, this.collection);
                 sleep(SIMULATION_INTERVAL);
                 lastRetrieve = currentTime;
                 currentTime = lastRetrieve.plusMinutes(interval);
@@ -55,18 +54,18 @@ public class MessageSimulationReceiver extends AbstractReceiver {
         }
     }
 
-    private void fireMessagesReceived(List<MessageDocument> documents) {
+    private void fireMessagesReceived(List<MessageDocument> documents, Collection collection) {
         handler.forEach(h -> {
-            h.processMessages(documents);
+            h.processMessages(documents, collection);
         });
     }
 
-    private void fireMessagesReceivedAsynchronous(List<MessageDocument> documents) {
+    private void fireMessagesReceivedAsynchronous(List<MessageDocument> documents, Collection collection) {
         handler.forEach(h -> {
             executor.submit(new Runnable() {
                 @Override
                 public void run() {
-                    h.processMessages(documents);
+                    h.processMessages(documents, collection);
                 }
             });
         });

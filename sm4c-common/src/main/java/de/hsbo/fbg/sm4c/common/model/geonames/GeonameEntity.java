@@ -8,8 +8,8 @@ package de.hsbo.fbg.sm4c.common.model.geonames;
 import de.hsbo.fbg.sm4c.common.model.AbstractEntity;
 
 /**
- *
- * @author Sebastian Drost
+ * 
+ * @author <a href="mailto:s.drost@52north.org">Sebastian Drost</a>
  */
 public abstract class GeonameEntity extends AbstractEntity {
 

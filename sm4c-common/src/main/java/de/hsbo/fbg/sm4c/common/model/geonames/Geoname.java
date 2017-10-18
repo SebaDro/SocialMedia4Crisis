@@ -8,8 +8,8 @@ package de.hsbo.fbg.sm4c.common.model.geonames;
 import de.hsbo.fbg.sm4c.common.model.AbstractEntity;
 
 /**
- *
- * @author Sebastian Drost
+ * 
+ * @author <a href="mailto:s.drost@52north.org">Sebastian Drost</a>
  */
 public class Geoname extends GeonameEntity {
 
@@ -56,13 +56,13 @@ public class Geoname extends GeonameEntity {
 
     @Override
     public GeonameEntity getParent() {
-        if (this.getFeatureCode().equals("ADM4") || this.getFeatureCode().equals("ADM4H")) {
+        if (this.getFeatureCode().equals("ADM4")) {
             return this.getAdmin4().getParent();
-        } else if (this.getFeatureCode().equals("ADM3") || this.getFeatureCode().equals("ADM3H")) {
+        } else if (this.getFeatureCode().equals("ADM3")) {
             return this.getAdmin3().getParent();
-        } else if (this.getFeatureCode().equals("ADM2") || this.getFeatureCode().equals("ADM2H")) {
+        } else if (this.getFeatureCode().equals("ADM2")) {
             return this.getAdmin2().getParent();
-        } else if (this.getFeatureCode().equals("ADM1") || this.getFeatureCode().equals("ADM1H")) {
+        } else if (this.getFeatureCode().equals("ADM1")) {
             return this.getAdmin2().getParent();
         } else if (this.getAdmin4() != null) {
             return this.getAdmin4();

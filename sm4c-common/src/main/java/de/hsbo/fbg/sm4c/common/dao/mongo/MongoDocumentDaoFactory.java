@@ -12,6 +12,7 @@ import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
+import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class MongoDocumentDaoFactory implements DocumentDaoFactory<MongoCollecti
     public MongoDocumentDaoFactory(MongoDatabaseConnection connection) {
         this.mongoConnection = connection;
         this.database = connection.getDatabase();
+        messageDocumentDecoder = new MessageDocumentDecoder(new HibernateDatabaseConnection());
     }
 
     @Override

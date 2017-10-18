@@ -45,15 +45,14 @@ public class MessageDocumentDecoder {
 
     }
 
-//    public MessageDocumentDecoder() {
-//        HibernateDatabaseConnection dbc = new HibernateDatabaseConnection();
-//        try {
-//            dbc.afterPropertiesSet();
-//        } catch (Exception ex) {
-//            LOGGER.error("Could not instantiate DB connection", ex);
-//        }
-//        daoFactory = new HibernateDaoFactory(dbc);
-//    }
+    public MessageDocumentDecoder(HibernateDatabaseConnection dbc) {
+        try {
+            dbc.afterPropertiesSet();
+        } catch (Exception ex) {
+            LOGGER.error("Could not instantiate DB connection", ex);
+        }
+        daoFactory = new HibernateDaoFactory(dbc);
+    }
 
     /**
      * Decodes a MongoDB document to a FacebookMessage
@@ -91,17 +90,17 @@ public class MessageDocumentDecoder {
                     message.setCreationTime(new DateTime(doc.getDate("creationTime")));
                     message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
                     List<Document> locDocs = (List<Document>) doc.get("locations");
+                    List<Location> locations = new ArrayList();
                     if (locDocs != null && !locDocs.isEmpty()) {
-                        List<Location> locations = new ArrayList();
+
                         locDocs.forEach(l -> {
                             Location loc = new Location();
                             loc.setLatitude(l.getDouble("latitude"));
                             loc.setLongitude(l.getDouble("longitude"));
                             locations.add(loc);
                         });
-                        message.setLocations(locations);
-
                     }
+                    message.setLocations(locations);
                     result.add(message);
                 }
             });

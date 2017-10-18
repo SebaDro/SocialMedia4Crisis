@@ -180,6 +180,7 @@ public abstract class AbstractClassifier {
 
     private TextPreprocessor createTextPreProcessor() {
         StopWordRemover stopWordRemover = new StopWordRemover();
+        stopWordRemover.loadStopWordList(DEFAULT_STOP_WORD_LIST);
         LowerCaseFilter lowerCaseFilter = new LowerCaseFilter();
         NonAlphabeticFilter nonAlphaFilter = new NonAlphabeticFilter();
         TextPreprocessor preProcessor = new TextPreprocessor();

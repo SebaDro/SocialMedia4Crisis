@@ -34,6 +34,8 @@ public interface MessageDocumentDao {
     List<MessageDocument> retrieveForTimeSpan(Date startTime, Date endTime);
 
     long count();
+    
+    long countUnlabeled();
 
     boolean exists(MessageDocument doc);
 

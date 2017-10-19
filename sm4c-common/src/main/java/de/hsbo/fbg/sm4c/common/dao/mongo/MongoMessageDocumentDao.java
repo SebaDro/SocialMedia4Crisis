@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import static com.mongodb.client.model.Filters.eq;
-import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 
 /**
@@ -163,6 +162,14 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
     public void createIndex() {
 //        IndexOptions indexOptions = new IndexOptions().unique(true);
         dbCollection.createIndex(Indexes.hashed("messageId"));
+    }
+
+    @Override
+    public long countUnlabeled() {
+        return dbCollection.count(Filters.and(
+                Filters.eq("training", false),
+                Filters.eq("label", "")
+        ));
     }
 
 }

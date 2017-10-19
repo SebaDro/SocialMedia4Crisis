@@ -8,12 +8,10 @@ package de.hsbo.fbg.sm4c.common.dao.mongo;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder;
-import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
-import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 

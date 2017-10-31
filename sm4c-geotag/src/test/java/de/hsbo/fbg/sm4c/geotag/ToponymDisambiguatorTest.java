@@ -13,7 +13,7 @@ import de.hsbo.fbg.sm4c.common.dao.geonames.GeonameDao;
 import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.hibernate.HibernateDatabaseConnection;
 import de.hsbo.fbg.sm4c.common.model.geonames.GeonameEntity;
-import de.hsbo.fbg.sm4c.geotag.geoparsing.AmbiguityToponym;
+import de.hsbo.fbg.sm4c.geotag.geoparsing.Toponym;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,9 +49,9 @@ public class ToponymDisambiguatorTest {
     @Test
     public void disambiguationTest() throws Exception {
         ToponymDisambiguator disambiguator = new ToponymDisambiguator();
-        AmbiguityToponym toponym1 = new AmbiguityToponym("Altenessen");
-        AmbiguityToponym toponym2 = new AmbiguityToponym("Katernberg");
-        List<AmbiguityToponym> toponyms = new ArrayList();
+        Toponym toponym1 = new Toponym("Altenessen");
+        Toponym toponym2 = new Toponym("Katernberg");
+        List<Toponym> toponyms = new ArrayList();
         toponyms.add(toponym1);
         toponyms.add(toponym2);
         try (Session session = (Session) daoFactory.initializeContext()) {
@@ -100,10 +100,10 @@ public class ToponymDisambiguatorTest {
             GeonameEntity singleResult = disambiguator.disambiguateSingleToponym(toponym2);
             Assert.assertThat(singleResult.getGeonameid(), CoreMatchers.equalTo("2892422"));
 
-            AmbiguityToponym toponym11 = new AmbiguityToponym("Kröllwitz");
-            AmbiguityToponym toponym12 = new AmbiguityToponym("Gesundbrunnen");
+            Toponym toponym11 = new Toponym("Kröllwitz");
+            Toponym toponym12 = new Toponym("Gesundbrunnen");
 
-            List<AmbiguityToponym> toponyms1 = new ArrayList();
+            List<Toponym> toponyms1 = new ArrayList();
             toponyms1.add(toponym11);
             toponyms1.add(toponym12);
             List<GeonameEntity> res = disambiguator.disambiguateToponyms(toponyms1);

@@ -44,5 +44,21 @@ public class CollectionEncoder {
         cv.setServices(services);
         return cv;
     }
+    
+        public CollectionView encodeReduced (Collection c){
+        CollectionView cv = new CollectionView();
+        cv.setId(c.getId());
+        cv.setName(c.getName());
+        cv.setDescription(c.getDescription());
+        cv.setStatus(c.getStatus().getName());       
+        cv.setCreation(c.getCreation());
+        List<String> keywords = c.getKeywords().stream().map(k -> k.getName()).collect(Collectors.toList());
+        cv.setKeywords(keywords);
+        List<String> labels = c.getLabels().stream().map(l -> l.getName()).collect(Collectors.toList());
+        cv.setLabels(labels);
+        List<String> services = c.getServices().stream().map(s -> s.getName()).collect(Collectors.toList());
+        cv.setServices(services);
+        return cv;
+    }
 
 }

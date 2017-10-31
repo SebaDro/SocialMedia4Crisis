@@ -18,8 +18,8 @@ public class CollectionView {
 
     private long id;
     private String name;
-    private String description; 
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private String description;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     private Date creation;
     private String status;
     private List<String> labels;
@@ -28,6 +28,8 @@ public class CollectionView {
     private List<FacebookSourceView> facebookSources;
 //    private ModelView model;
     private String modelSummary;
+    private long documentCount;
+    private long unlabeledCount;
 
     public String getModelSummary() {
         return modelSummary;
@@ -36,7 +38,6 @@ public class CollectionView {
     public void setModelSummary(String modelSummary) {
         this.modelSummary = modelSummary;
     }
-    private long documentCount;
 
     public CollectionView() {
 
@@ -121,14 +122,21 @@ public class CollectionView {
 //    public void setModel(ModelView model) {
 //        this.model = model;
 //    }
-    
-    
+
     public long getDocumentCount() {
         return documentCount;
     }
 
     public void setDocumentCount(long documentCount) {
         this.documentCount = documentCount;
+    }
+
+    public long getUnlabeledCount() {
+        return unlabeledCount;
+    }
+
+    public void setUnlabeledCount(long unlabeledCount) {
+        this.unlabeledCount = unlabeledCount;
     }
 
 }

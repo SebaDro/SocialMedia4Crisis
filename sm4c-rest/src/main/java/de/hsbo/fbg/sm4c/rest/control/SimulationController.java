@@ -6,7 +6,7 @@
 package de.hsbo.fbg.sm4c.rest.control;
 
 import de.hsbo.fbg.common.config.Configuration;
-import de.hsbo.fbg.sm4c.collect.FacebookApi;
+import de.hsbo.fbg.sm4c.collect.FacebookWrapper;
 import de.hsbo.fbg.sm4c.collect.encode.FacebookDecoder;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
@@ -52,7 +52,7 @@ public class SimulationController implements InitializingBean {
     @Autowired
     private FacebookDecoder fbDecoder;
 
-    private FacebookApi fbApi;
+    private FacebookWrapper fbApi;
     private MessageDocumentDao messageDocumentDao;
 
     DocumentDaoFactory documentDaoFactory;
@@ -127,7 +127,7 @@ public class SimulationController implements InitializingBean {
                 Integer.parseInt(conf.getPropertyValue("db_port")),
                 conf.getPropertyValue("db_sim_name"),
                 conf.getPropertyValue("db_sim_collection"));
-        fbApi = new FacebookApi();
+        fbApi = new FacebookWrapper();
 
     }
 }

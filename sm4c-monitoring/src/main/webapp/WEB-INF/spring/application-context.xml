@@ -31,6 +31,10 @@
     <bean class="de.hsbo.fbg.sm4c.rest.coding.FacebookSourceEncoder"/>
     <bean class="de.hsbo.fbg.sm4c.common.coding.MessageDocumentDecoder"/>
     <bean class="de.hsbo.fbg.sm4c.collect.encode.FacebookDecoder"/>
+    <bean class="de.hsbo.fbg.sm4c.classify.ModelManager"/>
+    
+    <!--Collector-->
+    <bean class="de.hsbo.fbg.sm4c.collect.SimulationCollector"/>
     
     
     <!-- hibernate -->    

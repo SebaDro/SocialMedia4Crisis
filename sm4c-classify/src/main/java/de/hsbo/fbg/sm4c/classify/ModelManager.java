@@ -23,6 +23,10 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class ModelManager {
 
     private static final String WEKA_PATH_KEY = "weka_path";
+    
+    public ModelManager(){
+        
+    }
 
     public String[] serializeModel(AbstractClassifier classifier, Collection collection) throws Exception {
         String[] paths = new String[2];

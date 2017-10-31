@@ -24,6 +24,7 @@ import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.EvaluationResult;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.model.Model;
+import de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder;
 import de.hsbo.fbg.sm4c.rest.view.MessageDocumentView;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,13 +53,17 @@ public class ModelController implements InitializingBean {
     @Autowired
     private DaoFactory<Session> daoFactory;
 
+    @Autowired
+    private MessageDocumentEncoder messageDocumentEncoder;
+
+    @Autowired
     DocumentDaoFactory documentDaoFactory;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        MongoDatabaseConnection con = new MongoDatabaseConnection();
-        con.afterPropertiesSet();
-        documentDaoFactory = new MongoDocumentDaoFactory(con);
+//        MongoDatabaseConnection con = new MongoDatabaseConnection();
+//        con.afterPropertiesSet();
+//        documentDaoFactory = new MongoDocumentDaoFactory(con);
     }
 
     @RequestMapping(value = "/collections/{id}/model/evaluate", method = RequestMethod.POST, produces = {"text/plain"})
@@ -100,7 +105,7 @@ public class ModelController implements InitializingBean {
                 List<MessageDocument> documents = documentDao.retrieveTrainingData();
 
                 ClassifierFactory factory = new ClassifierFactory();
-                AbstractClassifier classifier = factory.createClassifier(ClassifierFactory.NAIVE_BAYES_MULTINOMIAL);
+                AbstractClassifier classifier = factory.createClassifier(ClassifierFactory.SVM);
                 DatasetBuilder builder = new DatasetBuilder();
                 Dataset trainingData = builder.createDataset(collection);
                 builder.add(trainingData, documents);
@@ -116,13 +121,56 @@ public class ModelController implements InitializingBean {
                 String[] paths = manager.serializeModel(classifier, collection);
 
                 Model model = new Model();
-                Classifier cls = retrieveClassifier(ClassifierFactory.NAIVE_BAYES_MULTINOMIAL, session);
+                Classifier cls = retrieveClassifier(ClassifierFactory.SVM, session);
                 model.setClassifier(cls);
                 model.setClassifierPath(paths[0]);
                 model.setInputDataPath(paths[1]);
                 model.setEvaluation(result);
 
                 collection.setModel(model);
+                collectionDao.update(collection);
+
+//                ModelEncoder modelEncoder = new ModelEncoder();
+//                ModelView modelView = modelEncoder.encode(model);
+                return result.getClassDetails();
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
+    }
+
+    @RequestMapping(value = "/collections/{id}/model", method = RequestMethod.PUT, produces = {"text/plain"})
+    public String updateCollectionModel(@PathVariable("id") String id, @RequestBody String req) throws Exception {
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> col = collectionDao.retrieveById(Long.parseLong(id));
+            if (col.isPresent()) {
+                Collection collection = col.get();
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection);
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
+                List<MessageDocument> documents = documentDao.retrieveTrainingData();
+
+                ClassifierFactory factory = new ClassifierFactory();
+                AbstractClassifier classifier = factory.createClassifier(ClassifierFactory.SVM);
+                DatasetBuilder builder = new DatasetBuilder();
+                Dataset trainingData = builder.createDataset(collection);
+                builder.add(trainingData, documents);
+
+                classifier.setFormat(trainingData);
+                classifier.trainClassifier();
+
+                EvaluationResult result = classifier.evaluate(trainingData);
+//                EvaluationResultDao evalResultDao = daoFactory.createEvaluationResultDao(session);
+//                result = evalResultDao.store(result);
+
+                ModelManager manager = new ModelManager();
+                String[] paths = manager.serializeModel(classifier, collection);
+
+                Classifier cls = retrieveClassifier(ClassifierFactory.SVM, session);
+                collection.getModel().setClassifier(cls);
+                collection.getModel().setClassifierPath(paths[0]);
+                collection.getModel().setInputDataPath(paths[1]);
+                collection.getModel().setEvaluation(result);
+
                 collectionDao.update(collection);
 
 //                ModelEncoder modelEncoder = new ModelEncoder();
@@ -144,8 +192,13 @@ public class ModelController implements InitializingBean {
                 if (collection.get().getModel() != null) {
                     return collection.get().getModel().getEvaluation().getClassDetails();
                 }
+                else{
+                    throw new RessourceNotFoundException("The referenced model is not available");
+                }
+            } else {
+                throw new RessourceNotFoundException("The referenced collection is not available");
             }
-            throw new RessourceNotFoundException("The referenced collection is not available");
+
         }
     }
 

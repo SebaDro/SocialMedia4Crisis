@@ -166,8 +166,9 @@ public abstract class AbstractClassifier {
         filter.setOutputWordCounts(false);
 
         //Set german Snowball stemmer
-        SnowballStemmer stemmer = new SnowballStemmer("german");
-        filter.setStemmer((Stemmer) stemmer);
+//        SnowballStemmer stemmer = new SnowballStemmer();
+//        stemmer.setStemmer("german");
+//        filter.setStemmer((Stemmer) stemmer);
 
         //Set tokenizer per word
         WordTokenizer tokenizer = new WordTokenizer();

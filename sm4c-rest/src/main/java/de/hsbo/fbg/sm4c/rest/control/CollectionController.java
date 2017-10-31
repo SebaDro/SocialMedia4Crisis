@@ -6,6 +6,13 @@
 package de.hsbo.fbg.sm4c.rest.control;
 
 import com.mongodb.client.MongoCollection;
+import de.hsbo.fbg.common.config.Configuration;
+import de.hsbo.fbg.sm4c.classify.AbstractClassifier;
+import de.hsbo.fbg.sm4c.classify.ModelManager;
+import de.hsbo.fbg.sm4c.collect.AbstractReceiver;
+import de.hsbo.fbg.sm4c.collect.Collector;
+import de.hsbo.fbg.sm4c.collect.FacebookMessageHandler;
+import de.hsbo.fbg.sm4c.collect.MessageSimulationReceiver;
 import de.hsbo.fbg.sm4c.common.dao.CollectionDao;
 import de.hsbo.fbg.sm4c.common.dao.CollectionStatusDao;
 import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
@@ -45,11 +52,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import de.hsbo.fbg.sm4c.common.dao.SourceTypeDao;
-import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection;
-import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory;
+import de.hsbo.fbg.sm4c.common.dao.mongo.MongoMessageDocumentDao;
 import de.hsbo.fbg.sm4c.common.model.Status;
 import de.hsbo.fbg.sm4c.rest.coding.MessageDocumentEncoder;
 import de.hsbo.fbg.sm4c.rest.coding.ModelEncoder;
+import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -59,9 +70,12 @@ import org.springframework.web.bind.annotation.PathVariable;
  */
 @RestController
 @RequestMapping(produces = {"application/json"})
-public class CollectionController implements InitializingBean {
+public class CollectionController implements InitializingBean, DisposableBean {
 
     private static final Logger LOGGER = LogManager.getLogger(CollectionController.class);
+
+    //time period for receiving Social Media messages in seconds
+    private static final int RECEIVER_PERIOD = 30;
 
     @Autowired
     private DaoFactory<Session> daoFactory;
@@ -76,15 +90,32 @@ public class CollectionController implements InitializingBean {
     private ModelEncoder modelEncoder;
 
     @Autowired
+    private ModelManager modelManager;
+
+    @Autowired
     private MessageDocumentEncoder messageDocumentEncoder;
 
+    @Autowired
     DocumentDaoFactory documentDaoFactory;
 
+    @Autowired
+    Collector collector;
+
+    private HashMap<Long, AbstractReceiver> receiverList;
+
+    private ScheduledExecutorService scheduler;
+
     @Override
-    public void afterPropertiesSet() throws Exception {
-        MongoDatabaseConnection con = new MongoDatabaseConnection();
-        con.afterPropertiesSet();
-        documentDaoFactory = new MongoDocumentDaoFactory(con);
+    public void afterPropertiesSet() {
+        if (Configuration.getConfig().getPropertyValue("mode").equals("simulation")) {
+            try {
+                this.scheduler = Executors.newScheduledThreadPool(1);
+                prepareCollectionsForSimulation();
+            } catch (Exception ex) {
+                LOGGER.error("Can not prepare collections for simulation.", ex);
+            }
+        }
+        receiverList = new HashMap();
     }
 
     @RequestMapping(value = "/collections", method = RequestMethod.POST)
@@ -115,8 +146,6 @@ public class CollectionController implements InitializingBean {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-   
-
     @RequestMapping(value = "/collections", method = RequestMethod.GET)
     public List<CollectionView> getCollections() {
         List<CollectionView> result = new ArrayList();
@@ -124,7 +153,8 @@ public class CollectionController implements InitializingBean {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
             List<Collection> collections = collectionDao.retrieve();
             result = collections.stream()
-                    .map(c -> collectionEncoder.encode(c))
+                    .map(c -> collectionEncoder.encodeReduced(c))
+                    .sorted((e1, e2) -> Double.compare(e1.getId(), e2.getId()))
                     .collect(Collectors.toList());
         }
         return result;
@@ -132,7 +162,6 @@ public class CollectionController implements InitializingBean {
 
     @RequestMapping(value = "/collections/{id}", method = RequestMethod.GET)
     public CollectionView getCollection(@PathVariable("id") String id) throws RessourceNotFoundException {
-        List<CollectionView> result = new ArrayList();
         try (Session session = daoFactory.initializeContext()) {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
             Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
@@ -146,10 +175,82 @@ public class CollectionController implements InitializingBean {
 //                    cv.setModelSummary(collection.get().getModel().getEvaluation().getClassDetails());
 //                }
                 cv.setDocumentCount(documentDao.count());
+                cv.setUnlabeledCount(documentDao.countUnlabeled());
                 return cv;
             }
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
+    }
+
+    @RequestMapping(value = "/collections/{id}/start", method = RequestMethod.POST)
+    public ResponseEntity startCollecting(@PathVariable("id") String id) throws DatabaseException, Exception {
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> col = collectionDao.retrieveById(Long.parseLong(id));
+            if (col.isPresent()) {
+                Collection collection = col.get();
+
+                if (receiverList.containsKey(collection.getId())) {
+                    if (!collection.getStatus().getName().equals("aktiv")) {
+                        MessageSimulationReceiver receiver = (MessageSimulationReceiver) receiverList.get(collection.getId());
+                        if (receiver.runSimulationReceiver(scheduler)) {
+                            receiverList.put(collection.getId(), receiver);
+                            CollectionStatusDao statusDao = daoFactory.createCollectioStatusDao(session);
+                            CollectionStatus status = statusDao.retrieveByName(Status.ACTIVE.toString()).get();
+                            collection.setStatus(status);
+                            collectionDao.update(collection);
+                        }
+                    }
+
+                } else {
+
+                    MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection);
+                    MongoMessageDocumentDao documentDao = (MongoMessageDocumentDao) documentDaoFactory.createMessageDocumentDao(mongoCollection);
+                    AbstractClassifier classifier = modelManager.deserializeModel(collection.getModel());
+
+                    FacebookMessageHandler handler = new FacebookMessageHandler(classifier, documentDao);
+                    DateTime start = new DateTime("2013-06-05T00:00:00.000+02:00");
+                    DateTime end = new DateTime("2013-06-06T00:00:00.000+02:00");
+                    MessageSimulationReceiver receiver = new MessageSimulationReceiver(collector, 30, start, end, collection);
+                    receiver.addMessageHandler(handler);
+                    if (receiver.runSimulationReceiver(scheduler)) {
+                        receiverList.put(collection.getId(), receiver);
+                        CollectionStatusDao statusDao = daoFactory.createCollectioStatusDao(session);
+                        CollectionStatus status = statusDao.retrieveByName(Status.ACTIVE.toString()).get();
+                        collection.setStatus(status);
+                        collectionDao.update(collection);
+                    }
+                }
+
+            } else {
+                throw new RessourceNotFoundException("The specified collection is not available");
+            }
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/collections/{id}/stop", method = RequestMethod.POST)
+    public ResponseEntity stopCollecting(@PathVariable("id") String id) throws DatabaseException, Exception {
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> col = collectionDao.retrieveById(Long.parseLong(id));
+            if (col.isPresent()) {
+                Collection collection = col.get();
+                if (receiverList.containsKey(collection.getId()) && !collection.getStatus().getName().equals("gestoppt")) {
+
+                    MessageSimulationReceiver receiver = (MessageSimulationReceiver) receiverList.get(collection.getId());
+                    if (receiver.stopReceiving()) {
+                        CollectionStatusDao statusDao = daoFactory.createCollectioStatusDao(session);
+                        CollectionStatus status = statusDao.retrieveByName(Status.STOPPED.toString()).get();
+                        collection.setStatus(status);
+                        collectionDao.update(collection);
+                    }
+                }
+            } else {
+                throw new RessourceNotFoundException("The specified status is not available");
+            }
+        }
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     private CollectionStatus retrieveCollectionStatus(String status, Session session) throws RessourceNotFoundException {
@@ -238,6 +339,27 @@ public class CollectionController implements InitializingBean {
             }
         });
         return result;
+    }
+
+    private void prepareCollectionsForSimulation() throws Exception {
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            CollectionStatusDao statusDao = daoFactory.createCollectioStatusDao(session);
+            CollectionStatus stoppedStatus = statusDao.retrieveByName(Status.STOPPED.toString()).get();
+
+            List<Collection> collections = collectionDao.retrieve();
+            collections.forEach(c -> {
+                if (c.getStatus().getName().equals(Status.ACTIVE.toString())) {
+                    c.setStatus(stoppedStatus);
+                    collectionDao.update(c);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        this.receiverList.values().forEach(r -> ((AbstractReceiver) r).stopReceiving());
     }
 
 }

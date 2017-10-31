@@ -62,7 +62,7 @@ public class FacebookMessageHandler implements MessageHandler, InitializingBean 
             LOGGER.info("Document " + document.getId() + " was classified as " + label);
             document.setLabel(label);
 
-            if (document.getLabel().equals("relief")) {
+            if (!document.getLabel().equals("Sonstiges")) {
                 //find location entities in message content
                 List<Toponym> toponyms = geoparser.recognizeLocations(document.getContent());
 
@@ -90,11 +90,11 @@ public class FacebookMessageHandler implements MessageHandler, InitializingBean 
                 }
                 if (!document.getLocations().isEmpty()) {
                     this.fsPersister.addDocumentAsFeature(document, collection);
-                    LOGGER.error("Add document " + document.getId() + " to Feature-Service");
+                    LOGGER.info("Add document " + document.getId() + " to Feature-Service");
                 }
             }
-//            documentDao.store(document);
-            LOGGER.error("Store new document " + document.getId());
+            documentDao.store(document);
+            LOGGER.info("Store new document " + document.getId());
 
         });
     }

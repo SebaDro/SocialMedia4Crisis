@@ -14,16 +14,22 @@ import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import java.util.Date;
 import java.util.List;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  *
- * @author Seba
+ * @author Sebastian Drost
  */
-public class SimulationCollector implements Collector {
+public class SimulationCollector implements Collector, InitializingBean {
 
     private MessageDocumentDao documentDao;
 
     public SimulationCollector() {
+
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
         MongoSimulationDatabaseConnection con = new MongoSimulationDatabaseConnection();
         con.afterPropertiesSet();
         DocumentDaoFactory documentDaoFactory = new MongoDocumentDaoFactory(con);

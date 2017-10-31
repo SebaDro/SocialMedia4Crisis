@@ -6,10 +6,6 @@
 
 package de.hsbo.fbg.sm4c.collect;
 
-import com.mongodb.client.MongoDatabase;
-import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDatabaseConnection;
-import de.hsbo.fbg.sm4c.common.dao.mongo.MongoDocumentDaoFactory;
-import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import java.util.Date;
 import java.util.List;

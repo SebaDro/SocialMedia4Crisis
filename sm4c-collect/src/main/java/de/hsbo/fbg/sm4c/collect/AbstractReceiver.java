@@ -8,6 +8,8 @@ package de.hsbo.fbg.sm4c.collect;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,18 +19,18 @@ import org.joda.time.DateTime;
  *
  * @author Sebastian Drost
  */
-public abstract class AbstractReceiver extends Thread {
+public abstract class AbstractReceiver {
 
     protected Collector collector;
-    protected int interval; //in seconds
-    protected ThreadPoolExecutor executor;
+    protected int interval; //in minutes
+    protected ExecutorService executor;
     protected List<MessageHandler> handler;
     protected Collection collection;
 
     public AbstractReceiver(Collector collector, int interval, Collection collection) {
         this.collector = collector;
         this.interval = interval;
-        this.executor = new ThreadPoolExecutor(10, 50, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue());
+        this.executor = Executors.newCachedThreadPool();
         this.handler = new ArrayList();
         this.collection = collection;
     }
@@ -41,6 +43,6 @@ public abstract class AbstractReceiver extends Thread {
         this.handler.remove(handler);
     }
 
-    public abstract void run();
+    public abstract boolean stopReceiving();
 
 }

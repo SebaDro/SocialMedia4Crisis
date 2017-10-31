@@ -43,18 +43,53 @@ angular.module('sm4cMonitoring')
     }
 
     $scope.createModel = function() {
-      var payload = "Naive_Bayes_Multinomial";
+      displayLoadingDialog("Model wird trainiert...");
+      var payload = "SVM";
       $http.post(rootURL + '/collections/' + $routeParams.id + '/model', payload)
         .then(function success(response) {
+          $mdDialog.hide(true);
           $scope.collection.modelSummary = response.data;
-          console.log(response.summary);
+
+          var toast = $mdToast.simple()
+            .textContent('Das Model zur Kategorisierung wurde erfolgreich trainiert.')
+            .action('Schliessen')
+            .highlightAction(false)
+            .highlightClass('md-primary')
+            .hideDelay(0)
+            .position('bottom right');
+          $mdToast.show(toast);
         }, function fail(response) {
           console.log(response);
+          $mdDialog.cancel();
         });
     };
 
+    $scope.updateModel = function() {
+      displayLoadingDialog("Model wird aktualisiert...");
+      var payload = "SVM";
+      $http.put(rootURL + '/collections/' + $routeParams.id + '/model', payload)
+        .then(function success(response) {
+          $mdDialog.hide(true);
+          $scope.collection.modelSummary = response.data;
+
+          var toast = $mdToast.simple()
+            .textContent('Das Model zur Kategorisierung wurde erfolgreich aktualisiert.')
+            .action('Schliessen')
+            .highlightAction(false)
+            .highlightClass('md-primary')
+            .hideDelay(0)
+            .position('bottom right');
+          $mdToast.show(toast);
+        }, function fail(response) {
+          console.log(response);
+            $mdDialog.cancel();
+        });
+    };
+
+
     $scope.loadTrainingData = function() {
-      displayLoadingDialog();
+
+      displayLoadingDialog("Trainingsdaten werden abgerufen...");
       $http.get(rootURL + '/collections/' + $routeParams.id + '/documents/unlabeled/limit/' + $scope.trainingSize).then(function(response) {
         $mdDialog.hide(true);
         $scope.documents = response.data;
@@ -65,8 +100,12 @@ angular.module('sm4cMonitoring')
       });
     }
 
-    var displayLoadingDialog = function() {
+    var displayLoadingDialog = function(dialogContent) {
+
       $mdDialog.show({
+          locals: {
+            text: dialogContent
+          },
           controller: LoadingDialogController,
           templateUrl: 'templates/dialogs/loadingSourcesDialog.html',
           parent: angular.element(document.body),
@@ -81,8 +120,8 @@ angular.module('sm4cMonitoring')
         });
     };
 
-    var LoadingDialogController = ['$scope', '$mdDialog', function LoadingDialogController($scope, $mdDialog) {
-      $scope.loadingDialogContent = "Trainingsdaten werden abgerufen...";
+    var LoadingDialogController = ['$scope', '$mdDialog', 'text', function LoadingDialogController($scope, $mdDialog, text) {
+      $scope.loadingDialogContent = text;
       $scope.hide = function() {
         $mdDialog.hide();
       };

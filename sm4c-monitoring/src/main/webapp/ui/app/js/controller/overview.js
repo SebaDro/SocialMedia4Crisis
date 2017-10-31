@@ -16,7 +16,26 @@ angular.module('sm4cMonitoring')
         return false;
       }
     }
-    
+
+    $scope.startCollecting = function(collection){
+      $http.post(rootURL + '/collections/'+collection.id+'/start').then(function(response) {
+        collection.status = "aktiv";
+      }, function(err) {
+        console.warn(err);
+      });
+
+    }
+
+
+    $scope.stopCollecting = function(collection){
+      $http.post(rootURL + '/collections/'+collection.id+'/stop').then(function(response) {
+        collection.status = "gestoppt";
+      }, function(err) {
+        console.warn(err);
+      });
+
+    }
+
     $scope.relocateTo = function(target) {
       $location.path(target);
     };

@@ -25,17 +25,17 @@
             <td>
               <ul>
                 <li ng-repeat="keyword in collection.keywords">
-                  "{{keyword}}"
+                  {{keyword}}
                 </li>
               </ul>
             </td>
           </tr>
           <tr>
-            <th>Labels</th>
+            <th>Kategorien</th>
             <td>
               <ul>
-                <li ng-repeat="label in collection.labels">
-                  "{{label}}"
+                <li ng-repeat="label in collection.labels | filter:'!Sonstiges'">
+                  {{label}}
                 </li>
               </ul>
             </td>
@@ -52,10 +52,10 @@
               <div layout="row" layout-align="start center">
                 <div>{{collection.status}}</div>
                 <div style="margin-left:20px">
-                  <md-button class="md-icon-button" ng-disabled="isActive(collection)">
+                  <md-button class="md-icon-button" ng-disabled="isActive(collection)" ng-click="startCollecting(collection)">
                     <md-icon md-svg-icon="images/icons/play_black.svg"></md-icon>
                   </md-button>
-                  <md-button class="md-icon-button" ng-disabled="!active(collection)">
+                  <md-button class="md-icon-button" ng-disabled="!isActive(collection)" ng-click="stopCollecting(collection)">
                     <md-icon md-svg-icon="images/icons/stop_black.svg"></md-icon>
                   </md-button>
                 </div>

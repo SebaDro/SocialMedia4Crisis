@@ -24,12 +24,17 @@
             <md-icon md-svg-icon="images/icons/update_black_18px.svg"></md-icon>Model erstellen</md-button>
         </div>
       </div>
-      <div layout="column" ng-show="collection.modelSummary">
+      <div layout="column" ng-show="collection.modelSummary" >
         <md-content flex layout-padding>
           <h3>Modeldetails</h3>
           <pre>{{collection.modelSummary}}</pre>
         </md-content>
-        <p class="md-subhead">Sie können weitere Trainingsdaten kategorisieren um das Model zu aktualisieren.</p>
+        <div layout="row">
+          <p flex class="md-subhead">Sie können weitere Trainingsdaten kategorisieren um das Model zu aktualisieren.</p>
+          <div layout-align="end center"><md-button flex class="md-raised" ng-click="updateModel()">
+            <md-icon md-svg-icon="images/icons/update_black_18px.svg"></md-icon>Model aktualisieren</md-button></div>
+        </div>
+
       </div>
     </md-card-content>
   </md-card>
@@ -49,7 +54,7 @@
         <h3>1) Auswahl der Trainingsdaten</h3>
         <p class="md-subhead">Wählen Sie zunächst aus, wieviele Trainingsdaten Sie kategorisieren möchten:</p>
         <md-slider-container>
-          <md-slider flex md-discrete step="100" min="0" max="{{collection.documentCount}}" ng-model="trainingSize" aria-label="trainingSize" id="sizeSlider" ng-change="sliderChanged()" ng-disabled="documents">
+          <md-slider flex md-discrete step="100" min="0" max="{{collection.unlabeledCount}}" ng-model="trainingSize" aria-label="trainingSize" id="sizeSlider" ng-change="sliderChanged()" ng-disabled="documents">
           </md-slider>
         </md-slider-container>
         <div>
@@ -73,7 +78,7 @@
             <div class="document-div" layout-align="center start" layout="column" ng-repeat="document in documents | limitTo: 1 : currentIndex" flex>
               <h3>{{document.facebookSource.name}}</h3>
               <p class="md-body-1">{{document.content}}</p>
-              <p class="md-caption">Veröffentlichung: {{document.creationTime  | date : 'dd.MM.yyyy, HH:mm:ss' : '+0200'}} Uhr</p>
+              <p class="md-caption">Veröffentlichung: {{document.creationTime | date : 'dd.MM.yyyy, HH:mm:ss' : '+0200'}} Uhr</p>
             </div>
             <md-divider></md-divider>
             <div layout="column">

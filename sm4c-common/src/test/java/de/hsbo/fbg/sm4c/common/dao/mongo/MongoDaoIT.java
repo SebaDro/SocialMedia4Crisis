@@ -6,8 +6,6 @@
 package de.hsbo.fbg.sm4c.common.dao.mongo;
 
 import com.mongodb.client.MongoCollection;
-import de.hsbo.fbg.sm4c.common.coding.MessageDocumentEncoder;
-import de.hsbo.fbg.sm4c.common.dao.DaoFactory;
 import de.hsbo.fbg.sm4c.common.dao.DocumentDaoFactory;
 import de.hsbo.fbg.sm4c.common.model.Collection;
 import de.hsbo.fbg.sm4c.common.model.FacebookMessageDocument;
@@ -19,13 +17,11 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import de.hsbo.fbg.sm4c.common.model.Location;
 import java.util.ArrayList;
 import java.util.List;
-import org.hibernate.Session;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

@@ -119,10 +119,13 @@ div.collection-details {
   fill: rgba(0, 0, 0, 0.26);
 }
 
-.document-div {
+/*.document-div {
   width: 400px;
-  overflow-y: scroll;
 }
+
+.content-div {
+  overflow-y: scroll;
+}*/
 
 #map {
   position: absolute;
@@ -146,6 +149,11 @@ div.collection-details {
 }
 
 .custom-slider.rzslider .rz-tick {
+  width: 1px;
+ height: 10px;
+ margin-left: 4px;
+ border-radius: 0;
+ top: -1px;
   background: #f3e0e0;
 }
 

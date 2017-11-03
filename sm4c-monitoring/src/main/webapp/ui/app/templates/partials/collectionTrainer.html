@@ -75,14 +75,15 @@
             </md-button>
           </div>
           <md-whiteframe class="md-whiteframe-1dp" layout-padding layout="column" style="height:400px">
-            <div class="document-div" layout-align="center start" layout="column" ng-repeat="document in documents | limitTo: 1 : currentIndex" flex>
-              <h3>{{document.facebookSource.name}}</h3>
-              <p class="md-body-1">{{document.content}}</p>
-              <p class="md-caption">Veröffentlichung: {{document.creationTime | date : 'dd.MM.yyyy, HH:mm:ss' : '+0200'}} Uhr</p>
+            <div flex="80" style="width: 400px;" layout-align="center start" layout="column" ng-repeat="document in documents | limitTo: 1 : currentIndex">
+              <div><h3>{{document.facebookSource.name}}</h3></div>
+              <div style="overflow-y: scroll;" class="md-body-1"> {{document.content}}</div>
+              <div class="md-caption">Veröffentlichung: {{document.creationTime | date : 'dd.MM.yyyy, HH:mm:ss' : '+0200'}} Uhr</div>
+
             </div>
             <md-divider></md-divider>
-            <div layout="column">
-              <p>Labels zur Auswahl:</p>
+            <div layout="column" >
+              <p>Kategorien zur Auswahl:</p>
               <md-radio-group ng-model="classifiedLabel">
                 <md-radio-button ng-repeat="label in collection.labels" value="{{label}}" ng-disabled=" d.isDisabled ">{{label}}</md-radio-button>
               </md-radio-group>

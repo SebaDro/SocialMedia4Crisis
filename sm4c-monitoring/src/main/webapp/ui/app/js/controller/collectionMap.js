@@ -1,46 +1,80 @@
 angular.module('sm4cMonitoring')
-  .controller('CollectionMapCtrl', ['$scope', '$http', '$location', '$routeParams', '$mdDialog', '$mdToast', '$filter', '$interval', 'collectionService', 'esriRegistry', 'esriLoader', function($scope, $http, $location, $routeParams, $mdDialog, $mdToast, $filter, $interval, collectionService, esriRegistry, esriLoader) {
+  .controller('CollectionMapCtrl', ['$scope', '$http', '$location', '$routeParams', '$mdDialog', '$mdToast', '$filter', '$interval', '$window', '$mdMedia', '$timeout', 'collectionService', 'esriRegistry', 'esriLoader', function($scope, $http, $location, $routeParams, $mdDialog, $mdToast, $filter, $interval, $window, $mdMedia, $timeout, collectionService, esriRegistry, esriLoader) {
     var rootURL = 'http://localhost:8080/sm4c-monitoring/rest';
     var featureLayer = {};
     var featureLayerURL = 'https://services6.arcgis.com/RF3oqOe1dChQus9k/arcgis/rest/services/sm4c/FeatureServer/0';
     var facebookURL = 'https://www.facebook.com';
 
-    $http.get(rootURL + '/collections/' + $routeParams.id + '/documents/labeled').then(function(response) {
-      $scope.documents = response.data;
-    }, function(err) {
-      console.warn(err);
-    });
-
     var dates = [];
     var startDate = new Date();
     var endDate = startDate;
-    // var promise;
-    //
-    // function updateTime() {
-    //   console.log(new Date());
-    // }
-    // $scope.start = function() {
-    //   $scope.stop();
-    //   promise = $interval(updateTime, 1000);
-    // };
-    //
-    // $scope.stop = function() {
-    //   $interval.cancel(promise);
-    // };
-    //
-    // $scope.$on('$destroy', function() {
-    //   $scope.stop();
-    // });
-    //
-    // $scope.start();
+
+    loadDocuments();
+
+    var flag = false;
+    if (!$mdMedia('gt-md')) {
+      flag = true;
+    }
+
+    angular.element($window).on('resize', function() {
+      if (!$mdMedia('gt-md') && flag == true) {
+        refreshSlider();
+        flag = false;
+      }
+      if ($mdMedia('gt-md') && flag == false) {
+        refreshSlider();
+        flag = true;
+      }
+    });
+
+    function refreshSlider() {
+      $timeout(function() {
+        console.log("Refreshed");
+        $scope.$broadcast('rzSliderForceRender');
+      }, 500);
+    };
+
+
+
+    function updateMessages() {
+      console.log("Refresh documents and features")
+      loadDocuments();
+      $scope.featureLayer.refresh();
+    }
+
+    var promise;
+
+    $scope.start = function() {
+      $scope.stop();
+      promise = $interval(updateMessages, 30000);
+    };
+
+    $scope.stop = function() {
+      $interval.cancel(promise);
+    };
+
+    $scope.$on('$destroy', function() {
+      $scope.stop();
+    });
+
+    $scope.start();
+
+
+    function loadDocuments() {
+      $http.get(rootURL + '/collections/' + $routeParams.id + '/documents/labeled').then(function(response) {
+        $scope.documents = response.data;
+      }, function(err) {
+        console.warn(err);
+      });
+    }
 
     initSlider(getDates(startDate, endDate));
 
-    this.refreshSlider = function() {
-      $timeout(function() {
-        $scope.$broadcast('rzSliderForceRender');
-      });
-    };
+
+
+    //     $scope.$$postDigest(function () {
+    //     $scope.$broadcast('rzSliderForceRender');
+    // });
 
     Date.prototype.addDays = function(days) {
       var date = new Date(this.valueOf());
@@ -97,7 +131,7 @@ angular.module('sm4cMonitoring')
           stepsArray: dates,
           noSwitching: true,
           onEnd: timeIntervalChanged,
-          showTicks: true,
+          showTicks: false,
           disabled: true,
           translate: function(date) {
             if (date != null)
@@ -108,18 +142,11 @@ angular.module('sm4cMonitoring')
       };
     }
 
-
-
     function timeIntervalChanged() {
-      var minDateStr = getDateTimeString($scope.slider.minValue);
-      var maxDateStr = getDateTimeString($scope.slider.maxValue);
-      var expr = "creation >= date '" + minDateStr + "' AND creation <= date '" + maxDateStr + "'";
-      featureLayer.setDefinitionExpression(expr);
-      // featureLayer.setDefinitionExpression("creation < date '2013-06-02 20:00:00'");
-    }
-
-    $scope.test = function() {
-      featureLayer.setDefinitionExpression("creation < date '2013-06-03 20:00:00.000Z' AND");
+      $scope.timeDef.startTime = $scope.slider.minValue;
+      $scope.timeDef.endTime = $scope.slider.maxValue;
+      loadDocuments();
+      $scope.featureLayer.setTimeDefinition($scope.timeDef);
     }
 
     esriLoader.require([
@@ -133,6 +160,7 @@ angular.module('sm4cMonitoring')
       "esri/dijit/InfoWindow",
       "esri/dijit/Popup",
       "esri/dijit/PopupTemplate",
+      "esri/TimeExtent",
       "dojo/domReady!"
     ], function(
       Map,
@@ -144,11 +172,13 @@ angular.module('sm4cMonitoring')
       InfoTemplate,
       InfoWindow,
       Popup,
-      PopupTemplate
+      PopupTemplate,
+      TimeExtent
     ) {
       console.log("Test");
 
       var customActions;
+      $scope.timeDef = new TimeExtent();
 
       var map = new Map("overviewMap", {
         basemap: "osm",
@@ -191,44 +221,35 @@ angular.module('sm4cMonitoring')
       function mapLoadHandler(evt) {
         var map = evt.map;
         map.on("click", onMapClick);
-        featureLayer = new FeatureLayer(featureLayerURL, {
-          mode: FeatureLayer.MODE_ONDEMAND,
+        $scope.featureLayer = new FeatureLayer(featureLayerURL, {
+          mode: FeatureLayer.MODE_SNAPSHOT,
           outFields: ["*"],
           infoTemplate: template
         });
-        featureLayer.on("load", layerLoadHandler)
-        featureLayer.setDefinitionExpression("collectionId = '" + $routeParams.id + "'");
-        map.addLayer(featureLayer);
-
+        $scope.featureLayer.on("load", layerLoadHandler)
+        $scope.featureLayer.setDefinitionExpression("collectionId = '" + $routeParams.id + "'");
+        map.addLayer($scope.featureLayer);
       }
 
 
       var onMapClick = function(evt) {
         var graphic = evt.graphic;
-        // var docs =  $scope.documents;
-        // var query = new Query();
-        // query.geometry = pointToExtent(map, evt.mapPoint, 10);
-        // // var deferred = featureLayer.selectFeatures(query,
-        // //   FeatureLayer.SELECTION_NEW);
-        // map.infoWindow.setTitle("Hochwasser-Helfer<br> Halle und Saalekreis");
-        // map.infoWindow.setContent("<h4>An der Peißnitzbrücke werden noch dringend Helfer für das Befüllen von Sandsäcken gebraucht!!!</h4><br>06.06.2013 13:06 Uhr");
-        // // map.infoWindow.setFeatures([deferred]);
-        // map.infoWindow.show(evt.mapPoint, map.getInfoWindowAnchor(evt.mapPoint));
-        // map.infoWindow.set("anchor", "right");
       }
 
       function layerLoadHandler(evt) {
         var layer = evt.layer;
-        var timeDef = evt.layer.timeInfo.timeExtent;
-        var startTime = evt.layer.timeInfo.timeExtent.startTime;
+        // var timeDef = evt.layer.timeInfo.timeExtent;
+        // var startTime = evt.layer.timeInfo.timeExtent.startTime;
         // var endTime = evt.layer.timeInfo.timeExtent.endTime;
-        var endTime = new Date(2013, 5, 4)
+        var startTime = new Date(2013, 5, 1)
+        var endTime = new Date(2013, 5, 30)
         dates = getDates(startTime, endTime);
         $scope.slider.options.disabled = false;
         updateSlider(dates);
         $scope.$broadcast('rzSliderForceRender');
         console.log("Layer loaded");
       }
+
     });
 
     function updateSlider(dates) {

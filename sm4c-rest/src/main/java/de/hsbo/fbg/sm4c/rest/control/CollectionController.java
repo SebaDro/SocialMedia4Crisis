@@ -182,6 +182,30 @@ public class CollectionController implements InitializingBean, DisposableBean {
         }
     }
 
+    @RequestMapping(value = "/collections/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity deleteCollection(@PathVariable("id") String id) throws RessourceNotFoundException {
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            FacebookSourceDao sourceDao = daoFactory.createFacebookSourceDao(session);
+            LabelDao labelDao = daoFactory.createLabelDao(session);
+            KeywordDao keywordDao = daoFactory.createKeywordDao(session);
+
+            Optional<Collection> col = collectionDao.retrieveById(Long.parseLong(id));
+            if (col.isPresent()) {
+                Collection collection = col.get();
+
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection);
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
+                documentDao.removeAll();
+
+                collectionDao.remove(collection);
+            
+                return new ResponseEntity(HttpStatus.OK);
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
+    }
+
     @RequestMapping(value = "/collections/{id}/start", method = RequestMethod.POST)
     public ResponseEntity startCollecting(@PathVariable("id") String id) throws DatabaseException, Exception {
         try (Session session = daoFactory.initializeContext()) {
@@ -291,6 +315,11 @@ public class CollectionController implements InitializingBean, DisposableBean {
                 result.add(lab);
             }
         });
+        Optional<Label> lbl = labelDao.retrieveByName("Sonstiges");
+        if (lbl.isPresent()) {
+            result.add(lbl.get());
+        }
+
         return result;
     }
 

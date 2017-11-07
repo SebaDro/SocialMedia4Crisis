@@ -44,6 +44,8 @@ public interface MessageDocumentDao {
     void store(MessageDocument doc);
 
     void store(List<MessageDocument> docs);
+    
+    void updateDefault(MessageDocument doc);
 
     void update(MessageDocument doc, String field);
 

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,25 +46,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(produces = {"application/json"})
 public class DocumentController implements InitializingBean {
-
+    
     private static final Logger LOGGER = LogManager.getLogger(DocumentController.class);
-
+    
     @Autowired
     private DaoFactory<Session> daoFactory;
-
+    
     @Autowired
     private MessageDocumentEncoder messageDocumentEncoder;
-
+    
     @Autowired
     DocumentDaoFactory documentDaoFactory;
-
+    
     @Override
     public void afterPropertiesSet() throws Exception {
 //        MongoDatabaseConnection con = new MongoDatabaseConnection();
 //        con.afterPropertiesSet();
 //        documentDaoFactory = new MongoDocumentDaoFactory(con);
     }
-
+    
     @RequestMapping(value = "/collections/{id}/documents", method = RequestMethod.POST)
     public ResponseEntity initiateCollectionDocuments(@PathVariable("id") String id, @RequestBody TimeDefinitionView req) throws Exception {
         try (Session session = daoFactory.initializeContext()) {
@@ -72,7 +73,7 @@ public class DocumentController implements InitializingBean {
             if (collection.isPresent()) {
                 FacebookCollector collector = new FacebookCollector(collection.get());
                 List<MessageDocument> documents = collector.collectMessages(req.getStartTime(), req.getEndTime());
-
+                
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
                 MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
 //                List<MessageDocument> documents = documentDao.retrieve();
@@ -83,28 +84,54 @@ public class DocumentController implements InitializingBean {
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
     }
-
-    @RequestMapping(value = "/collections/{id}/documents/unlabeled/limit/{limit}", method = RequestMethod.GET)
-    public List<MessageDocumentView> getUnlabeledCollectionDocuments(@PathVariable("id") String id, @PathVariable("limit") String limit) throws RessourceNotFoundException {
+    
+    @RequestMapping(value = "/collections/{id}/documents", method = RequestMethod.GET)
+    public List<MessageDocumentView> getCollectionDocuments(@PathVariable("id") String id) throws RessourceNotFoundException {
         List<MessageDocumentView> result = new ArrayList();
-
+        
         try (Session session = daoFactory.initializeContext()) {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
             Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
             if (collection.isPresent()) {
-
+                
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
+                List<MessageDocument> documents = documentDao.retrieve();
+                
+                if (documents.isEmpty()) {
+                    throw new RessourceNotFoundException("There are no documents");
+                }
+                
+                result = documents.stream()
+                        .map(d -> messageDocumentEncoder.encode(d))
+                        .collect(Collectors.toList());
+                return result;
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
+    }
+    
+    @RequestMapping(value = "/collections/{id}/documents/unlabeled/limit/{limit}", method = RequestMethod.GET)
+    public List<MessageDocumentView> getUnlabeledCollectionDocuments(@PathVariable("id") String id, @PathVariable("limit") String limit) throws RessourceNotFoundException {
+        List<MessageDocumentView> result = new ArrayList();
+        
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
+            if (collection.isPresent()) {
+                
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
                 MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
                 List<MessageDocument> documents = documentDao.retrieveUnlabeledData();
-
+                
                 if (documents.isEmpty()) {
                     throw new RessourceNotFoundException("There are no unlabeled documents");
                 }
-
+                
                 Random random = new Random();
                 random.setSeed(42);
                 Collections.shuffle(documents, random);
-
+                
                 documents = documents.subList(0, Integer.parseInt(limit));
                 result = documents.stream()
                         .map(d -> messageDocumentEncoder.encode(d))
@@ -114,24 +141,24 @@ public class DocumentController implements InitializingBean {
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
     }
-
+    
     @RequestMapping(value = "/collections/{id}/documents/labeled", method = RequestMethod.GET)
     public List<MessageDocumentView> getLabeledCollectionDocuments(@PathVariable("id") String id) throws RessourceNotFoundException {
         List<MessageDocumentView> result = new ArrayList();
-
+        
         try (Session session = daoFactory.initializeContext()) {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
             Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
             if (collection.isPresent()) {
-
+                
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
                 MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
                 List<MessageDocument> documents = documentDao.retrieveLabeledData();
-
+                
                 if (documents.isEmpty()) {
                     throw new RessourceNotFoundException("There are no labeled documents");
                 }
-
+                
                 result = documents.stream()
                         .map(d -> messageDocumentEncoder.encode(d))
                         .collect(Collectors.toList());
@@ -140,16 +167,16 @@ public class DocumentController implements InitializingBean {
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
     }
-
+    
     @RequestMapping(value = "/collections/{id}/documents/training", method = RequestMethod.GET)
     public List<MessageDocumentView> getTrainingCollectionDocuments(@PathVariable("id") String id) throws RessourceNotFoundException {
         List<MessageDocumentView> result = new ArrayList();
-
+        
         try (Session session = daoFactory.initializeContext()) {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
             Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
             if (collection.isPresent()) {
-
+                
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
                 MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
                 List<MessageDocument> documents = documentDao.retrieveTrainingData();
@@ -161,23 +188,56 @@ public class DocumentController implements InitializingBean {
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
     }
-
+    
     @RequestMapping(value = "/collections/{collection_id}/documents/{id}", method = RequestMethod.GET)
-    public MessageDocumentView getTrainingCollectionDocument(@PathVariable("collection_id") String collectionId, @PathVariable("id") String id) throws RessourceNotFoundException {
-
+    public MessageDocumentView getCollectionDocument(@PathVariable("collection_id") String collectionId, @PathVariable("id") String id) throws RessourceNotFoundException {
+        
         try (Session session = daoFactory.initializeContext()) {
             CollectionDao collectionDao = daoFactory.createCollectionDao(session);
             Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(collectionId));
             if (collection.isPresent()) {
-
+                
                 MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
                 MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
                 MessageDocument result = documentDao.retrieveById(id);
-
+                if (result == null) {
+                    throw new RessourceNotFoundException("The referenced document is not available");
+                }
+                
                 return messageDocumentEncoder.encode(result);
             }
             throw new RessourceNotFoundException("The referenced collection is not available");
         }
     }
-
+    
+    @RequestMapping(value = "/collections/{id}/documents/update", method = RequestMethod.POST)
+    public ResponseEntity updateDocuments(@PathVariable("id") String id, @RequestBody List<MessageDocumentView> req) throws Exception {
+        try (Session session = daoFactory.initializeContext()) {
+            CollectionDao collectionDao = daoFactory.createCollectionDao(session);
+            Optional<Collection> collection = collectionDao.retrieveById(Long.parseLong(id));
+            if (collection.isPresent()) {
+                
+                MongoCollection mongoCollection = (MongoCollection) documentDaoFactory.getContext(collection.get());
+                MessageDocumentDao documentDao = documentDaoFactory.createMessageDocumentDao(mongoCollection);
+                req.forEach(mdv -> {
+                    try {
+                        MessageDocument doc = documentDao.retrieveById(mdv.getId());
+                        if (doc == null) {
+                            
+                            throw new RessourceNotFoundException("The referenced document is not available");
+                        }
+                        
+                        doc.setLabel(mdv.getLabel());
+                        doc.setTraining(mdv.getTraining());
+                        documentDao.updateDefault(doc);
+                    } catch (RessourceNotFoundException ex) {
+                        LOGGER.error("Updating a message document failed.", ex);
+                    }
+                });
+                return new ResponseEntity(HttpStatus.OK);
+            }
+            throw new RessourceNotFoundException("The referenced collection is not available");
+        }
+    }
+    
 }

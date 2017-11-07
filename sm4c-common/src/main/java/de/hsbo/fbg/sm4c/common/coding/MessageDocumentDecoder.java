@@ -60,6 +60,52 @@ public class MessageDocumentDecoder {
      * @param doc MongoDB document
      * @return decoded FacebookMessage
      */
+    public MessageDocument decodeFacebookMessage(Document doc) {
+
+        try (Session session = (Session) daoFactory.initializeContext()) {
+
+            FacebookSourceDao sourceDao = daoFactory.createFacebookSourceDao(session);
+            MessageDocument message = new FacebookMessageDocument();
+            if (doc.getString("service").equals(Services.FACEBOOK.toString())) {
+                message.setService(Services.FACEBOOK.toString());
+                ((FacebookMessageDocument) message).setType(doc.getString("type"));
+                Document sourceDoc = (Document) doc.get("source");
+                FacebookSource source;
+                try {
+                    source = retrieveFacebookSource(sourceDoc.getString("id"), sourceDao);
+                    ((FacebookMessageDocument) message).setSource(source);
+                } catch (Exception ex) {
+                    LOGGER.error("Can not decode referenced source", ex);
+                }
+            }
+            message.setId(doc.getString("messageId"));
+            message.setLabel(doc.getString("label"));
+            message.setContent(doc.getString("content"));
+            message.setTraining(doc.getBoolean("training"));
+            message.setCreationTime(new DateTime(doc.getDate("creationTime")));
+            message.setUpdateTime(new DateTime(doc.getDate("updateTime")));
+            List<Document> locDocs = (List<Document>) doc.get("locations");
+            List<Location> locations = new ArrayList();
+            if (locDocs != null && !locDocs.isEmpty()) {
+
+                locDocs.forEach(l -> {
+                    Location loc = new Location();
+                    loc.setLatitude(l.getDouble("latitude"));
+                    loc.setLongitude(l.getDouble("longitude"));
+                    locations.add(loc);
+                });
+            }
+            message.setLocations(locations);
+            return message;
+        }
+    }
+
+    /**
+     * Decodes MongoDB documents to FacebookMessages
+     *
+     * @param doc MongoDB document
+     * @return decoded FacebookMessage
+     */
     public List<MessageDocument> decodeFacebookMessages(FindIterable<Document> documents) {
 
         List<MessageDocument> result = new ArrayList();

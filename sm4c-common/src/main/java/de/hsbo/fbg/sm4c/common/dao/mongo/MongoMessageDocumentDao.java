@@ -23,6 +23,8 @@ import de.hsbo.fbg.sm4c.common.model.MessageDocument;
 import de.hsbo.fbg.sm4c.common.dao.MessageDocumentDao;
 import static com.mongodb.client.model.Filters.eq;
 import com.mongodb.client.model.Indexes;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -52,9 +54,13 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
 
     @Override
     public MessageDocument retrieveById(String id) {
-        FindIterable<Document> document = dbCollection.find(eq("messageId", id));
-        MessageDocument message = messageDocDecoder.decodeFacebookMessages(document).get(0);
-        return message;
+        Document document = dbCollection.find(eq("messageId", id)).first();
+        if(document != null){
+            return messageDocDecoder.decodeFacebookMessage(document);
+        }
+        else{
+            return null;
+        }
     }
 
     @Override
@@ -151,6 +157,15 @@ public class MongoMessageDocumentDao implements MessageDocumentDao {
         dbCollection.updateOne(
                 eq("messageId", doc.getId()),
                 new Document("$set", new Document(field, updatedDoc.get(field))));
+    }
+
+    @Override
+    public void updateDefault(MessageDocument doc) {
+        Document updatedDoc = messageDocEncoder.encodeMessageToDocument((FacebookMessageDocument) doc);
+        dbCollection.updateOne(
+                eq("messageId", doc.getId()),
+                new Document("$set", new Document("label", updatedDoc.getString("label"))
+                        .append("training", updatedDoc.getBoolean("training"))));
     }
 
     @Override

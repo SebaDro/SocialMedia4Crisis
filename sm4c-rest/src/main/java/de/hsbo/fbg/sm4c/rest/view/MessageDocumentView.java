@@ -66,7 +66,7 @@ public class MessageDocumentView {
         this.service = service;
     }
 
-    public boolean isTraining() {
+    public boolean getTraining() {
         return training;
     }
 
